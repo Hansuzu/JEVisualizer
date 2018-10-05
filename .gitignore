@@ -1,4 +1,4 @@
-bin
+bin/*
 !bin/main.config
 !bin/layer1.config
 !bin/layer0.config
