@@ -1,0 +1,10 @@
+bin
+!bin/main.config
+!bin/layer1.config
+!bin/layer0.config
+!bin/visualizer.config
+build
+doc/document
+doc/help_layer_config
+doc/help_main_config
+doc/help_visualizer_config
