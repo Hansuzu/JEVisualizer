@@ -1,5 +1,5 @@
 # JEVisualizer
-JEVisualizer is a program that creates a visualization video for music. The development started, when we wanted to add visualizations for our music on YouTube.
+JEVisualizer is a program that creates a visualization video for music. The development started, when we wanted to add visualizations for our music on YouTube. One important goal is to develop JEVisualizer in such a way that it can be configured to create very different visualizations - only imagination should be the limit.
 
 Some examples about visualizations made with JEVisualizer can be found on our YouTube channel, [John Egestas](https://www.youtube.com/channel/UCSA9SAK2T-KkLAR59Jwy78w)
 
