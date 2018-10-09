@@ -16,4 +16,4 @@ mkdir build
 make all
 ```
 ## How to use
-Edit config files on bin/ to make the visualizer do what you want and run bin/main.
+Edit config files on bin/ to make the visualizer do what you want and run bin/JEVisualizer .
