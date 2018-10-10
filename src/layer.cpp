@@ -1,5 +1,4 @@
 #include <layer.h>
-#include <config.h>
 #include <iostream>
 
 

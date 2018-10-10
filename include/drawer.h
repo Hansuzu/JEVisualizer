@@ -1,10 +1,11 @@
 #include <vector>
 #include <string>
 #include <opencv2/imgproc.hpp>
+#include <config.h>
+#include <trackcontroller.h>
+#include <fpe.h>
 #include <formula.h>
 #include <formulacolor.h>
-#include <fpe.h>
-#include <trackcontroller.h>
 
 #ifndef DRAWER_H
 #define DRAWER_H

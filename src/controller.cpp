@@ -1,5 +1,4 @@
 #include <controller.h>
-#include <config.h>
 #include <vector>
 #include <string>
 

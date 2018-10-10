@@ -1,8 +1,9 @@
 #include <wav.h>
 #include <mmp.h>
-#include <visualizer.h>
 //#include <system.h>
+#include <visualizer.h>
 #include <fstream>
+#include <config.h>
 
 //Class to read main config and do stuff and 
 

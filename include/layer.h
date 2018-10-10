@@ -3,12 +3,13 @@
 #include <opencv2/core.hpp>        // Basic OpenCV structures (cv::Mat)
 #include <opencv2/imgproc.hpp>    // Basic OpenCV structures (cv::Mat)
 #include <opencv2/highgui.hpp> 
+#include <config.h>
+#include <trackcontroller.h>
 #include <fpe.h>
 #include <formula.h>
 #include <formulacolor.h>
 #include <drawer.h>
 #include <filter.h>
-#include <trackcontroller.h>
 
 #ifndef LAYER_H
 #define LAYER_H

@@ -1,5 +1,4 @@
 #include <visualizer.h>
-#include <config.h>
 #include <string>
 #include <bits/stdc++.h>
 using namespace std;

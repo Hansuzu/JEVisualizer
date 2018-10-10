@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <opencv2/imgproc.hpp>
+#include <config.h>
 #include <trackcontroller.h>
 #include <fpe.h>
 #include <formula.h>

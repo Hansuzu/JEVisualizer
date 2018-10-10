@@ -2,9 +2,10 @@
 #include <opencv2/core.hpp>        // Basic OpenCV structures (cv::Mat)
 #include <opencv2/highgui.hpp>     // Video write
 #include <fstream>
-#include <layer.h>
+#include <config.h>
 #include <trackcontroller.h>
-
+#include <fpe.h>
+#include <layer.h>
 
 #ifndef VISUALIZER_H
 #define VISUALIZER_H

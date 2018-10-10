@@ -1,6 +1,6 @@
 #include <iostream>
 #include <drawer.h>
-#include <config.h>
+
 
 void Drawer::setFPEV(std::string& key, std::string& value){
   int index=std::stoi(key);
