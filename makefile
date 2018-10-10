@@ -26,7 +26,7 @@ $(BUILDDIR)/mmp.o: $(SRCDIR)/mmp.cpp $(HEADERDIR)/mmp.h
 
 
 
-$(BUILDDIR)/visualizer.o: $(SRCDIR)/visualizer.cpp $(HEADERDIR)/visualizer.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/layer.h
+$(BUILDDIR)/visualizer.o: $(SRCDIR)/visualizer.cpp $(HEADERDIR)/visualizer.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/layer.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h $(HEADERDIR)/drawer.h $(HEADERDIR)/filter.h
 	$(CC) $(CFLAGS) $(SRCDIR)/visualizer.cpp -o $(BUILDDIR)/visualizer.o -c  $(OPENCV_FLAGS)
 
 $(BUILDDIR)/layer.o: $(SRCDIR)/layer.cpp $(HEADERDIR)/layer.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h $(HEADERDIR)/drawer.h $(HEADERDIR)/filter.h
