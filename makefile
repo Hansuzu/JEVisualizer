@@ -26,22 +26,22 @@ $(BUILDDIR)/mmp.o: $(SRCDIR)/mmp.cpp $(HEADERDIR)/mmp.h
 
 
 
-$(BUILDDIR)/visualizer.o: $(SRCDIR)/visualizer.cpp $(HEADERDIR)/visualizer.h $(BUILDDIR)/layer.o
+$(BUILDDIR)/visualizer.o: $(SRCDIR)/visualizer.cpp $(HEADERDIR)/visualizer.h $(HEADERDIR)/layer.h
 	$(CC) $(CFLAGS) $(SRCDIR)/visualizer.cpp -o $(BUILDDIR)/visualizer.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/layer.o: $(SRCDIR)/layer.cpp $(HEADERDIR)/layer.h $(BUILDDIR)/drawer.o $(BUILDDIR)/filter.o
+$(BUILDDIR)/layer.o: $(SRCDIR)/layer.cpp $(HEADERDIR)/layer.h $(BUILDDIR)/drawer.o $(HEADERDIR)/filter.h
 	$(CC) $(CFLAGS) $(SRCDIR)/layer.cpp -o $(BUILDDIR)/layer.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/drawer.o: $(SRCDIR)/drawer.cpp $(HEADERDIR)/drawer.h $(BUILDDIR)/formulacolor.o $(BUILDDIR)/config.o $(BUILDDIR)/trackcontroller.o
+$(BUILDDIR)/drawer.o: $(SRCDIR)/drawer.cpp $(HEADERDIR)/drawer.h $(HEADERDIR)/formulacolor.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h
 	$(CC) $(CFLAGS) $(SRCDIR)/drawer.cpp -o $(BUILDDIR)/drawer.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/filter.o: $(SRCDIR)/filter.cpp $(HEADERDIR)/filter.h $(BUILDDIR)/formula.o $(BUILDDIR)/config.o $(BUILDDIR)/trackcontroller.o
+$(BUILDDIR)/filter.o: $(SRCDIR)/filter.cpp $(HEADERDIR)/filter.h $(HEADERDIR)/formula.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h
 	$(CC) $(CFLAGS) $(SRCDIR)/filter.cpp -o $(BUILDDIR)/filter.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/formulacolor.o: $(SRCDIR)/formulacolor.cpp $(HEADERDIR)/formulacolor.h $(BUILDDIR)/formula.o
+$(BUILDDIR)/formulacolor.o: $(SRCDIR)/formulacolor.cpp $(HEADERDIR)/formulacolor.h $(HEADERDIR)/formula.h
 	$(CC) $(CFLAGS) $(SRCDIR)/formulacolor.cpp -o $(BUILDDIR)/formulacolor.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/formula.o: $(SRCDIR)/formula.cpp $(HEADERDIR)/formula.h $(BUILDDIR)/fpe.o
+$(BUILDDIR)/formula.o: $(SRCDIR)/formula.cpp $(HEADERDIR)/formula.h $(HEADERDIR)/fpe.h
 	$(CC) $(CFLAGS) $(SRCDIR)/formula.cpp -o $(BUILDDIR)/formula.o -c  $(OPENCV_FLAGS)
 
 $(BUILDDIR)/fpe.o: $(SRCDIR)/fpe.cpp $(HEADERDIR)/fpe.h

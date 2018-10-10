@@ -201,7 +201,7 @@ void WavFile::print(){
 
 
 double WavFile::length(int ch){
-  if (ch<0 || ch>=channels.size()) return 0;
+  if (ch<0 || ch>=(int)channels.size()) return 0;
   return channels[ch].size()/fmt.sampleRate;
 }
 

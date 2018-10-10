@@ -240,7 +240,7 @@ int MMPFile::read(const char* filename, int verboseLevel){
   return 0;
 }
 
-void MMPFile::spectrums(int track, std::vector<double>& times, std::vector<std::vector<double> >& ans, int verboseLevel){
+void MMPFile::spectrums(int track, std::vector<double>& times, std::vector<std::vector<double> >& ans, int){
   for (double time : times){
     ans.push_back(std::vector<double>());
     int timeT=timeFromSecs(time);
