@@ -2,13 +2,17 @@
 #include <drawer.h>
 
 
-void Drawer::setFPEV(std::string& key, std::string& value){
+void Drawer::setFPEV(std::string& key, std::string& value, int verboseLevel){
+  if (verboseLevel>1) std::cout << "[I] Drawer::setFPEV " << this << "('" << key << "', '" << value << "')" << std::endl;
   int index=std::stoi(key);
   if (value.size()>12 && value.substr(0,12)=="track-values"){
     fpeTracks.push_back(std::vector<TrackController::Index>());
     tc->parseTrackIndices(value.substr(12,value.size()-12), fpeTracks.back());
     fpe.setIndex(index, 0+fpeTracks.size());
   }else if (value=="null"||value=="0") fpe.setIndex(index, 0);
+  else if (verboseLevel) {
+     std::cout << "[W] Drawer::setFPEV " << this << ", unknown FPV: '" << value << "'" << std::endl;
+  }
 }
 
 void Drawer::updateFPE(int){
@@ -71,8 +75,8 @@ void Drawer::update(int cframe){
 }
 
 
-void Drawer::draw(int cframe, cv::Mat* frame){
-//   std::cout << "Visualizer::Drawer::draw(" << cframe << ", *frame)" << std::endl;
+void Drawer::draw(int cframe, cv::Mat* frame, int verboseLevel){
+  if (verboseLevel>1) std::cout << "[I] Drawer::draw " << this << "(" << cframe << ") " << std::endl;
   update(cframe);
   
   double x0d=x0.value();
@@ -118,28 +122,30 @@ void Drawer::draw(int cframe, cv::Mat* frame){
 
 
 
-void Drawer::setParameter(std::string& param, std::string& key, std::string& value){
-  std::cout << "Drawer::setParameter(" << param << ", " << key << ", " << value << ")" << std::endl;
-  if (param=="line-color-0") lineColor0.parse(value);
-  if (param=="line-color-1") lineColor1.parse(value);
-  if (param=="fill-color-0") fillColor0.parse(value);
-  if (param=="fill-color-1") fillColor1.parse(value);
-  if (param=="w") w.parse(value);
-  if (param=="h") h.parse(value);
-  if (param=="x0") x0.parse(value);
-  if (param=="x1") x1.parse(value);
-  if (param=="y0") y0.parse(value);
-  if (param=="y1") y1.parse(value);
-  if (param=="fpv") setFPEV(key, value);
-  if (param=="thickness") lineThickness.parse(value);
-  if (param=="i"){
+void Drawer::setParameter(std::string& param, std::string& key, std::string& value, int verboseLevel){
+  if (verboseLevel>1) std::cout << "[I] Drawer::setParameter " << this << "('" << param << "', '" << key << "', '" << value << "') " << std::endl;
+  if (param=="line-color-0") lineColor0.parse(value, verboseLevel);
+  else if (param=="line-color-1") lineColor1.parse(value, verboseLevel);
+  else if (param=="fill-color-0") fillColor0.parse(value, verboseLevel);
+  else if (param=="fill-color-1") fillColor1.parse(value, verboseLevel);
+  else if (param=="w") w.parse(value, verboseLevel);
+  else if (param=="h") h.parse(value, verboseLevel);
+  else if (param=="x0") x0.parse(value, verboseLevel);
+  else if (param=="x1") x1.parse(value, verboseLevel);
+  else if (param=="y0") y0.parse(value, verboseLevel);
+  else if (param=="y1") y1.parse(value, verboseLevel);
+  else if (param=="thickness") lineThickness.parse(value, verboseLevel);
+  else if (param=="fpv") setFPEV(key, value, verboseLevel);
+  else if (param=="i"){
     tc->parseTrackIndices(value, indices);
+  }else if (verboseLevel){
+    std::cout << "[W] Drawer::setParameter " << this << ", unknown parameter '" << param << "'" << std::endl;
   }
 }
 
-void Drawer::parse(std::string& config){
-//   std::cout << "Drawer::parse " << config << std::endl; 
+void Drawer::parse(std::string& config, int verboseLevel){
+  if (verboseLevel>2) std::cout << "[X] Drawer::parse " << this << " '" << config << "'" << std::endl; 
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;
   configReader::readConfig(config.c_str(), ans);
-  for (auto conf:ans)setParameter(conf.first.first, conf.first.second, conf.second);
+  for (auto conf:ans)setParameter(conf.first.first, conf.first.second, conf.second, verboseLevel);
 }

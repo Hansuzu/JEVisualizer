@@ -1,12 +1,11 @@
-#include <visualizer.h>
 #include <string>
-#include <bits/stdc++.h>
-using namespace std;
+#include <iostream>
+#include <visualizer.h>
 
 
 void Visualizer::setFPEV(std::string& key, std::string& value, int verboseLevel){
   int index=std::stoi(key);
-  if (verboseLevel) std::cout << "Visualizer::setFPEV(" << index << ", " << value << ")" << std::endl;
+  if (verboseLevel>1 ) std::cout << "[I] Visualizer::setFPEV " << this << "('" << index << "', '" << value << "')" << std::endl;
   if (value=="frame") fpe.setIndex(index, 1);
   else if (value=="fps") fpe.setIndex(index, 2);
   else if (value=="w") fpe.setIndex(index, 3);
@@ -17,6 +16,9 @@ void Visualizer::setFPEV(std::string& key, std::string& value, int verboseLevel)
     tc.parseTrackIndices(value.substr(12,value.size()-12), fpeTracks.back());
     fpe.setIndex(index, 5+fpeTracks.size());
   }else if (value=="null"||value=="0") fpe.setIndex(index, 0);
+  else if (verboseLevel){
+     std::cout << "[W] Drawer::setFPEV " << this << ", unknown FPV: '" << value << "'" << std::endl;
+  }
 }
 
 void Visualizer::updateFPE(){
@@ -40,7 +42,7 @@ void Visualizer::updateFPE(){
 
 
 void Visualizer::nextFrame(int verboseLevel){
-  if (verboseLevel) std::cout << "Visualizer::nextFrame" << std::endl;
+  if (verboseLevel>1) std::cout << "[I] Visualizer::nextFrame " << this << std::endl;
   if (cframe>=firstFrame && cframe<=lastFrame){
     updateFPE();
     // draw layers
@@ -49,15 +51,15 @@ void Visualizer::nextFrame(int verboseLevel){
     }
     // output the frame
     outputVideo.write(*oframe);
-    cout << cframe << endl;
-  }else if (cframe%100==0 && verboseLevel) std::cout << "..." << cframe << "..." << std::endl;
+    if (verboseLevel>1) std::cout << "[I] Visualizer::nextFrame " << this << " drawn frame " << cframe << std::endl;
+  }else if (cframe%100==0 && verboseLevel>1) std::cout << "[I] Visualizer::nextFrame " << this << "... skipped frame " << cframe << " ..." << std::endl;
   ++cframe;
 }
   
 
 
 void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackValues, int verboseLevel){
-  if (verboseLevel) std::cout << "Visualizer::next(" << time << ", &st, " << verboseLevel << ")" << std::endl; 
+  if (verboseLevel>1) std::cout << "[I] Visualizer::next(" << time << ", &st, " << verboseLevel << ")" << std::endl; 
 
   while (((double)cframe)/fps<time){
     double ftime=(double)cframe/fps;
@@ -72,7 +74,7 @@ void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackVa
 
 
 void Visualizer::setConfigParam(std::string& param, std::string& key, std::string& value, int verboseLevel){
-  if (verboseLevel) std::cout << "Visualizer::setConfigParam(" << param << ", " << key << ", " << value << ", " << verboseLevel << ")" << std::endl;
+  if (verboseLevel>1) std::cout << "[I] Visualizer::setConfigParam " << this << "('" << param << "', '" << key << "', '" << value << "', " << verboseLevel << ")" << std::endl;
   if (param=="fps"){
     fps=std::stof(value);
   }else if (param=="w" || param=="width"){
@@ -92,6 +94,8 @@ void Visualizer::setConfigParam(std::string& param, std::string& key, std::strin
     if (key.size()) index=std::stoi(key);
     while ((int)layers.size()<=index) layers.push_back(new Layer(w, h, &fpe, &tc));
     layers[index]->readConfig(value.c_str(), verboseLevel);
+  }else if (verboseLevel){
+    std::cout << "[W] Visualizer::setConfigParam " << this << ", unknown parameter '" << param << "'" << std::endl;
   }
 }
 

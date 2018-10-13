@@ -20,7 +20,8 @@ class Layer{
 private: 
   double layerWidth, layerHeight; // The coordinates in Drawers are relative to these values. Values are then scaled to actual width and height
   int firstFrame, lastFrame;      // First and last frame to actually draw
-  cv::Mat* frame;                 // TODO: what is this?
+  cv::Mat* frame1;                // Layer is drawn on these (two frames are needed for filters)
+  cv::Mat* frame2;
   cv::Mat* background;            // if background-image is used, it is saved here
   bool hasBgImage;
   FormulaColor LU, LD, RU, RD;    // if background-color is used
@@ -51,17 +52,16 @@ public:   //TODO: remove debug prints
   void readConfig(const char* configFile, int verboseLevel);  // load configuratino from file
   
   Layer(int w, int h, FormulaParameterEngine* pfpe, TrackController* ptc):layerWidth(w), layerHeight(h), firstFrame(0), lastFrame(1000000), hasBgImage(0), LU(&fpe), LD(&fpe), RU(&fpe), RD(&fpe), hasBgColor(0), tc(ptc), fpe(pfpe) {
-    std::cout << "Layer(" << w << ", " << h << ")" << std::endl;
-    frame=new cv::Mat(cv::Size(w, h), CV_8UC4);
-    std::cout << frame->size().width << ", " << frame->size().height << std::endl;
-    std::cout << this << std::endl;
+    frame1=new cv::Mat(cv::Size(w, h), CV_8UC4);
+    frame2=new cv::Mat(cv::Size(w, h), CV_8UC4);
   }
   
   ~Layer(){
     for (int i=0;i<(int)drawers.size();++i) if (drawers[i]) delete drawers[i];
     for (int i=0;i<(int)layerFilters.size();++i) if (layerFilters[i]) delete layerFilters[i];
     for (int i=0;i<(int)imageFilters.size();++i) if (imageFilters[i]) delete imageFilters[i];
-    delete frame;
+    delete frame1;
+    delete frame2;
   }
 };
 

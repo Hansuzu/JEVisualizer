@@ -22,7 +22,7 @@ public:
   Formula(FormulaParameterEngine* pfpe): isConstant(1), c(0), C(NULL), frameK(NULL), sinK(NULL), inSin(NULL), minV(NULL), maxV(NULL), fpe(pfpe) {}
   double value();
   static void split(std::string& s, std::vector<std::string>& res);
-  void parse(std::string& s);
+  void parse(std::string& s, int verboseLevel);
   Formula* createCopy(){
     Formula* b=new Formula(fpe);
     *b=*this;

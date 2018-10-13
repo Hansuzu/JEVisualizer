@@ -1,5 +1,5 @@
 #include <vector>
-
+#include <iostream>
 #ifndef FPE_H
 #define FPE_H
 
@@ -17,7 +17,9 @@ public:
     return values;
   }
   FormulaParameterEngine(FormulaParameterEngine* pParent):parent(pParent){
-    while (pParent && (int)indices.size()<pParent->size()) indices.push_back(-indices.size()-1);
+    while (pParent && (int)indices.size()<pParent->size()){
+      indices.push_back(-((int)indices.size())-1);
+    }
   }
 };
 

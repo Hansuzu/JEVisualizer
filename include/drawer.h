@@ -16,7 +16,7 @@ private:
   // some magic to make fpe work (basically same as in visualizer.h)
   std::vector<std::vector<TrackController::Index> > fpeTracks;
   std::vector<double> fpevs;
-  void setFPEV(std::string& key, std::string& value);
+  void setFPEV(std::string& key, std::string& value, int verboseLevel);
   void updateFPE(int cframe);
 
   Formula x0, y0; // left point of the spectrum
@@ -42,13 +42,13 @@ private:
   void update(int cframe); // draw calls first this
   
 public:
-  void draw(int cframe, cv::Mat* frame); // draws this
+  void draw(int cframe, cv::Mat* frame, int verboseLevel); // draws this
 
 private:
-  void setParameter(std::string& param, std::string& key, std::string& value); //parse calls this
+  void setParameter(std::string& param, std::string& key, std::string& value, int verboseLevel); //parse calls this
 
 public:
-  void parse(std::string& config); // given a string, parses the configuration
+  void parse(std::string& config, int verboseLevel); // given a string, parses the configuration
   
   Drawer(FormulaParameterEngine* pfpe, TrackController* ptc) : 
       x0(&fpe), y0(&fpe), x1(&fpe), y1(&fpe), lineColor0(&fpe), lineColor1(&fpe),
