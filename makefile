@@ -35,7 +35,7 @@ $(BUILDDIR)/layer.o: $(SRCDIR)/layer.cpp $(HEADERDIR)/layer.h $(HEADERDIR)/confi
 $(BUILDDIR)/drawer.o: $(SRCDIR)/drawer.cpp $(HEADERDIR)/drawer.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h
 	$(CC) $(CFLAGS) $(SRCDIR)/drawer.cpp -o $(BUILDDIR)/drawer.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/filter.o: $(SRCDIR)/filter.cpp $(HEADERDIR)/filter.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h
+$(BUILDDIR)/filter.o: $(SRCDIR)/filter.cpp $(HEADERDIR)/filter.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h
 	$(CC) $(CFLAGS) $(SRCDIR)/filter.cpp -o $(BUILDDIR)/filter.o -c  $(OPENCV_FLAGS)
 
 $(BUILDDIR)/formulacolor.o: $(SRCDIR)/formulacolor.cpp $(HEADERDIR)/formulacolor.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h

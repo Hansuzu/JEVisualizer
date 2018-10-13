@@ -4,7 +4,10 @@ bin/*
 !bin/layer0.config
 !bin/visualizer.config
 build
-doc/document
-doc/help_layer_config
-doc/help_main_config
-doc/help_visualizer_config
+doc/*
+!doc/documentation.pdf
+!doc/documentation.tex
+!doc/gen_examples.sh
+!doc/include
+!doc/include/example1
+!doc/include/example1.tex

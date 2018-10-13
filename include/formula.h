@@ -14,12 +14,12 @@ public:
   Formula* C;
   std::vector<Formula*> variables;
   Formula* frameK;
-  Formula* sinK;
-  Formula* inSin;
   Formula* minV;
   Formula* maxV;
+  Formula* sinK;
+  Formula* inSin;
   FormulaParameterEngine* fpe;
-  Formula(FormulaParameterEngine* pfpe): isConstant(1), c(0), C(NULL), frameK(NULL), sinK(NULL), inSin(NULL), minV(NULL), maxV(NULL), fpe(pfpe) {}
+  Formula(FormulaParameterEngine* pfpe): isConstant(1), c(0), C(NULL), frameK(NULL), minV(NULL), maxV(NULL), sinK(NULL), inSin(NULL), fpe(pfpe) {}
   double value();
   static void split(std::string& s, std::vector<std::string>& res);
   void parse(std::string& s, int verboseLevel);
@@ -33,11 +33,11 @@ public:
     c=o.c;
     if (o.C)C=o.C->createCopy();
     for (int i=0;i<(int)o.variables.size();++i) variables[i]=o.variables[i]->createCopy();
+    if (o.minV)    minV=o.minV->createCopy();
+    if (o.maxV)    maxV=o.maxV->createCopy();
     if (o.frameK)  frameK=o.frameK->createCopy();
     if (o.sinK)    sinK=o.sinK->createCopy();
     if (o.inSin)   inSin=o.inSin->createCopy();
-    if (o.minV)    minV=o.minV->createCopy();
-    if (o.maxV)    maxV=o.maxV->createCopy();
     fpe=o.fpe;
     return *this;
   }
@@ -45,10 +45,10 @@ public:
     if (C) delete C;
     if (frameK) delete frameK;
     for (int i=0;i<(int)variables.size();++i)  delete variables[i];
-    if (sinK) delete sinK;
-    if (inSin) delete inSin;
     if (minV) delete minV;
     if (maxV) delete maxV;
+    if (sinK) delete sinK;
+    if (inSin) delete inSin;
   }
 };
 

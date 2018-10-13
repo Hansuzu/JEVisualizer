@@ -67,17 +67,17 @@ void Formula::parse(std::string& s, int verboseLevel){
           variables.back()->parse(array[j], verboseLevel);
         }
       }else if (i==2){
-        sinK=new Formula(fpe);
-        sinK->parse(params[i], verboseLevel);
-      }else if (i==3){
-        inSin=new Formula(fpe);
-        inSin->parse(params[i], verboseLevel);
-      }else if (i==4){
         minV=new Formula(fpe);
         minV->parse(params[i], verboseLevel);
-      }else if (i==5){
+      }else if (i==3){
         maxV=new Formula(fpe);
         maxV->parse(params[i], verboseLevel);
+      }else if (i==4){
+        sinK=new Formula(fpe);
+        sinK->parse(params[i], verboseLevel);
+      }else if (i==5){
+        inSin=new Formula(fpe);
+        inSin->parse(params[i], verboseLevel);
       }
     }
   }else{
