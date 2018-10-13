@@ -20,34 +20,40 @@
   \newpage
     
   \section{Introduction}
-    JEVisualizer is a program that creates a visualization video for music. The development started, when we wanted to add visualizations for our music on YouTube. One important goal is to develop JEVisualizer in such a way that it can be configured to create very different visualizations - only imagination should be the limit. \\ \\
-    JEVisualizer is designed to be used by editing configuration files. N
-  \newpage
+    JEVisualizer is a command line program that creates a visualization video for music. The development started, when we wanted to add visualizations for our music on YouTube. One important goal is to develop JEVisualizer in such a way that it can be configured to
+    create very different visualizations - only imagination should be the limit. \\ \\
+    JEVisualizer is designed to be used from command line and configured in configuration files. Config files and command lines are nice, 
+    much more nice than GUIs. GUIs are slow, they often crash for no reason, and creating a GUI would take overs 9000\% time compared
+    to a creating a simple program without a GUIs. \\ \\
+    That's why we don't need any GUIs. \\ \\
+    No GUI is a wise choice.
   \section{How does it work}
-    The basic idea is that JEVisualizer takes as an input any number of $tracks$, and outputs a video that visualizes those $tracks$. $A track$
-    contains a number of $notes$, which get different intensities. Currently the program can extract tracks from the channels of wav-files
-    (using an algorithm that detects frequencies) or from the tracks of mmp-files (Linux multimedia studio -files).
-    
-    For the output-video, any number of $layers$ can be configured. $A layer$ can contain a picture, any number of $drawers$ and any number 
-    of $filters$.
-    
-    $A drawer$ visualizes some notes from some track(s).
-    
-    $Filters$ are used to create cool effects on layers or output-video.
-    
+    The basic idea is that JEVisualizer takes as an input any number of \textit{tracks}, and outputs a video that visualizes those \textit{tracks}. \\ \\
+    \textit{A track} contains a number of \textit{notes}, which get different intensities. Currently the program can extract tracks from the channels of wav-files (using an algorithm that detects frequencies) or from the tracks of mmp-files (Linux multimedia studio -files). \\ \\
+    For the output-video, any number of \textit{layers} can be configured. \textit{A layer} can contain a picture, any number of 
+    \textit{drawers} and any number of \textit{filters}. \\ \\
+    \textit{A drawer} visualizes some notes from some track(s). \\ \\
+    \textit{Filters} are used to create cool effects on layers or output-video. \\ \\
     More about all these in section "How to config".
-  \newpage
+  \section{Parameters that can be given to JEVisualizer}
+    Following parameters can be given to JEVisualizer.
+    \begin{labeling}{--verbose3, -v3}
+      \item [--config \underline{file}] Sets a file from which main configuration is loaded. Default is main.config    
+      \item [--verbose0, -v0]           Sets verbose level to 0. Only errors are printed on stdout.
+      \item [--verbose1, -v1]           Sets verbose level to 1. Errors and warnings are printed on stdout.
+      \item [--verbose2, -v2]           Sets verbose level to 2. Errors, warnings and some other information are printed on stdout.
+      \item [--verbose3, -v3]           Sets verbose level to 2. Errors, warnings and some more other information are printed on stdout.
+      \item [--no-run]                  Do not run create the output-video, only load tracks.
+    -\# is the delimeter between parameter name and key 
+    \end{labeling}
   \section{How to config}
-    JEVisualizer contains a number of different config-files.
+    JEVisualizer contains a number of different config-files.\\ \\
+    First is \textbf{main.config}. It contains information about tracks and the name of visualizer-config file. \\ \\
+    Second is \textbf{visualizer.config}. It defines basic information about the output-video, like width, height, fps, filename etc. It also contains the layers as filenames. \\ \\
+    Thirdly there can be any number of \textbf{layer-config-files}. Each layer-config-file contains information about that layer. It can contain
+    a background-image, information about when the layer is visible, a number of drawers and a number of different filters. \\ \\
+    From configuration-files it is also possible to include other configuration files, so there could also be a different config-file for some drawers or filter etc. \\ \\
     
-    First is main.config. It contains information about tracks and the name of visualizer-config file.
-    
-    Second is visualizer.config. It defines basic information about the output-video, like width, height, fps, filename etc. It also contains the layers as filenames.
-    
-    Thirdly there can be any number of layer-config-files. Each layer-config-file contains information about that layer. It can contain
-    a background-image, information about when the layer is visible, a number of drawers and a number of different filters.
-    
-    From configuration-files it is also possible to include other configuration files, so there could also be a different config-file for some drawers or filter etc.
     
     \subsection{JEVisualizer configuration file format}
       JEVisualizer uses its own syntax in configuration files.
@@ -67,77 +73,149 @@
         \item [\#-character]          \#-character in attribute is the delimeter between name and key. (for some attributes there can
                                       be different keys...)
         \item [UPPER and lower case]  Parameter names will be converted to smallcase when reading file. A=b is same as a=b.
-      -\# is the delimeter between parameter name and key 
       \end{labeling}
       Example: \\ \\
       \input{include/example1.tex} \\ \\
       For further details see implementation in \textit{config.h} and \textit{config.cpp}.
-    \subsection{main.config}
-      Following pa
-      \begin{labeling}{alligator}
-      \item [ant] really busy all the time
-      \item [chimp] likes bananas
-      \item [alligator] very dangerous animal, sharp teeth, long
-      muscular tail and a bit of text that is longer than one
-      line and shows the alignment of text quite nicely
-      \end{labeling}
-        
-    \subsection{Formulas}
-      Most of the values that are used are given as datatype Formula (defined in formula.h and formula.cpp).\\
-      The value of a formula is calculated again for every frame. Formula can be either simple constant or it can depend on many variables. 
       
-      1. $CONSTANT$  \\
-      simple floating-point number   \\
-      2. $(CONSTANT,\ [ARRAY\_OF\_VARIABLE_COEFFICIENTS],\ MIN\_VALUE,\ MAX\_VALUE,\ SIN\_COEFFICIENT,\ IN\_SIN)$  \\
+      
+    \subsection{main.config}
+      Following paramaters can be used in main.config
+      \begin{labeling}{A-FREQUENCY}
+        \item [TRACK\#id] The information about track $id$, where $id$ must be an integer $0\le id$. Value should be 
+                          multiline value with following parameters:
+                          \begin{labeling}{CHANNEL}
+                            \item [TYPE]  Type of the track: value should be WAV (1) or MMP (2).
+                            \item [FILE]  Filename where the data is. WAV-file should be of type \textbf{16-bit}, \textbf{32-bit float} is 
+                                          currently \textbf{not} suppored.
+                          \end{labeling}
+                          Parameters of track of type WAV :
+                          \begin{labeling}{CHANNEL}
+                            \item [CHANNEL] The chanel from which the track is extracted. Usually $0$, but for example stereo wav-files it would
+                                            be possible to create a track for left channel and a track for right channel ($0$ and $1$)
+                            \item [F0]      Lowest frequency (in Hz) to extract from the file
+                            \item [F1]      Upper bound for frequencies to extract from file (in Hz)
+                            \item [FK]      A multiplier for frequencies: frequencies $F0*FK^i$ are extracted. One example of good values is
+                                            $1.0594630943592953$.
+                            \item [CHLEN]   A parameter for the frequency-extracting algorithm: a sample of length at most CHLEN is used to 
+                                            determine how loud certain frequency is at certain time. (however, this is a kind of legacy 
+                                            parameter, since the algorithm has changed a bit...) A good value is like 1.
+                            \item [THR]     A parameter for the frequency-extracting algorithm that: Removes noise from the outcome, if 
+                                            the loudness of a note is less than THR, the loudness is set to zero. A good value is $0.01$, since
+                                            the loudness is estimated with a value on range $[0,1]$.
+                          \end{labeling}
+                          See file wav.cpp for further details about the parameters above. \\ \\
+                          Parameters of track of type MMP:
+                          \begin{labeling}{CHANNEL}
+                            \item [TRACK] The index of track in MMP. If unsure about the index, a good idea is to set it to zero, run JEVIsualizer -v2 --no-run, and the track indices with track names are printed on stdout.
+                          \end{labeling}
+        \item [VISUALIZER]  Filename of the visualizer config file. Usually "visualizer.config".
+        \item [ON-END]      Command that is executed after the video is ready. (Often something like a ffmpeg -command that adds sound to the video)
+        \item [A-FREQUENCY] The frequency of how often the track-values do change. Good value is about the FPS. Value should be a floating-point
+                            number (or an integer)
+      \end{labeling}
+      
+      Example of main.config: \\ \\
+      \input{include/example_main_config.tex} \\ \\
+      Implementation of the reading of the parameters of main.config can be found in \textit{controller.cpp}.
+      
+      
+    \subsection{visualizer.config}
+      Following paramaters can be used in visualizer.config (or whatever filename is used for the configuration of visualizer)
+      \begin{labeling}{OUTPUT-FILE}
+        \item [FPS]         The fps-rate of the output-video. Value shuold be a floating-point-number (or an integer)
+        \item [W or WIDTH]  The width of the output-video in pixels.
+        \item [H or HEIGHT] The height of the output-video in pixels.
+        \item [OUTPUT-FILE] The filename of the output-video. Should be .ogg/.ogv since ogg-format is used.
+        \item [FIRST-FRAME] The index of the first frame that is drawn.
+        \item [LAST-FRAME]  The index of the last frame that is drawn.
+        \item [FPV\#id]     Set a parameter for formulas, see section formulas below for further details.
+                            Possible values: frame, fps, w, h, time and null.
+        \item [LAYER\#id]   Set a filename, where $id$th layer is defined. Layers are drawn in order $0$, $1$, $2$, ...
+      \end{labeling}
+      
+      Example of visualizer.config: \\ \\
+      \input{include/example_visualizer_config.tex} \\ \\
+      Implementation of the reading of the parameters of visualizer.config can be found in visualizer.cpp.
+    \subsection{Formulas}
+      Most of the values that are used are given as datatype Formula (defined in \textit{formula.h} and \textit{formula.cpp}).\\
+      The value of a formula is calculated again every time a new frame is drawn. 
+      Formula can be either a simple constant or it can depend on many variables. \\
+      Basic format of formula is either: \\
+      1. CONSTANT  , where CONSTANT is simple floating-point number   \\
+      2. (CONSTANT,\ ARRAY\_OF\_VARIABLE\_COEFFICIENTS]\ MIN\_VALUE,\ MAX\_VALUE,\ SIN\_COEFFICIENT,\ IN\_SIN)  \\
       Value of this type of formula is:  \\
-      $min(max(CONSTANT + ARRAY_i*VARIABLE_i (for each i) + SIN\_COEFFICIENT * sin(IN\_SIN), MIN\_VALUE), MAX\_VALUE)$ \\
-      Each parameter of is given as another formula \\
-      Formula can have all parameters or n first of them, like for example $(CONSTANT,\ [ARRAY\_OF\_VARIABLE_COEFFICIENTS])$ \\
+      $min(max($ \\
+      $\ \ CONSTANT + \sum_i{ARRAY_i*variable_i} + SIN\_COEFFICIENT * sin(IN\_SIN),$ \\ 
+      $MIN\_VALUE), MAX\_VALUE)$ \\
+      Each parameter is another formula \\
+      Formula can have all parameters or n first of them, like for example \\
+      $(CONSTANT,\ ARRAY\_OF\_VARIABLE_COEFFICIENTS)$ \\
 
-      Formulas are defined in following format:  
-      Variables the formulas can use are also defined in config-files:
-      $FPV\#i=name$
-        where $name$ is some valid variable (see list below)
-    
-    
-      Examples of valid formulas:
-        $5$
-          Formula has constant value $5$.
-        $(5)$
-          Formula contains a constant formula with value $5$ -> does same as formula $5$, but is a bit slower to calculated.
-        $(5,\ [1])$
-          Formula has value $5+FPV\#0$
-        $(0,\ [],\ -1,\ 1,\ 1,\ (0,\ [1]))$
-          Formula has value $sin(FPV\#0)$. (Min and max don't have effect since the value of $sin$ is always between $-1$ and $1$)
-
-
-
-      Different variables can be defined in different scopes. Here is a list (this list is not necessarily up to date, but at least we have a list)
-      In visualizer:
-        frame
-          index of the frame
-        fps
-          fps of output-video
-        w
-          width of output-video in pixels
-        h
-          height of output-video in pixels
-        null or 0
-          unset parameter
-
-
-        
-
-      Example:
-
-      In file visualizer.config:
-      \begin{lstlisting}
-        FPV#0=frame
-        LAYER#0="layer0.config"
-      \end{lstlisting}
-
-      in file layer0.
-
+      Variables the formulas can use are also defined in config-files with: \\ 
+      $FPV\#i=name$ \\
+      This sets that $variable_i$ is getting the value from $name$ ,where $name$ is some valid variable that can be used
+      as a \textit{formula parameter variable}. For example $frame$ can be used as a \textit{formula parameter variable}
+      in visualizer.config. \\ \\
+      Examples of valid formulas: \\
+      \begin{labeling}{$(0,\ [],\ -1,\ 1,\ 1,\ (0,\ [1]))$}
+        \item[$5$]  Formula has constant value $5$. \\
+        \item[$(5)$]  Formula contains a constant formula with value $5$ $->$ does same as formula $5$ above, but is a bit slower to calculated. \\
+        \item[$(5,\ {[1]})$]  Formula has value $5+FPV\#0$ \\
+        \item[$(0,{[]},\ -1,\ 1,\ 1,\ (0,\ 1))$] Formula has value $sin(FPV\#0)$. (Min and max don't have effect since the value of $sin$ is always between $-1$ and $1$)
+      \end{labeling}
+      
+      The bracket type used can be anywhere either round brackets () or box brackets []. However, it is recommended to use box brackets to
+      indicate an array.
+      \subsubsection{FPV:s}
+      The variables formulas use are defined with FPV\#i=name. Different variables can be used in different scopes. Variables that
+      are defined in an outer scope, are inherited to the inner scope, even when the variable wouldn't otherwise be accessible
+      on that scope. \\
+      The different scopes are: \\
+      \begin{labeling}{visualizer}
+        \item[visualizer] doesn't have a parent-scope
+        \item[layer]      each layer has a \textit{visualizer} as a parent
+        \item[drawer]     each drawer has a \textit{layer} as a parent
+        \item[filter]     each filter has a \textit{layer} as a parent
+      \end{labeling}
+      So if in visualizer.config there is defined FPV\#0=frame, all scopes inherit this variable and have the index of current 
+      frame as a $variabe_0$. (unless FPV\#0 is rewritten or removed in some scope, in which case all the children of that scope
+      inherit the rewritten or removed $variable_0$) \\
+      Here is a list of different variable names that for all scopes.
+      (this list is not necessarily up to date, but at least we have a list)
+      \\
+      In visualizer: \\
+      \begin{labeling}{frame}
+        \item[frame]    the index of the frame
+        \item[fps]      the fps of output-video
+        \item[w]        the width of output-video in pixels
+        \item[h]        the height of output-video in pixels 
+        \item[null]     unset parameter
+      \end{labeling}
+      In layers: \\
+      \begin{labeling}{track-valuesNOTES}
+        \item[layer-width]       the width of the layer. 
+        \item[layer-height]      the height of the layer. 
+        \item[track-valuesNOTES] notes whose values are summed up and this sum is the variable: \\
+                                 NOTES are given as follows:
+                                 TRACKID:FROMNOTE-TONOTE,TRACKID2:FROMNOTE2-TONOTE2 \\
+                                 for example: \\
+                                 track-values0:0-13,1:0-13 \\ 
+                                 is a sum of notes 0-13 on tracks 0 and 1.
+        \item[null]              unset a parameter\\
+      \end{labeling}
+      In drawers: \\
+      \begin{labeling}{track-valuesNOTES}
+        \item[track-valuesNOTES] notes whose values are summed up and this sum is the variable: \\
+                                 NOTES are given as follows:
+                                 TRACKID:FROMNOTE-TONOTE,TRACKID2:FROMNOTE2-TONOTE2 \\
+                                 for example: \\
+                                 track-values0:0-13,1:0-13 \\ 
+                                 is a sum of notes 0-13 on tracks 0 and 1.
+        \item[null]              unset a parameter\\
+      \end{labeling}
+      In filters there is currently no possibility to edit FPV:s.
+      
 
 \end{document}
 \grid

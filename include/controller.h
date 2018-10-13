@@ -29,7 +29,7 @@ public:
     int channel,track;
     std::string file;
   public:
-    void loadConfig(std::string& configStr);
+    void loadConfig(std::string& configStr, int verboseLevel);
     Track():
       mLength(0), type(Undefined),wavFile(NULL),mmpFile(NULL),
       F0(16.35),F1(8000),FK(1.0594630943592953),CHLEN(1),THR(0.01),

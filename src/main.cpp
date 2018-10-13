@@ -16,13 +16,12 @@ int main(int argc, const char** args){
       config=args[i];
     }else if (std::string(args[i])=="--verbose0" || std::string(args[i])=="-v0"){
       verboseLevel=0;
-      cout << "verboseLevel 0" << endl;
     }else if (std::string(args[i])=="--verbose" || std::string(args[i])=="--verbose1" || std::string(args[i])=="-v" || std::string(args[i])=="-v1"){
       verboseLevel=1;
-      cout << "verboseLevel 1" << endl;
     }else if (std::string(args[i])=="--verbose2" || std::string(args[i])=="-v2"){
-      verboseLevel=2;
-      cout << "verboseLevel 2" << endl;
+      verboseLevel=2
+    }else if (std::string(args[i])=="--verbose3" || std::string(args[i])=="-v3"){
+      verboseLevel=3;
     }else if (std::string(args[i])=="--no-run"){
       noRun=1;
     }

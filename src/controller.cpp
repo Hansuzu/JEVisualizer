@@ -5,7 +5,7 @@
 
 #include <bits/stdc++.h>
 
-void Controller::Track::loadConfig(std::string& configStr){
+void Controller::Track::loadConfig(std::string& configStr, int verboseLevel){
 //   std::cout << "Track::loadConfig" << configStr << std::endl;
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;
   configReader::readConfig(configStr, ans);
@@ -26,6 +26,9 @@ void Controller::Track::loadConfig(std::string& configStr){
     else if (param=="track") track=std::stoi(value);
     else if (param=="channel") channel=std::stoi(value);
     else if (param=="file") file=value;
+    else if (verboseLevel){
+      std::cout << "[W] Controller::Track::loadConfig " << this << ", unknown parameter '" << param << "'" << std::endl;
+    }
   }
 }
 
@@ -106,12 +109,13 @@ void Controller::setConfigParam(std::string& param, std::string& paramKey, std::
     if (index<0) std::cout << "[E] Controller::setConfigParameter " << this << ", ERROR IN INDEX" << std::endl;
     else{
       while ((int)tracks.size()<=index) tracks.push_back(Track());
-      tracks[index].loadConfig(value);
+      tracks[index].loadConfig(value, verboseLevel);
     }
   }
   else if (param=="visualizer") video_config_file=value;
   else if (param=="on-end") on_end_command=value;
   else if (param=="a-frequency") aFrequency=std::stof(value);
+  else if (verboseLevel) std::cout << "[I] Controller::setConfigParam " << this << ", unknown parameter '" << param << "'" << std::endl;
 }
 void Controller::readMainConfig(std::ifstream& co){
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;

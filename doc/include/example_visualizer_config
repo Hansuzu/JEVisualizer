@@ -1,0 +1,12 @@
+W=640
+H=480
+
+FPS=40
+OUTPUT-FILE="output/test.ogv"
+
+FIRST-FRAME=0
+LAST-FRAME=600
+
+FPV#0=frame
+LAYER#0="layer0.config"
+LAYER#1="layer1.config"
