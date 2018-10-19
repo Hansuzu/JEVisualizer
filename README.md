@@ -18,5 +18,5 @@ make all
 ## How to use
 Edit config files on bin/ to make the visualizer do what you want and run bin/JEVisualizer .
 
-Currently there isn't any documentation (sad story.. :'( ) I will add documentation when I have time and motivation, and when I believe that the features I'm documenting won't be changed on the very next commit.
+[Documentation](https://github.com/Hansuzu/JEVisualizer/blob/master/doc/documentation.pdf) is here. It is not covering everything and it is not necessarily up to date. I will update it and add more documentation when I have time and motivation, and when I believe that the features I'm documenting won't be changed on the very next commit.
 
