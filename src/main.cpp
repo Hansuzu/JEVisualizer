@@ -3,10 +3,8 @@
 using namespace std;
 
 int verboseLevel=2;
-bool noRun=0;
 
-
-
+int mode=0;
 
 int main(int argc, const char** args){
   string config="main.config";
@@ -19,18 +17,24 @@ int main(int argc, const char** args){
     }else if (std::string(args[i])=="--verbose" || std::string(args[i])=="--verbose1" || std::string(args[i])=="-v" || std::string(args[i])=="-v1"){
       verboseLevel=1;
     }else if (std::string(args[i])=="--verbose2" || std::string(args[i])=="-v2"){
-      verboseLevel=2
+      verboseLevel=2;
     }else if (std::string(args[i])=="--verbose3" || std::string(args[i])=="-v3"){
       verboseLevel=3;
     }else if (std::string(args[i])=="--no-run"){
-      noRun=1;
+      mode=1;
+    }else if (std::string(args[i])=="--extractor"){
+      mode=2;
     }
   }
   Controller controller(config, verboseLevel);
   controller.loadFiles();
   controller.createSpectrums();
   cout << "spectrums ok" << endl;
-  if (!noRun) controller.runVisualizer();
+  if (mode==0){
+    controller.runVisualizer();
+  }else if (mode==2){
+    controller.runExtractor();
+  }
   /*
   std::ifstream co(config);
   readMainConfig(co);

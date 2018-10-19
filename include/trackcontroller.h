@@ -18,6 +18,7 @@ public:
     double maxUpSpeed;
     double updateTime;
   public:
+    int size(){return values.size();}
     void update(std::vector<double>* newValues, double time, double newValueTime);
     Track():maxDownSpeed(10000),maxUpSpeed(100000),updateTime(-1000000){}
   };
@@ -34,6 +35,8 @@ public:
     double getValue();
     Index(TrackController* pController, int pTrackIndex, int pNoteIndex):controller(pController), trackIndex(pTrackIndex), noteIndex(pNoteIndex) {}
   };
+  int size(){return tracks.size();}
+  int size(int i){if (i>=0 && i<(int)tracks.size()) return tracks[i].size(); return 0;}
   
   void updateValues(std::vector<std::vector<double>*>& newValues, double time, double newValueTime); // Update the values of tracks
   

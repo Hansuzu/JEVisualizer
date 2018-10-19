@@ -102,6 +102,25 @@ void Controller::runVisualizer(){
   if (v) std::cout << "[E] Controller::runVisualizer " << this << ", system call returned " << v << std::endl;
 }
 
+void Controller::runExtractor(){
+  std::cout << std::endl << std::endl << std::endl;
+  if (verboseLevel>1) std::cout << "[I] Controller::runExtractor " << this << std::endl;
+    
+  Extractor extractor(extractor_config_file.c_str(), verboseLevel);
+  
+  std::cout << std::endl << std::endl << std::endl;
+  if (verboseLevel>1) std::cout << "[I] Controller::runExtractor " << this << ", configurations loaded " << std::endl;
+  
+  for (int i=0;i<(int)times.size();++i){
+    if (verboseLevel>1) std::cout << "[I] Controller::runExtractor " << this << ", TIME: " << times[i] << std::endl;
+    std::vector<std::vector<double>* > st;
+    for (int j=0;j<(int)tracks.size();++j){
+      st.push_back(tracks[j].getValues(i));
+    }
+    extractor.next(times[i], st, verboseLevel);
+  }
+}
+
 void Controller::setConfigParam(std::string& param, std::string& paramKey, std::string& value){
   if (verboseLevel>1) std::cout << "[I] Controller::setConfigParameter " << this << "('" << param <<"', '" << paramKey << "', '" << value << "')" << std::endl;
   if (param=="track"){
@@ -113,6 +132,7 @@ void Controller::setConfigParam(std::string& param, std::string& paramKey, std::
     }
   }
   else if (param=="visualizer") video_config_file=value;
+  else if (param=="extractor") extractor_config_file=value;
   else if (param=="on-end") on_end_command=value;
   else if (param=="a-frequency") aFrequency=std::stof(value);
   else if (verboseLevel) std::cout << "[I] Controller::setConfigParam " << this << ", unknown parameter '" << param << "'" << std::endl;

@@ -2,6 +2,7 @@
 #include <mmp.h>
 //#include <system.h>
 #include <visualizer.h>
+#include <extractor.h>
 #include <fstream>
 #include <config.h>
 
@@ -10,6 +11,7 @@
 class Controller{
   std::string on_end_command;
   std::string video_config_file;
+  std::string extractor_config_file;
   int verboseLevel;
   double aFrequency;
   std::vector<double> times;
@@ -45,6 +47,7 @@ public:
   void loadFiles();
   void createSpectrums();
   void runVisualizer();
+  void runExtractor();
   
   void setConfigParam(std::string& param, std::string& paramKey, std::string& value);
   void readMainConfig(std::ifstream& co);
