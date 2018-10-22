@@ -81,6 +81,7 @@ void Formula::parse(std::string& s, int verboseLevel){
       }
     }
   }else{
+    isConstant=1;
     c=std::stod(s);
   }
 }

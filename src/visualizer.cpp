@@ -60,6 +60,8 @@ void Visualizer::nextFrame(int verboseLevel){
 
 void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackValues, int verboseLevel){
   if (verboseLevel>1) std::cout << "[I] Visualizer::next(" << time << ", &st, " << verboseLevel << ")" << std::endl; 
+  tc.setMaxDownSpeed(maxDownSpeed);
+  tc.setMaxUpSpeed(maxUpSpeed);
 
   while (((double)cframe)/fps<time){
     double ftime=(double)cframe/fps;
@@ -76,7 +78,11 @@ void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackVa
 void Visualizer::setConfigParam(std::string& param, std::string& key, std::string& value, int verboseLevel){
   if (verboseLevel>1) std::cout << "[I] Visualizer::setConfigParam " << this << "('" << param << "', '" << key << "', '" << value << "', " << verboseLevel << ")" << std::endl;
   if (param=="fps"){
-    fps=std::stof(value);
+    fps=std::stod(value);
+  }else if (param=="downspeed"){
+    maxDownSpeed=std::stod(value);
+  }else if (param=="upspeed"){
+    maxUpSpeed=std::stod(value);
   }else if (param=="w" || param=="width"){
     w=std::stoi(value);
   }else if (param=="h" || param=="height"){

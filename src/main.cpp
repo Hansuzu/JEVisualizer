@@ -20,10 +20,14 @@ int main(int argc, const char** args){
       verboseLevel=2;
     }else if (std::string(args[i])=="--verbose3" || std::string(args[i])=="-v3"){
       verboseLevel=3;
+    }else if (std::string(args[i])=="--verbose4" || std::string(args[i])=="-v4"){
+      verboseLevel=4;
     }else if (std::string(args[i])=="--no-run"){
       mode=1;
     }else if (std::string(args[i])=="--extractor"){
       mode=2;
+    }else if (std::string(args[i])=="--spctr"){
+      mode=3;
     }
   }
   Controller controller(config, verboseLevel);
@@ -34,6 +38,8 @@ int main(int argc, const char** args){
     controller.runVisualizer();
   }else if (mode==2){
     controller.runExtractor();
+  }else if (mode==3){
+    controller.runCreateSPCTRs();
   }
   /*
   std::ifstream co(config);

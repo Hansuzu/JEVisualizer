@@ -17,25 +17,34 @@ private:
   std::string ofilename;
   std::ofstream ofile;
   double fps;
-  
+  double limit;
+  double peekLimit;
+  double maxDownSpeed;
+  double maxUpSpeed;
   double ctime; // current time
   int cframe;   // current frame
-  
+
   TrackController tc; // Contains values of tracks and other stuff, a pointer to this is passed to layers
   
   std::vector<std::pair<std::pair<int, int>, std::string> > map;
+  std::vector<std::pair<std::string, std::vector<std::string> > > groups;
+  std::vector<std::pair<std::string, std::vector<std::string> > > chords;
   
   void nextFrame(int verboseLevel);
 public:
   void next(double time, std::vector<std::vector<double>* >& newTrackValues, int verboseLevel);
   
   std::pair<int, int> split(std::string& value, int verboseLevel);
+  void getArray(std::string& value, std::vector<std::string>& res, int verboseLevel);
+  
   void loadMap(std::string& param, int verboseLevel);
+  void loadGroups(std::string& param, int verboseLevel);
+  void loadChords(std::string& param, int verboseLevel);
 private:
   void setConfigParam(std::string& param, std::string& paramKey, std::string& value, int verboseLevel); // Handles one statement of config-file
   void readConfig(std::istream& co, int verboseLevel); // loads a configuration from a file, calls setConfigParam for each configuratino statement
 public:
-  Extractor(const char* configFile, int verboseLevel):ofilename(""), fps(10), ctime(0), cframe(0){
+  Extractor(const char* configFile, int verboseLevel):ofilename(""), fps(10), limit(1e-4), peekLimit(0), maxDownSpeed(10000), maxUpSpeed(1000), ctime(0), cframe(0){
     std::ifstream co;
     co.open(configFile);
     readConfig(co, verboseLevel);

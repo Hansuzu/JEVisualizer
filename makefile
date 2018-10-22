@@ -9,11 +9,11 @@ HEADERDIR=include
 
 all:$(TARGETDIR)/JEVisualizer
 
-$(TARGETDIR)/JEVisualizer: $(SRCDIR)/main.cpp $(BUILDDIR)/controller.o $(BUILDDIR)/wav.o $(BUILDDIR)/mmp.o $(BUILDDIR)/extractor.o $(BUILDDIR)/visualizer.o $(BUILDDIR)/layer.o $(BUILDDIR)/drawer.o $(BUILDDIR)/filter.o $(BUILDDIR)/formulacolor.o $(BUILDDIR)/formula.o $(BUILDDIR)/fpe.o $(BUILDDIR)/trackcontroller.o $(BUILDDIR)/config.o
-	$(CC) $(CFLAGS) $(SRCDIR)/main.cpp $(BUILDDIR)/controller.o $(BUILDDIR)/wav.o $(BUILDDIR)/mmp.o $(BUILDDIR)/extractor.o $(BUILDDIR)/visualizer.o $(BUILDDIR)/layer.o $(BUILDDIR)/drawer.o $(BUILDDIR)/filter.o $(BUILDDIR)/formulacolor.o $(BUILDDIR)/formula.o $(BUILDDIR)/fpe.o $(BUILDDIR)/trackcontroller.o $(BUILDDIR)/config.o -o $(TARGETDIR)/JEVisualizer  $(OPENCV_FLAGS)
+$(TARGETDIR)/JEVisualizer: $(SRCDIR)/main.cpp $(BUILDDIR)/controller.o $(BUILDDIR)/wav.o $(BUILDDIR)/mmp.o $(BUILDDIR)/spctr.o $(BUILDDIR)/extractor.o $(BUILDDIR)/visualizer.o $(BUILDDIR)/layer.o $(BUILDDIR)/drawer.o $(BUILDDIR)/filter.o $(BUILDDIR)/formulacolor.o $(BUILDDIR)/formula.o $(BUILDDIR)/fpe.o $(BUILDDIR)/trackcontroller.o $(BUILDDIR)/config.o
+	$(CC) $(CFLAGS) $(SRCDIR)/main.cpp $(BUILDDIR)/controller.o $(BUILDDIR)/wav.o $(BUILDDIR)/mmp.o $(BUILDDIR)/spctr.o $(BUILDDIR)/extractor.o $(BUILDDIR)/visualizer.o $(BUILDDIR)/layer.o $(BUILDDIR)/drawer.o $(BUILDDIR)/filter.o $(BUILDDIR)/formulacolor.o $(BUILDDIR)/formula.o $(BUILDDIR)/fpe.o $(BUILDDIR)/trackcontroller.o $(BUILDDIR)/config.o -o $(TARGETDIR)/JEVisualizer  $(OPENCV_FLAGS)
 
 
-$(BUILDDIR)/controller.o: $(SRCDIR)/controller.cpp $(BUILDDIR)/config.o $(HEADERDIR)/controller.h $(BUILDDIR)/wav.o $(BUILDDIR)/extractor.o $(BUILDDIR)/visualizer.o $(BUILDDIR)/mmp.o 
+$(BUILDDIR)/controller.o: $(SRCDIR)/controller.cpp $(BUILDDIR)/config.o $(HEADERDIR)/controller.h $(BUILDDIR)/wav.o $(BUILDDIR)/mmp.o $(BUILDDIR)/spctr.o  $(BUILDDIR)/extractor.o $(BUILDDIR)/visualizer.o
 	$(CC) $(CFLAGS) $(SRCDIR)/controller.cpp -o $(BUILDDIR)/controller.o -c  $(OPENCV_FLAGS)
 
 
@@ -22,6 +22,9 @@ $(BUILDDIR)/wav.o: $(SRCDIR)/wav.cpp $(HEADERDIR)/wav.h
 
 $(BUILDDIR)/mmp.o: $(SRCDIR)/mmp.cpp $(HEADERDIR)/mmp.h
 	$(CC) $(CFLAGS) $(SRCDIR)/mmp.cpp -o $(BUILDDIR)/mmp.o -c  $(OPENCV_FLAGS)
+
+$(BUILDDIR)/spctr.o: $(SRCDIR)/spctr.cpp $(HEADERDIR)/spctr.h
+	$(CC) $(CFLAGS) $(SRCDIR)/spctr.cpp -o $(BUILDDIR)/spctr.o -c  $(OPENCV_FLAGS)
 
 
 

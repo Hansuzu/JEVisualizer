@@ -85,11 +85,11 @@ void Layer::draw(int cframe, cv::Mat* oframe, int verboseLevel){
     
     for (int y=0;y<h;++y){
       for (int x=0;x<w;++x){
-          cv::Scalar a=frame1->at<cv::Vec4b>(cv::Point(x, y));
-          cv::Scalar o=oframe->at<cv::Vec3b>(cv::Point(x, y));
-          int alpha=255-(255-a[3])*(255-o[3])/255/255;
-          o=(a[3]*a+(255-a[3])*o)/255;
-          frame1->at<cv::Vec4b>(cv::Point(x, y))=cv::Vec4b(o[0], o[1], o[2], alpha);
+        cv::Scalar a=frame1->at<cv::Vec4b>(cv::Point(x, y));
+        cv::Scalar o=oframe->at<cv::Vec3b>(cv::Point(x, y));
+        int alpha=255-(255-a[3])*(255-o[3])/255/255;
+        o=(a[3]*a+(255-a[3])*o)/255;
+        frame1->at<cv::Vec4b>(cv::Point(x, y))=cv::Vec4b(o[0], o[1], o[2], alpha);
       }
     }
     
@@ -103,8 +103,8 @@ void Layer::draw(int cframe, cv::Mat* oframe, int verboseLevel){
     
     for (int y=0;y<h;++y){
       for (int x=0;x<w;++x){
-          cv::Scalar a=frame1->at<cv::Vec4b>(cv::Point(x, y));
-          oframe->at<cv::Vec3b>(cv::Point(x, y))=cv::Vec3b(a[0], a[1], a[2]);
+        cv::Scalar a=frame1->at<cv::Vec4b>(cv::Point(x, y));
+        oframe->at<cv::Vec3b>(cv::Point(x, y))=cv::Vec3b(a[0], a[1], a[2]);
       }
     }
   }

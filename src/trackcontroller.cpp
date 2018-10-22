@@ -9,8 +9,16 @@ void TrackController::Track::update(std::vector<double>* newValues, double time,
   }
   double dtime=time-updateTime;
   double k=dtime/(newValueTime-updateTime);
+  
   for (int j=0;j<(int)values.size();++j){
-    values[j]=k*values[j]+(1-k)*limitValue(values[j], (*newValues)[j], dtime, maxDownSpeed, maxUpSpeed);
+    values[j]=(1-k)*values[j]+k*limitValue(values[j], (*newValues)[j], dtime, maxDownSpeed, maxUpSpeed);
+  }
+  updateTime=time;
+}
+
+void TrackController::Track::clean(double time){
+  for (int i=0;i<(int)values.size();++i){
+    values[i]=0;
   }
   updateTime=time;
 }
@@ -28,6 +36,13 @@ void TrackController::updateValues(std::vector<std::vector<double>*>& newValues,
     tracks[i].update(newValues[i], time, newValueTime);
   }
 }
+
+void TrackController::clean(double time){
+  for (int i=0;i<(int)tracks.size();++i){
+    tracks[i].clean(time);
+  }
+}
+
 
 TrackController::Index TrackController::getIndex(int i, int j) {
   return Index(this, i, j);

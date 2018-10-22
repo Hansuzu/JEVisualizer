@@ -11,12 +11,12 @@ void Controller::Track::loadConfig(std::string& configStr, int verboseLevel){
   configReader::readConfig(configStr, ans);
   for (std::pair<std::pair<std::string, std::string>, std::string>& conf : ans){
     std::string& param=conf.first.first;
-//     std::string& key=conf.first.second;
     std::string& value=conf.second;
-//     std::cout << param << ", " << value << std::endl;
     if (param=="type"){
       if (value=="WAV" || value=="1") type=WAV;
       else if (value=="MMP" || value=="2") type=MMP;
+      else if (value=="SPCTR" || value=="3") type=SPCTR;
+      else if (verboseLevel) std::cout << "[W] Controller::Track::loadConfig " << this << ", unknown value for type '" << value << "'" << std::endl;
     }
     else if (param=="f0") F0=std::stof(value);
     else if (param=="f1") F1=std::stof(value);
@@ -37,12 +37,14 @@ void Controller::Track::load(int verboseLevel){
     wavFile=new WavFile;
     wavFile->read(file.c_str());
     mLength=wavFile->length(channel);
-//     std::cout << "length: " << mLength << std::endl;
   }else if (type==MMP){
     mmpFile=new MMPFile;
     mmpFile->read(file.c_str(), verboseLevel);
     mLength=mmpFile->length(track);
-//     std::cout << "length: " << mLength << std::endl;
+  }else if (type==SPCTR){
+    spctrFile=new SPCTRFile;
+    spctrFile->read(file.c_str(), verboseLevel);
+    mLength=spctrFile->length();
   }
 }
 
@@ -51,13 +53,16 @@ void Controller::Track::createSpectrum(std::vector<double>& times, int verboseLe
   if (type==WAV){
     wavFile->spectrums(channel, FK, F0, F1, CHLEN, THR, values, times, verboseLevel);
   }else if (type==MMP){
-//     std::cout << "create Spectrums" << std::endl;
     mmpFile->spectrums(track, times, values, verboseLevel);
-//     std::cout << "create Spectrums ok" << std::endl;
+  }else if (type==SPCTR){
+    spctrFile->getSpectrums(times, values, verboseLevel);
   }else{
     for (int i=0;i<(int)times.size();++i){
       values.push_back(std::vector<double>());
     }
+  }
+  while (values.size()<times.size()){
+    values.push_back(std::vector<double>());
   }
 }
 
@@ -120,6 +125,17 @@ void Controller::runExtractor(){
     extractor.next(times[i], st, verboseLevel);
   }
 }
+
+
+void Controller::runCreateSPCTRs(){
+  if (verboseLevel>1) std::cout << "[I] Controller::runCreateSPCTRs " << this << "()" << std::endl;
+  for (int i=0;i<(int)tracks.size();++i){
+    SPCTRFile of;
+    of.fromSpectrum(tracks[i].getAllValues(), times, 1);
+    of.write((tracks[i].getFileName()+".spctr").c_str(), 1);
+  }
+}
+
 
 void Controller::setConfigParam(std::string& param, std::string& paramKey, std::string& value){
   if (verboseLevel>1) std::cout << "[I] Controller::setConfigParameter " << this << "('" << param <<"', '" << paramKey << "', '" << value << "')" << std::endl;

@@ -1,7 +1,10 @@
 #include <config.h>
 
 namespace configReader{
-  void readConfig(std::istream& co, std::vector<std::pair<std::pair<std::string, std::string>, std::string> >& ans){
+  char toLowerCase(char c){
+    return c>='A' && c<='Z'?c-'A'+'a':c;
+  }
+  void readConfig(std::istream& co, std::vector<std::pair<std::pair<std::string, std::string>, std::string> >& ans, bool lower){
     std::string line;
     int istr=0;
     bool isComment=0;
@@ -58,7 +61,8 @@ namespace configReader{
           for (int i=0;i<(int)b.size();++i){
             if (b[i]=='#') c=1;
             else if (!c){
-              p.push_back(b[i]>='A' && b[i]<='Z'?b[i]-'A'+'a':b[i]);
+              if (lower) p.push_back(toLowerCase(b[i]));
+              else       p.push_back(b[i]);
             }else{
               no.push_back(b[i]);
             }
@@ -68,12 +72,12 @@ namespace configReader{
       }
     }
   }
-  void readConfig(std::string co,  std::vector<std::pair<std::pair<std::string, std::string>, std::string> >& ans){
+  void readConfig(std::string co,  std::vector<std::pair<std::pair<std::string, std::string>, std::string> >& ans, bool lower){
     std::istringstream coi(co);
-    readConfig(coi, ans);
+    readConfig(coi, ans, lower);
   }
-  void readConfigFromFile(const char* fname,  std::vector<std::pair<std::pair<std::string, std::string>, std::string> >& ans){
+  void readConfigFromFile(const char* fname,  std::vector<std::pair<std::pair<std::string, std::string>, std::string> >& ans, bool lower){
     std::ifstream iff(fname);
-    readConfig(iff, ans);
+    readConfig(iff, ans, lower);
   }
 }

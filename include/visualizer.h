@@ -26,6 +26,9 @@ private:
   int cframe;   // current frame
   std::string ovfname; // the filename of output video
   
+  double maxDownSpeed;
+  double maxUpSpeed;
+  
   FormulaParameterEngine fpe; // Contains information about parameters that can be used in formulas
   TrackController tc; // Contains values of tracks and other stuff, a pointer to this is passed to layers
 private:
@@ -50,13 +53,10 @@ private:
   void readConfig(std::istream& co, int verboseLevel); // loads a configuration from a file, calls setConfigParam for each configuratino statement
 public:
   
-  Visualizer(const char* configFile, int verboseLevel):fps(20), w(640), h(480),ctime(0), cframe(0),ovfname("default.ogv"),fpe(NULL),firstFrame(0),lastFrame(1000000000){
-    std::cout << "hhui" << std::endl;
+  Visualizer(const char* configFile, int verboseLevel):fps(20), w(640), h(480),ctime(0), cframe(0),ovfname("default.ogv"),maxDownSpeed(100000), maxUpSpeed(100000),fpe(NULL),firstFrame(0),lastFrame(1000000000){
     std::ifstream co;
     co.open(configFile);
     readConfig(co, verboseLevel);
-    std::cout << "hhui" << std::endl;
-    
     oframe=new cv::Mat(cv::Size(w, h), CV_8UC3);
     outputVideo.open(ovfname, cv::VideoWriter::fourcc('t','h','e','o'), fps, cv::Size(w, h));
   }

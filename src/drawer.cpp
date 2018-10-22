@@ -32,12 +32,12 @@ void Drawer::updateFPE(int){
 
 
 
-void Drawer::drawLine(cv::Point a, cv::Point b, cv::Scalar color, double thickness, cv::Mat* frame){
-//   std::cout << "drawLine(<" << a.x << "," << a.y << ">, <" << b.x << "," << b.y << ">, <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, " << thickness << ", *frame)" << std::endl; 
+void Drawer::drawLine(cv::Point a, cv::Point b, cv::Scalar color, double thickness, cv::Mat* frame, int verboseLevel){
+  if (verboseLevel>3) std::cout << "[4] Drawer::drawLine " << this << "(<" << a.x << "," << a.y << ">, <" << b.x << "," << b.y << ">, <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, " << thickness << ", *frame)" << std::endl; 
   cv::line(*frame, a, b, color, thickness);
 }
-void Drawer::drawRectangle(cv::Point a, cv::Point b, cv::Point c, cv::Point d, cv::Scalar color, cv::Mat* frame){
-//   std::cout << "drawRectangle(... <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << std::endl;
+void Drawer::drawRectangle(cv::Point a, cv::Point b, cv::Point c, cv::Point d, cv::Scalar color, cv::Mat* frame, int verboseLevel){
+  if (verboseLevel>3) std::cout << "[4] Drawer::drawRectangle " << this << "(... <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << std::endl;
   while (a.x>b.x){swap(a, b);swap(b, c);swap(c, d);}
   while (a.x>d.x){swap(a, d);swap(d, c);swap(c, b);}
   if (b.y>d.y) swap(b, d);
@@ -76,7 +76,7 @@ void Drawer::update(int cframe){
 
 
 void Drawer::draw(int cframe, cv::Mat* frame, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Drawer::draw " << this << "(" << cframe << ") " << std::endl;
+  if (verboseLevel>2) std::cout << "[X] Drawer::draw " << this << "(" << cframe << ") " << std::endl;
   update(cframe);
   
   double x0d=x0.value();
@@ -112,11 +112,11 @@ void Drawer::draw(int cframe, cv::Mat* frame, int verboseLevel){
     cv::Scalar color(255*(p*lColor0+(1-p)*lColor1));
     cv::Scalar fillColor(255*(p*fColor0+(1-p)*fColor1));
     
-    drawRectangle(a, b, c, d, fillColor, frame);
-    drawLine(a, b, color, vthickness, frame);
-    drawLine(b, c, color, vthickness, frame);
-    drawLine(c, d, color, vthickness, frame);
-    drawLine(d, a, color, vthickness, frame);
+    drawRectangle(a, b, c, d, fillColor, frame, verboseLevel);
+    drawLine(a, b, color, vthickness, frame, verboseLevel);
+    drawLine(b, c, color, vthickness, frame, verboseLevel);
+    drawLine(c, d, color, vthickness, frame, verboseLevel);
+    drawLine(d, a, color, vthickness, frame, verboseLevel);
   }
 }
 

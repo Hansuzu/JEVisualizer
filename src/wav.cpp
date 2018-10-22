@@ -98,38 +98,61 @@ int WavFile::read(const char* filename){
   return 0;
 }
 
+
+double WavFile::valueForJL(std::vector<long long>& sm, double jl,  int K){
+  double rv=0;
+  for (int bgp=0;bgp<jl/2;++bgp){
+    double res=0;
+    int e=bgp;
+    for (int k=1;bgp+k*jl<sm.size() && k<K;++k){
+      int n=bgp+k*jl;
+      int h=e+(n-e)/2;
+      res+=sm[n]-2*sm[h]+sm[e];
+      // jl/3
+      int d=(n-e)/6;
+      int h1=e+1*d;
+      int h2=e+2*d;
+      int h3=e+3*d;
+      int h4=e+4*d;
+      int h5=e+5*d;
+      res-=(sm[n]-2*sm[h5]+2*sm[h4]-2*sm[h3]+2*sm[h2]-2*sm[h1]+sm[e])/3.0;
+      e=n;
+    }
+    int length=e-bgp;
+    if (length>0) res/=length;
+    if (res<0) res=-res;
+    if (res>rv) rv=res;
+  }
+  return rv;
+}
 void WavFile::singleSpectrum(int sp, int ep, int ch, std::vector<double>& fs, std::vector<double>& ans, std::vector<long long>& sm, double thr, int verboseLevel){
-  if (verboseLevel) std::cout << "WavFile::singleSpectrum(" << sp << ", " << ep << ", " << ch << ", &fs, &ans, &sm, " << thr << ", " << verboseLevel << ")" << std::endl;
+  if (verboseLevel>1) std::cout << "[I] WavFile::singleSpectrum(" << sp << ", " << ep << ", " << ch << ", &fs, &ans, &sm, " << thr << ", " << verboseLevel << ")" << std::endl;
   ans.resize(fs.size());
   for (int i=0;i<(int)ans.size();++i) ans[i]=0;
   if (ep>(int)channels[ch].size()) ep=channels[ch].size();
   sm.resize(ep-sp);
   sm[0]=channels[ch][sp];
   for (int i=sp+1;i<ep;++i) sm[i-sp]=sm[i-sp-1]+channels[ch][i];
+  if (verboseLevel>2){
+    std::cout << "[X] WavFile::singleSpectum: ";
+    for (int j=0;j<(int)fs.size();++j){
+      std::cout << j << ":" << fs[j] << "hZ ";
+    }
+    std::cout << std::endl << "[X] WavFile::singleSpectum: ";
+  }
   for (int j=0;j<(int)fs.size();++j){
     double jl=fmt.sampleRate/fs[j];
     ans[j]=0;
-    for (int bgp=0;bgp<jl/2;++bgp){
-      double res=0;
-      int e=bgp;
-      for (int k=1;bgp+k*jl<sm.size() && k<10;++k){
-        int n=bgp+k*jl;
-        int h=(n+e)/2;
-        res+=sm[n]-sm[h];
-        res-=sm[h]-sm[e];
-        e=n;
-      }
-      int length=e-bgp;
-      if (length>0) res/=length;
-      if (res<0) res=-res;
-      if (res>ans[j]) ans[j]=res;
-    }
+    double res=valueForJL(sm, jl, 18);
+    
+    if (res>ans[j]) ans[j]=res;
     
     double k=(1<<(fmt.bitsPerSample));
     ans[j]/=k;
     if (ans[j]<thr) ans[j]=0;
-    if (verboseLevel>=2) std::cout << fs[j] << "hZ: " << ans[j] << std::endl;
+    if (verboseLevel>2) std::cout <<  j << ":" << ans[j] << " ";
   }
+  if (verboseLevel>2) std::cout << std::endl;
 }
 
 
