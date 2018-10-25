@@ -8,26 +8,23 @@ int mode=0;
 
 int main(int argc, const char** args){
   string config="main.config";
-  for (int i=0;i<argc;++i){
-    if (std::string(args[i])=="--config"){
+  for (int i=1;i<argc;++i){
+    std::string arg=args[i];
+    if (arg=="--config"){
       if (++i==argc) break;
       config=args[i];
-    }else if (std::string(args[i])=="--verbose0" || std::string(args[i])=="-v0"){
-      verboseLevel=0;
-    }else if (std::string(args[i])=="--verbose" || std::string(args[i])=="--verbose1" || std::string(args[i])=="-v" || std::string(args[i])=="-v1"){
-      verboseLevel=1;
-    }else if (std::string(args[i])=="--verbose2" || std::string(args[i])=="-v2"){
-      verboseLevel=2;
-    }else if (std::string(args[i])=="--verbose3" || std::string(args[i])=="-v3"){
-      verboseLevel=3;
-    }else if (std::string(args[i])=="--verbose4" || std::string(args[i])=="-v4"){
-      verboseLevel=4;
-    }else if (std::string(args[i])=="--no-run"){
+    }else if (arg.size()>9 && arg.substr(0, 9)=="--verbose"){
+      verboseLevel=std::stoi(arg.substr(9));
+    }else if (arg.size()>2 && arg.substr(0, 2)=="-v"){
+      verboseLevel=std::stoi(arg.substr(2));
+    }else if (arg=="--no-run"){
       mode=1;
-    }else if (std::string(args[i])=="--extractor"){
+    }else if (arg=="--extractor"){
       mode=2;
-    }else if (std::string(args[i])=="--spctr"){
+    }else if (arg=="--spctr"){
       mode=3;
+    }else{
+      std::cout << "unrecognized parameter: '" << arg << "'" << endl;
     }
   }
   Controller controller(config, verboseLevel);

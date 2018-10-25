@@ -38,9 +38,9 @@ namespace configReader{
           if (line[i]=='"' && istr==1 && !esc){istr=0;continue;}
           if (line[i]=='\'' && !istr){istr=2; continue;}
           if (line[i]=='\'' && istr==2 && !esc){istr=0; continue;}
-          if (line[i]=='{' && !istr){istr=3; continue;}
+          if (line[i]=='{' && !istr && !esc){istr=3; continue;}
           if (line[i]=='}' && istr==3 && !esc){istr=0; continue;}
-          if (istr && !esc && line[i]=='\\') esc=1;
+          if (istr && !esc && line[i]=='\\'){esc=1; continue;}
           else esc=0;
           
           if (!istr && line[i]=='=') ec=1;

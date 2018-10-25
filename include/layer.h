@@ -25,6 +25,7 @@ private:
   cv::Mat* background;            // if background-image is used, it is saved here
   bool hasBgImage;
   FormulaColor LU, LD, RU, RD;    // if background-color is used
+  cv::Scalar lLU, lLD, lRU, lRD;
   bool hasBgColor;
   
   std::vector<Drawer*> drawers;      // all drawers
@@ -42,6 +43,7 @@ private:
   void setFPEV(std::string& key, std::string& value, int verboseLevel);
   void updateFPE(int cframe);
   
+  void createBgBackground(bool force=0);
 public:
   void draw(int cframe, cv::Mat* oframe, int verboseLevel); // draw this layer to the oframe
 
@@ -49,9 +51,12 @@ private:
   void setConfigParam(std::string& param, std::string& key, std::string& value, int verboseLevel); //readConfig calls this
 
 public:   //TODO: remove debug prints
-  void readConfig(const char* configFile, int verboseLevel);  // load configuratino from file
+  void readConfig(const char* configFile, int verboseLevel);  // load configuration from file
   
-  Layer(int w, int h, FormulaParameterEngine* pfpe, TrackController* ptc):layerWidth(w), layerHeight(h), firstFrame(0), lastFrame(1000000), hasBgImage(0), LU(&fpe), LD(&fpe), RU(&fpe), RD(&fpe), hasBgColor(0), tc(ptc), fpe(pfpe) {
+  Layer(int w, int h, FormulaParameterEngine* pfpe, TrackController* ptc):
+      layerWidth(w), layerHeight(h), firstFrame(0), lastFrame(1000000),
+        frame1(nullptr), frame2(nullptr), background(nullptr),
+        hasBgImage(0), LU(&fpe), LD(&fpe), RU(&fpe), RD(&fpe), hasBgColor(0), tc(ptc), fpe(pfpe) {
     frame1=new cv::Mat(cv::Size(w, h), CV_8UC4);
     frame2=new cv::Mat(cv::Size(w, h), CV_8UC4);
   }

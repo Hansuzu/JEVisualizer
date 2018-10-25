@@ -36,13 +36,40 @@ void Layer::updateFPE(int){
 
 void Layer::drawDrawers(int cframe, int verboseLevel){
   if (verboseLevel>1) std::cout << "[I] Layer::drawDrawers " << this << "(" << cframe << ")" << std::endl;
+  double xs=frame1->cols/layerWidth;
+  double ys=frame1->rows/layerHeight;
   for (int i=0;i<(int)drawers.size();++i){
-    drawers[i]->draw(cframe, frame1, verboseLevel);
+    drawers[i]->draw(cframe, frame1, xs, ys, verboseLevel);
   }
 }
 
 bool Layer::isVisible(int cframe){
   return cframe>=firstFrame && cframe<=lastFrame; // TODO: visibility parameter in config...
+}
+
+double dif(cv::Scalar& a, cv::Scalar&b){
+  cv::Scalar c=a-b;
+  return std::max(std::max(abs(c[0]), abs(c[1])), std::max(abs(c[2]), abs(c[3])));
+}
+void Layer::createBgBackground(bool force){
+  cv::Scalar vLU=LU.value();
+  cv::Scalar vLD=LD.value();
+  cv::Scalar vRU=RU.value();
+  cv::Scalar vRD=RD.value();
+  double df=std::max(std::max(dif(vLU, lLU), dif(vLD, lLD)), std::max(dif(vRU, lRU), dif(vRD, lRD)));
+  if (!force && df<1) return;
+  int w=frame1->size().width;
+  int h=frame1->size().height;
+  for (int x=0;x<w;++x){
+    cv::Scalar U=(vLU*(w-x)+vRU*x)/w;
+    cv::Scalar D=(vLD*(w-x)+vRD*x)/w;
+    for (int y=0;y<h;++y){
+      cv::Scalar color=(U*(h-y)+D*y)/h;
+      cv::Vec4b c(color[0], color[1], color[2], color[3]);
+      background->at<cv::Vec4b>(cv::Point(x, y))=c;
+    }
+  }
+  lLU=vLU;lLD=vLD;lRU=vRU;lRD=vRD;
 }
 
 void Layer::draw(int cframe, cv::Mat* oframe, int verboseLevel){
@@ -52,21 +79,9 @@ void Layer::draw(int cframe, cv::Mat* oframe, int verboseLevel){
     int w=oframe->size().width;
     int h=oframe->size().height;
     // draw layer
-    if (hasBgColor && !hasBgImage){ // TODO: bgcolor && bgimage?
-      cv::Scalar vLU=LU.value();
-      cv::Scalar vLD=LD.value();
-      cv::Scalar vRU=RU.value();
-      cv::Scalar vRD=RD.value();
-      for (int x=0;x<w;++x){
-        cv::Scalar U=(vLU*(w-x)+vRU*x)/w;
-        cv::Scalar D=(vLD*(w-x)+vRD*x)/w;
-        for (int y=0;y<h;++y){
-          cv::Scalar color=(U*(h-y)+D*y)/h;
-          cv::Vec4b c(color[0], color[1], color[2], color[3]);
-          frame1->at<cv::Vec4b>(cv::Point(x, y))=c;
-        }
-      }
-    }else if (hasBgImage){
+
+    if (hasBgImage || hasBgColor){
+      if (hasBgColor) createBgBackground();
       background->copyTo(*frame1);
     }else if (!hasBgColor && !hasBgImage) { // init layer to fully transparent black
       *frame1=cv::Scalar(0,0,0,0);
@@ -145,10 +160,14 @@ void Layer::setConfigParam(std::string& param, std::string& key, std::string& va
         RU.parse(res[i], verboseLevel);
       }
     }
+    if (background) delete background;
+    background=new cv::Mat(frame1->size(), CV_8UC4);
+    createBgBackground(1);
   }else if (param=="bg-image"){
     cv::Mat bgimage=cv::imread(value, cv::IMREAD_UNCHANGED);
     if (bgimage.data){
       hasBgImage=1;
+      if (background) delete background;
       background=new cv::Mat(frame1->size(), CV_8UC4);
       
       if (bgimage.channels()!=4){

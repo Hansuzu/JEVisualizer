@@ -42,8 +42,9 @@ void Visualizer::updateFPE(){
 
 
 void Visualizer::nextFrame(int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Visualizer::nextFrame " << this << std::endl;
+  if (verboseLevel>1) std::cout << "[I] Visualizer::nextFrame " << this << ", frame " << cframe << std::endl;
   if (cframe>=firstFrame && cframe<=lastFrame){
+    std::cout << cframe << std::endl;
     updateFPE();
     // draw layers
     for (int i=0;i<(int)layers.size();++i){

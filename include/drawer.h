@@ -18,7 +18,12 @@ private:
   std::vector<double> fpevs;
   void setFPEV(std::string& key, std::string& value, int verboseLevel);
   void updateFPE(int cframe);
-
+  enum ColumnType{Rectangle, Triangle, Polygon};
+  std::vector<std::pair<Formula*, Formula*> > polyCorners;
+  std::vector<std::pair<double, double> > polyCornerVs;
+  std::vector<cv::Point> polygonToDraw;
+  ColumnType columnType;
+  
   Formula x0, y0; // left point of the spectrum
   Formula x1, y1; // right point of the spectrum
   FormulaColor lineColor0; // color of the border line on the left end of the spectrum
@@ -36,20 +41,21 @@ private:
 
   
   // own functions to draw simple things because opencv wasn't doing what I wanted it to do
-  void drawLine(cv::Point a, cv::Point b, cv::Scalar color, double thickness, cv::Mat* frame, int veroseLevel);
-  void drawRectangle(cv::Point a, cv::Point b, cv::Point c, cv::Point d, cv::Scalar color, cv::Mat* frame, int verboseLevel);
+  void drawLine(cv::Point& a, cv::Point& b, cv::Scalar& color, double thickness, cv::Mat* frame, int veroseLevel);
+  void drawRectangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Point& d, cv::Scalar& color, cv::Mat* frame, int verboseLevel);
+  void drawTriangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Scalar& color, cv::Mat* frame, int verboseLevel);
+  void drawPolygon(std::vector<cv::Point>& pts, cv::Scalar& color, cv::Mat* frame, int verboseLevel);
   
   void update(int cframe); // draw calls first this
   
 public:
-  void draw(int cframe, cv::Mat* frame, int verboseLevel); // draws this
+  void draw(int cframe, cv::Mat* frame, double xScale, double yScale, int verboseLevel); // draws this
 
 private:
   void setParameter(std::string& param, std::string& key, std::string& value, int verboseLevel); //parse calls this
 
 public:
   void parse(std::string& config, int verboseLevel); // given a string, parses the configuration
-  
   Drawer(FormulaParameterEngine* pfpe, TrackController* ptc) : 
       x0(&fpe), y0(&fpe), x1(&fpe), y1(&fpe), lineColor0(&fpe), lineColor1(&fpe),
       fillColor0(&fpe), fillColor1(&fpe),  w(&fpe), h(&fpe), lineThickness(&fpe),
