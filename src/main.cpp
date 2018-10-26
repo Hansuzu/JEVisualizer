@@ -24,7 +24,7 @@ int main(int argc, const char** args){
     }else if (arg=="--spctr"){
       mode=3;
     }else{
-      std::cout << "unrecognized parameter: '" << arg << "'" << endl;
+      cout << "unrecognized parameter: '" << arg << "'" << endl;
     }
   }
   Controller controller(config, verboseLevel);
@@ -56,7 +56,7 @@ int main(int argc, const char** args){
     cout << "Analysis ready." << endl;
     cout << "Will start visualizer" << endl;
     if (spectrums.size()!=times.size()){
-      cout << "Internal error: spectrums.size()!=times.size()" << std::endl;
+      cout << "Internal error: spectrums.size()!=times.size()" << LEND;
     }else if (spectrums.size()){
       Visualizer o(video_config_file.c_str(), spectrums[0].size(), verboseLevel);
       cout << "Writing video..." << endl;

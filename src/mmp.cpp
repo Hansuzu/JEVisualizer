@@ -1,25 +1,23 @@
+#include <log.h>
 #include <mmp.h>
 #include <algorithm>
-
-
-#include <iostream>
 
 void MMPFile::XML::print(int level){
   if (!(level&1) && type==Type::EndTag) return;
   if (!(level&2) && type==Type::Data) return;
-  for (int i=0;i<2*depth;++i) std::cout << " ";
-  if (type==Type::Root) std::cout << "ROOT";
-  else if (type==Type::Unset) std::cout << "Unset";
-  else if (type==Type::Data) std::cout << "Data";
-  else if (type==Type::Comment) std::cout << "Comment";
-  else if (type==Type::EndTag) std::cout << "ENDTAG " << name << ":";
+  for (int i=0;i<2*depth;++i) lout << " ";
+  if (type==Type::Root) lout << "ROOT";
+  else if (type==Type::Unset) lout << "Unset";
+  else if (type==Type::Data) lout << "Data";
+  else if (type==Type::Comment) lout << "Comment";
+  else if (type==Type::EndTag) lout << "ENDTAG " << name << ":";
   else {
-    if (type==Type::Prologue)  std::cout << "Prologue: ";
-    else if (type==Type::DOCTYPE) std::cout << "Doctype: ";
-    else if (type==Type::Tag) std::cout << "TAG " << name << ":";
-    for (int i=0; i<(int)params.size();++i) std::cout << params[i].first << "->" << params[i].second << "  ";
+    if (type==Type::Prologue)  lout << "Prologue: ";
+    else if (type==Type::DOCTYPE) lout << "Doctype: ";
+    else if (type==Type::Tag) lout << "TAG " << name << ":";
+    for (int i=0; i<(int)params.size();++i) lout << params[i].first << "->" << params[i].second << "  ";
   }
-  std::cout << "\n";
+  lout << "\n";
   for (int i=0;i<(int)contents.size();++i) contents[i].print(level);
 }
 
@@ -186,12 +184,12 @@ void MMPFile::parseFromXML(int verboseLevel){
           v=bpm->findParam("value");
           if (v.first){
             BPM=std::stoi(v.second);
-            if (verboseLevel>1) std::cout << "[I] MMPFile::parseFromXML " << this << ", BPM (2):" << BPM << std::endl;
-          }else std::cout << "[E] MMPFile::parseFromXML " << this << ", NO BPM (2)" << std::endl;
-        }else  std::cout << "[E] MMPFile::parseFromXML " << this << ", NO BPM (1)" << std::endl;
+            if (verboseLevel>1) lout << "[I] MMPFile::parseFromXML " << this << ", BPM (2):" << BPM << LEND;
+          }else lout << "[E] MMPFile::parseFromXML " << this << ", NO BPM (2)" << LEND;
+        }else  lout << "[E] MMPFile::parseFromXML " << this << ", NO BPM (1)" << LEND;
       }else{
         BPM=std::stoi(v.second);
-        if (verboseLevel>1) std::cout << "[I] MMPFile::parseFromXML " << this << ", BPM:" << BPM << std::endl;
+        if (verboseLevel>1) lout << "[I] MMPFile::parseFromXML " << this << ", BPM:" << BPM << LEND;
       }
     }
     if ((songNode=lmmsProjectNode->findOne("song"))){
@@ -204,7 +202,7 @@ void MMPFile::parseFromXML(int verboseLevel){
   std::vector<XML*> patterns;
   std::vector<XML*> notes;
   for (int i=0;i<(int)trackNodes.size();++i){
-    if (verboseLevel>1 ) std::cout << "[I] MMPFile::parseFromXML " << this << ", MPP FILE Track #" << i << ": " << trackNodes[i]->findParam("name").second << std::endl;
+    if (verboseLevel>1 ) lout << "[I] MMPFile::parseFromXML " << this << ", MPP FILE Track #" << i << ": " << trackNodes[i]->findParam("name").second << LEND;
     patterns.clear();
     trackNodes[i]->find("pattern", patterns);
     tracks.push_back(Track());

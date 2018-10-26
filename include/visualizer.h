@@ -40,6 +40,7 @@ private:
 public:
 private:
   std::vector<Layer*> layers; // Layers that are rendered
+  std::vector<std::future<void> > layerIndependentDrawers;
   
   // stuff to make FormulaParameterEngine work
   std::vector<std::vector<TrackController::Index> > fpeTracks; // used when some formula-parameter value depends on some values of tracks
@@ -51,6 +52,7 @@ private:
   void writeNewFrame(int cframe, std::chrono::duration<double> timeElapsedBeforeWrite, int verboseLevel);
   void launchWriteNewFrame(std::chrono::duration<double> timeElapsedBeforeWrite, int verboseLevel);
   void waitWriteFrameToFinish();
+  
   std::chrono::time_point<std::chrono::high_resolution_clock> lastFrameFinishTime;
   void nextFrame(int verboseLevel); //Renders a frame of video
 public:

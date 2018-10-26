@@ -1,5 +1,5 @@
+#include <log.h>
 #include <wav.h>
-#include <iostream>
 
 int WavFile::Riff::read(std::vector<unsigned char> data, unsigned int& p){
   if (p+12 > data.size()) return WAV_ERROR_RIFF_ERROR;
@@ -33,8 +33,6 @@ int WavFile::DataChunk::read(std::vector<unsigned char> fdata, unsigned int& p){
     chunkID=(fdata[p]<<24)|(fdata[p+1]<<16)|(fdata[p+2]<<8)|fdata[p+3];
     chunkSize=(fdata[p+7]<<24)|(fdata[p+6]<<16)|(fdata[p+5]<<8)|fdata[p+4];
     p+=8;
-//     std::cout << chunkSize << std::endl;
-//     std::cout << chunkID << std::endl;
     if (chunkID!=0x64617461 && chunkID!=0x494e464f){
       p+=8+chunkSize;
       continue;
@@ -126,7 +124,7 @@ double WavFile::valueForJL(std::vector<long long>& sm, double jl,  int K){
   return rv;
 }
 void WavFile::singleSpectrum(int sp, int ep, int ch, std::vector<double>& fs, std::vector<double>& ans, std::vector<long long>& sm, double thr, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] WavFile::singleSpectrum(" << sp << ", " << ep << ", " << ch << ", &fs, &ans, &sm, " << thr << ", " << verboseLevel << ")" << std::endl;
+  if (verboseLevel>1) lout << "[I] WavFile::singleSpectrum(" << sp << ", " << ep << ", " << ch << ", &fs, &ans, &sm, " << thr << ", " << verboseLevel << ")" << LEND;
   ans.resize(fs.size());
   for (int i=0;i<(int)ans.size();++i) ans[i]=0;
   if (ep>(int)channels[ch].size()) ep=channels[ch].size();
@@ -134,11 +132,11 @@ void WavFile::singleSpectrum(int sp, int ep, int ch, std::vector<double>& fs, st
   sm[0]=channels[ch][sp];
   for (int i=sp+1;i<ep;++i) sm[i-sp]=sm[i-sp-1]+channels[ch][i];
   if (verboseLevel>2){
-    std::cout << "[X] WavFile::singleSpectum: ";
+    lout << "[X] WavFile::singleSpectum: ";
     for (int j=0;j<(int)fs.size();++j){
-      std::cout << j << ":" << fs[j] << "hZ ";
+      lout << j << ":" << fs[j] << "hZ ";
     }
-    std::cout << std::endl << "[X] WavFile::singleSpectum: ";
+    lout << LEND << "[X] WavFile::singleSpectum: ";
   }
   for (int j=0;j<(int)fs.size();++j){
     double jl=fmt.sampleRate/fs[j];
@@ -150,26 +148,26 @@ void WavFile::singleSpectrum(int sp, int ep, int ch, std::vector<double>& fs, st
     double k=(1<<(fmt.bitsPerSample));
     ans[j]/=k;
     if (ans[j]<thr) ans[j]=0;
-    if (verboseLevel>2) std::cout <<  j << ":" << ans[j] << " ";
+    if (verboseLevel>2) lout <<  j << ":" << ans[j] << " ";
   }
-  if (verboseLevel>2) std::cout << std::endl;
+  if (verboseLevel>2) lout << LEND;
 }
 
 
-
+/*
 void WavFile::print(){
-  std::cout << "NumChannels: " << fmt.numChannels << "\n";
-  std::cout << "SampleRate: " << fmt.sampleRate << "\n";
-  std::cout << "ByteRate: " << fmt.byteRate << "\n";
-  std::cout << "BlockAlign: " << fmt.blockAlign << "\n";
-  std::cout << "BitsPerSample: " << fmt.bitsPerSample << "\n";
-  std::cout << std::endl;
-  std::cout << "DATA: ";
+  lout << "NumChannels: " << fmt.numChannels << "\n";
+  lout << "SampleRate: " << fmt.sampleRate << "\n";
+  lout << "ByteRate: " << fmt.byteRate << "\n";
+  lout << "BlockAlign: " << fmt.blockAlign << "\n";
+  lout << "BitsPerSample: " << fmt.bitsPerSample << "\n";
+  lout << LEND;
+  lout << "DATA: ";
   for (int i=0;i+fmt.blockAlign<=(int)data.data.size() && i<256;i+=fmt.blockAlign){
-    if (i) std::cout << "  ";
-    std::cout << "(";
+    if (i) lout << "  ";
+    lout << "(";
     for (int j=0;j<fmt.numChannels;++j){
-      if (j) std::cout << ", ";
+      if (j) lout << ", ";
       int no=0;
       for (int b=0;b<fmt.bitsPerSample;++b){
         no<<=1;
@@ -178,13 +176,13 @@ void WavFile::print(){
       }
 //       ans[j]=std::max(ans[j], res>=0?res:-res);
       if (fmt.bitsPerSample==16 && no>=(1<<15)) no-=1<<16;
-      std::cout << no;
+      lout << no;
     }
-    std::cout << ")";
+    lout << ")";
   }
-  if (256<data.data.size()) std::cout << "...";
-  std::cout << std::endl;
-  std::cout << std::endl;
+  if (256<data.data.size()) lout << "...";
+  lout << LEND;
+  lout << LEND;
   
   std::vector<double> hz;
   double b=88;
@@ -210,17 +208,18 @@ void WavFile::print(){
     double t1=f+1;
     t0/=20;
     t1/=20;
-    std::cout << "SPECTRUM FROM POSITION " << t0 << "s to " << t1 << "s on channel 0" << std::endl;
+    lout << "SPECTRUM FROM POSITION " << t0 << "s to " << t1 << "s on channel 0" << LEND;
     std::vector<long long> sm;
     singleSpectrum(fmt.sampleRate*t0, fmt.sampleRate*t1, 0, hz, ans, sm, 0, 0);
     for (int i=1;i<(int)hz.size();++i){
       //cout << hz[i-1] << "-" << hz[i] << ":" << ans[ans.size()-i] << "\n";
-      for (int j=0;j<ans[ans.size()-i]*10;++j) std::cout << "#"; std::cout << "\n";
+      for (int j=0;j<ans[ans.size()-i]*10;++j) lout << "#"; lout << "\n";
     }
-    std::cout << std::endl;
+    lout << LEND;
   }
   
 }
+*/
 
 
 double WavFile::length(int ch){

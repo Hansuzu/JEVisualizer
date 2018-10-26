@@ -1,10 +1,10 @@
-#include <iostream>
+#include <log.h>
 #include <chrono>
 #include <layer.h>
 
 
 void Layer::setFPEV(std::string& key, std::string& value, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Layer::setFPEV " << this << "('" << key << "', '" << value << "')" << std::endl;
+  if (verboseLevel>1) lout << "[I] Layer::setFPEV " << this << "('" << key << "', '" << value << "')" << LEND;
   int index=std::stoi(key);
   if (value=="layer-width") fpe.setIndex(index, 1);
   else if (value=="layer-height") fpe.setIndex(index, 2);
@@ -14,7 +14,7 @@ void Layer::setFPEV(std::string& key, std::string& value, int verboseLevel){
     fpe.setIndex(index, 2+fpeTracks.size());
   }else if (value=="null"||value=="0") fpe.setIndex(index, 0);
   else if (verboseLevel){
-     std::cout << "[W] Layer:setFPEV " << this << ", unknown FPV: '" << value << "'" << std::endl;
+     lout << "[W] Layer:setFPEV " << this << ", unknown FPV: '" << value << "'" << LEND;
   }
 }
 
@@ -36,7 +36,7 @@ void Layer::updateFPE(int){
 
 
 void Layer::drawDrawers(int cframe, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Layer::drawDrawers " << this << "(" << cframe << ")" << std::endl;
+  if (verboseLevel>1) lout << "[I] Layer::drawDrawers " << this << "(" << cframe << ")" << LEND;
   auto start = std::chrono::high_resolution_clock::now();
   double xs=frame1->cols/layerWidth;
   double ys=frame1->rows/layerHeight;
@@ -45,7 +45,7 @@ void Layer::drawDrawers(int cframe, int verboseLevel){
   }
   auto finish = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = finish - start;
-  if (verboseLevel>2) std::cout << "[X] Layer::drawDrawers " << this << " finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+  if (verboseLevel>2) lout << "[P] Layer::drawDrawers " << this << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
 }
 
 bool Layer::isVisible(int cframe){
@@ -77,14 +77,11 @@ void Layer::createBgBackground(bool force){
   lLU=vLU;lLD=vLD;lRU=vRU;lRD=vRD;
 }
 
-void Layer::draw(int cframe, cv::Mat* oframe, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Layer::draw " << this << "(" << cframe << ")" << std::endl;
+void Layer::drawIndependent(int cframe, int verboseLevel){
+  if (verboseLevel>1) lout << "[I] Layer::drawIndependent " << this << "(" << cframe << ")" << LEND;
   if (isVisible(cframe)){
     auto start = std::chrono::high_resolution_clock::now();
-    
     updateFPE(cframe);
-    int w=oframe->size().width;
-    int h=oframe->size().height;
     // draw layer
 
     if (hasBgImage || hasBgColor){
@@ -97,7 +94,7 @@ void Layer::draw(int cframe, cv::Mat* oframe, int verboseLevel){
     drawDrawers(cframe, verboseLevel);
     
     // apply layer filters
-    if (verboseLevel>2) std::cout << "[X] Layer::draw " << this << " apply layer filters" << std::endl;
+    if (verboseLevel>2) lout << "[X] Layer::drawIndependent " << this << " apply layer filters" << LEND;
     auto startLayerFilters = std::chrono::high_resolution_clock::now();
     for (int i=0;i<(int)layerFilters.size();++i){
       if (~i&1) layerFilters[i]->apply(frame1, frame2, verboseLevel);
@@ -107,11 +104,21 @@ void Layer::draw(int cframe, cv::Mat* oframe, int verboseLevel){
     if (verboseLevel>2){
       auto finish = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> elapsed = finish - startLayerFilters;
-      std::cout << "[X] Layer::draw apply layer filters finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+      lout << "[P] Layer::drawIndependent " << this << " apply layer filters finished, elapsed time=" << elapsed.count() << " s" << LEND;
+      elapsed = finish - start;
+      lout << "[P] Layer::drawIndependent " << this << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
     }
-    // draw layer to image
-    
-    if (verboseLevel>2) std::cout << "[X] Layer::draw " << this << " draw image to layer" << std::endl;
+  }
+}
+
+void Layer::drawToOframe(int cframe, cv::Mat* oframe, int verboseLevel){
+  if (verboseLevel>1) lout << "[I] Layer::drawToOframe " << this << "(" << cframe << ")" << LEND;
+  if (isVisible(cframe)){
+    int w=oframe->size().width;
+    int h=oframe->size().height;
+    // draw image to layer
+    auto start = std::chrono::high_resolution_clock::now();
+    if (verboseLevel>2) lout << "[X] Layer::drawToOframe " << this << " draw image to layer" << LEND;
     auto startDrawImageToLayer = std::chrono::high_resolution_clock::now();
     
     uchar* p1;
@@ -129,11 +136,11 @@ void Layer::draw(int cframe, cv::Mat* oframe, int verboseLevel){
     if (verboseLevel>2){
       auto finish = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> elapsed = finish - startDrawImageToLayer;
-      std::cout << "[X] Layer::draw draw image to layer finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+      lout << "[P] Layer::drawToOframe " << this << " draw image to layer finished, elapsed time=" << elapsed.count() << " s" << LEND;
     }
     
     // apply image filters
-    if (verboseLevel>2) std::cout << "[X] Layer::draw " << this << " apply image filters" << std::endl;
+    if (verboseLevel>2) lout << "[X] Layer::drawToOframe " << this << " apply image filters" << LEND;
     auto startImageFilters = std::chrono::high_resolution_clock::now();
     for (int i=0;i<(int)imageFilters.size();++i){
       if (~i&1) imageFilters[i]->apply(frame1, frame2, verboseLevel);
@@ -142,12 +149,12 @@ void Layer::draw(int cframe, cv::Mat* oframe, int verboseLevel){
     if (verboseLevel>2){
       auto finish = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> elapsed = finish - startImageFilters;
-      std::cout << "[X] Layer::draw apply image filters finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+      lout << "[P] Layer::drawToOframe " << this << " apply image filters finished, elapsed time=" << elapsed.count() << " s" << LEND;
     }
     
     if ((imageFilters.size())&1) swap(frame1, frame2);
     
-    if (verboseLevel>2) std::cout << "[X] Layer::draw " << this << " draw layer to image" << std::endl;
+    if (verboseLevel>2) lout << "[X] Layer::drawToOframe " << this << " draw layer to image" << LEND;
     auto startDrawLayerToImage = std::chrono::high_resolution_clock::now();
     
     for (int y=0;y<h;++y){
@@ -163,17 +170,17 @@ void Layer::draw(int cframe, cv::Mat* oframe, int verboseLevel){
     if (verboseLevel>2){
       auto finish = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> elapsed = finish - startDrawLayerToImage;
-      std::cout << "[X] Layer::draw draw layer to image finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+      lout << "[P] Layer::drawToOframe draw layer to image finished, elapsed time=" << elapsed.count() << " s" << LEND;
     }
     
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
-    if (verboseLevel>2) std::cout << "[X] Layer::draw " << this << " finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+    if (verboseLevel>2) lout << "[P] Layer::drawToOframe " << this << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
   }
 }
 
 void Layer::setConfigParam(std::string& param, std::string& key, std::string& value, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Layer::setConfigParam " << this << "('" << param << "', '" << key << "', '" << value << "')" << std::endl;
+  if (verboseLevel>1) lout << "[I] Layer::setConfigParam " << this << "('" << param << "', '" << key << "', '" << value << "')" << LEND;
   if (param=="w" || param=="width"){
     layerWidth=std::stod(value);
   }else if (param=="h" || param=="height"){
@@ -230,16 +237,16 @@ void Layer::setConfigParam(std::string& param, std::string& key, std::string& va
       }else{
         cv::resize(bgimage, *background, frame1->size());
       }
-    }else std::cout << "[E] Layer::setConfigParam " << this << ", couldn't load image '" << value << "'" << std::endl;
+    }else lout << "[E] Layer::setConfigParam " << this << ", couldn't load image '" << value << "'" << LEND;
   }else if (param=="fpv"){
     setFPEV(key, value, verboseLevel);
   }else if (verboseLevel){
-     std::cout << "[W] Layer::setConfigParam " << this << ", unknown parameter '" << value << "'" << std::endl;
+     lout << "[W] Layer::setConfigParam " << this << ", unknown parameter '" << value << "'" << LEND;
   }
 }
 
 void Layer::readConfig(const char* configFile, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Layer::readConfig " << this << "('" <<configFile << "')" << std::endl;
+  if (verboseLevel>1) lout << "[I] Layer::readConfig " << this << "('" <<configFile << "')" << LEND;
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;
   configReader::readConfigFromFile(configFile, ans);
   for (auto& conf:ans) setConfigParam(conf.first.first, conf.first.second, conf.second, verboseLevel);

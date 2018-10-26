@@ -45,7 +45,8 @@ private:
   
   void createBgBackground(bool force=0);
 public:
-  void draw(int cframe, cv::Mat* oframe, int verboseLevel); // draw this layer to the oframe
+  void drawIndependent(int cframe, int verboseLevel); // draw layer-things that can be drawn without oframe (-> )
+  void drawToOframe(int cframe, cv::Mat* oframe, int verboseLevel);    // draw layer to oframe (drawIndepent should be called before this)
 
 private:
   void setConfigParam(std::string& param, std::string& key, std::string& value, int verboseLevel); //readConfig calls this

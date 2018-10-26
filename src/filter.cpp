@@ -1,9 +1,9 @@
-#include <iostream>
+#include <log.h>
 #include <chrono>
 #include <filter.h>
 
 void Filter::loadColorRule(std::string& ruleStr, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Filter::loadColorRule " << this << "('" << ruleStr << "')" << std::endl;
+  if (verboseLevel>1) lout << "[I] Filter::loadColorRule " << this << "('" << ruleStr << "')" << LEND;
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;
   configReader::readConfig(ruleStr, ans);
   ColorRule* rule = new ColorRule(&fpe);
@@ -32,19 +32,19 @@ void Filter::loadColorRule(std::string& ruleStr, int verboseLevel){
     }else if (param=="shift-y"){
       rule->shiftY.parse(value, verboseLevel);
     }else if (verboseLevel){
-      std::cout << "[W] Filter::loadColorRule " << this << ", unrecognized parameter '" << param << "'" << std::endl;
+      lout << "[W] Filter::loadColorRule " << this << ", unrecognized parameter '" << param << "'" << LEND;
     }
   }
 }
 
 void Filter::setConfigParam(std::string& param, std::string& key, std::string& value, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Filter::setConfigParam " << this << "('" << param << "', '" << key << "', '" << value << "')" << std::endl;
+  if (verboseLevel>1) lout << "[I] Filter::setConfigParam " << this << "('" << param << "', '" << key << "', '" << value << "')" << LEND;
   if (param=="type"){
     if (value=="GAUSSIAN-BLUR" || value=="0") type=Type::GaussianBlur;
     else if (value=="COLOR" || value=="1") type=Type::Color;
     else if (value=="SUPER-COLOR" || value=="2") type=Type::SuperColor;
     else if (verboseLevel){
-      std::cout << "[W] Filter::setConfigParam " << this << ", unknown filter-type '" << value<< "'" << std::endl;
+      lout << "[W] Filter::setConfigParam " << this << ", unknown filter-type '" << value<< "'" << LEND;
     }
   }else if (param=="kernel"){
     kernelX.parse(value, verboseLevel);
@@ -72,16 +72,16 @@ void Filter::setConfigParam(std::string& param, std::string& key, std::string& v
   }else if (param=="rule"){
     loadColorRule(value, verboseLevel);
   }else if (verboseLevel){
-    std::cout << "[W] Filter::setConfigParam " << this << ", unrecognized parameter '" << param << "'" << std::endl;
+    lout << "[W] Filter::setConfigParam " << this << ", unrecognized parameter '" << param << "'" << LEND;
   }
 }
 
 void Filter::loadConfig(std::string& config, int verboseLevel){
-  if (verboseLevel>2) std::cout << "[X] Filter::loadConfig " << this << "('" << config << "')" << std::endl;
+  if (verboseLevel>2) lout << "[X] Filter::loadConfig " << this << "('" << config << "')" << LEND;
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;
   configReader::readConfig(config, ans);
   for (auto conf:ans) setConfigParam(conf.first.first, conf.first.second, conf.second, verboseLevel);
-  if (verboseLevel>2) std::cout << "[X] Filter::loadConfig " << this << " OK " << std::endl;
+  if (verboseLevel>2) lout << "[X] Filter::loadConfig " << this << " OK " << LEND;
 }
 
 
@@ -166,31 +166,30 @@ void Filter::applySuperColorRule(cv::Mat* frame1, cv::Mat* frame2, int i, int k)
   }
 }
 void Filter::apply(cv::Mat* frame1, cv::Mat* frame2, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Filter::apply " << this << std::endl; 
+  if (verboseLevel>1) lout << "[I] Filter::apply " << this << LEND; 
   std::vector<double> tmp;
   fpe.updateValues(tmp);
   if (type==GaussianBlur){
-    if (verboseLevel>2) std::cout << "[X] Filter::apply type==GaussianBlur " << this << std::endl;
+    if (verboseLevel>2) lout << "[X] Filter::apply type==GaussianBlur " << this << LEND;
     auto start = std::chrono::high_resolution_clock::now();
     applyGaussianBlur(frame1, frame2);
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
-    if (verboseLevel>2) std::cout << "[X] Filter::apply type==GaussianBlur " << this << " finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+    if (verboseLevel>2) lout << "[P] Filter::apply type==GaussianBlur " << this << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
   }else if (type==Color){
-    if (verboseLevel>2) std::cout << "[X] Filter::apply type==Color " << this << std::endl; 
+    if (verboseLevel>2) lout << "[X] Filter::apply type==Color " << this << LEND; 
     auto start = std::chrono::high_resolution_clock::now();
     applyColor(frame1, frame2);
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
-    if (verboseLevel>2) std::cout << "[X] Filter::apply type==Color " << this << " finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+    if (verboseLevel>2) lout << "[P] Filter::apply type==Color " << this << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
   }else if (type==SuperColor){
-    if (verboseLevel>2) std::cout << "[X] Filter::apply type==SuperColor " << this << std::endl; 
+    if (verboseLevel>2) lout << "[X] Filter::apply type==SuperColor " << this << LEND; 
     auto start = std::chrono::high_resolution_clock::now();
     *frame2=cv::Vec4b(0,0,0,0);
     for (int k=0;k<(int)colorRules.size();++k){
       //Stuff to make multithreading possible...
       //With same k, no two colorRules should write to same indices in array
-      
       fs.clear();
       for (int i=0;i<(int)colorRules.size();++i){
         fs.push_back(std::async(std::launch::async, &Filter::applySuperColorRule, this, frame1, frame2, i, k));
@@ -199,7 +198,7 @@ void Filter::apply(cv::Mat* frame1, cv::Mat* frame2, int verboseLevel){
     }
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
-    if (verboseLevel>2) std::cout << "[X] Filter::apply type==SuperColor " << this << " finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+    if (verboseLevel>2) lout << "[P] Filter::apply type==SuperColor " << this << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
   }
 }
 

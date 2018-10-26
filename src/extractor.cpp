@@ -1,8 +1,9 @@
+#include <log.h>
 #include <extractor.h>
-#include <iostream>
+
 
 void Extractor::nextFrame(int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Extractor::nextFrame " << this << std::endl;
+  if (verboseLevel>1) lout << "[I] Extractor::nextFrame " << this << LEND;
   std::vector<std::pair<std::string, double> > notes;
   for (int k=0;k<(int)map.size();++k){
     int i=map[k].first.first;
@@ -65,7 +66,7 @@ void Extractor::nextFrame(int verboseLevel){
 
 
 void Extractor::next(double time, std::vector<std::vector<double>*>& newTrackValues, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Extractor::next(" << time << ", &st, " << verboseLevel << ")" << std::endl; 
+  if (verboseLevel>1) lout << "[I] Extractor::next(" << time << ", &st, " << verboseLevel << ")" << LEND; 
   tc.setMaxDownSpeed(maxDownSpeed);
   tc.setMaxUpSpeed(maxUpSpeed);
   while (((double)cframe)/fps<time){
@@ -81,7 +82,7 @@ void Extractor::next(double time, std::vector<std::vector<double>*>& newTrackVal
 }
 
 std::pair<int, int> Extractor::split(std::string& value, int verboseLevel){
-  if (verboseLevel>2) std::cout << "[X] Ectractor::split " << this << "('" << value << "')" << std::endl;
+  if (verboseLevel>2) lout << "[X] Ectractor::split " << this << "('" << value << "')" << LEND;
   std::string a="";
   std::string b="";
   bool bb=0;
@@ -93,7 +94,7 @@ std::pair<int, int> Extractor::split(std::string& value, int verboseLevel){
   return {std::stoi(a), std::stoi(b)};
 }
 void Extractor::getArray(std::string& value, std::vector<std::string>& res, int verboseLevel){
-  if (verboseLevel>2) std::cout << "[X] Ectractor::getArray " << this << "('" << value << "')" << std::endl;
+  if (verboseLevel>2) lout << "[X] Ectractor::getArray " << this << "('" << value << "')" << LEND;
   int d=0;
   std::string last="";
   for (auto c : value){
@@ -108,19 +109,19 @@ void Extractor::getArray(std::string& value, std::vector<std::string>& res, int 
     }else if (d==1){
       last.push_back(c);
     }else if (verboseLevel) {
-      std::cout << "[W] Extractor::getArray " << this << "('" << value << "'): Out-of-array data: '" << c << "'" << std::endl; 
+      lout << "[W] Extractor::getArray " << this << "('" << value << "'): Out-of-array data: '" << c << "'" << LEND; 
     }
   }
   if (d!=0 && verboseLevel){
-      std::cout << "[W] Extractor::getArray " << this << "('" << value << "'): Array didn't end as expected. " << std::endl; 
+      lout << "[W] Extractor::getArray " << this << "('" << value << "'): Array didn't end as expected. " << LEND; 
   }else if (last.size() && verboseLevel){
-      std::cout << "[W] Extractor::getArray " << this << "('" << value << "'): Value '" << last << "' not appended to the array." << std::endl; 
+      lout << "[W] Extractor::getArray " << this << "('" << value << "'): Value '" << last << "' not appended to the array." << LEND; 
   }
 }
 
 
 void Extractor::loadMap(std::string& conf, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Ectractor::loadMap " << this << "('" << conf << "')" << std::endl;
+  if (verboseLevel>1) lout << "[I] Ectractor::loadMap " << this << "('" << conf << "')" << LEND;
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;
   configReader::readConfig(conf, ans);
   for (auto confp : ans){
@@ -129,7 +130,7 @@ void Extractor::loadMap(std::string& conf, int verboseLevel){
 }
 
 void Extractor::loadGroups(std::string& conf, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Ectractor::loadGroups " << this << "('" << conf << "')" << std::endl;
+  if (verboseLevel>1) lout << "[I] Ectractor::loadGroups " << this << "('" << conf << "')" << LEND;
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;
   configReader::readConfig(conf, ans, 0);
   for (auto confp : ans){
@@ -138,7 +139,7 @@ void Extractor::loadGroups(std::string& conf, int verboseLevel){
   }
 }
 void Extractor::loadChords(std::string& conf, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Ectractor::loadChords " << this << "('" << conf << "')" << std::endl;
+  if (verboseLevel>1) lout << "[I] Ectractor::loadChords " << this << "('" << conf << "')" << LEND;
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;
   configReader::readConfig(conf, ans, 0);
   for (auto confp : ans){
@@ -148,7 +149,7 @@ void Extractor::loadChords(std::string& conf, int verboseLevel){
 }
 
 void Extractor::setConfigParam(std::string& param, std::string& paramKey, std::string& value, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Ectractor::setConfigParameter " << this << "('" << param <<"', '" << paramKey << "', '" << value << "')" << std::endl;
+  if (verboseLevel>1) lout << "[I] Ectractor::setConfigParameter " << this << "('" << param <<"', '" << paramKey << "', '" << value << "')" << LEND;
   if (param=="fps") fps=std::stod(value);
   else if (param=="limit") limit=std::stod(value);
   else if (param=="peek-limit") peekLimit=std::stod(value);
@@ -161,7 +162,7 @@ void Extractor::setConfigParam(std::string& param, std::string& paramKey, std::s
     loadGroups(value, verboseLevel);
   }else if (param=="chords"){
     loadChords(value, verboseLevel);
-  }else if (verboseLevel) std::cout << "[W] Ectractor::setConfigParam " << this << ", unknown parameter '" << param << "'" << std::endl;
+  }else if (verboseLevel) lout << "[W] Ectractor::setConfigParam " << this << ", unknown parameter '" << param << "'" << LEND;
 }
 void Extractor::readConfig(std::istream& co, int verboseLevel){
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;

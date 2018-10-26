@@ -1,9 +1,9 @@
-#include <iostream>
+#include <log.h>
 #include <formulacolor.h>
 
 
 FormulaColor& FormulaColor::parse(std::string& s, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] FormulaColor::parse " << this << "('" << s << "')" << std::endl;
+  if (verboseLevel>1) lout << "[I] FormulaColor::parse " << this << "('" << s << "')" << LEND;
   std::vector<std::string> res;
   Formula::split(s, res);
   if (res.size())   r.parse(res[0], verboseLevel);

@@ -1,9 +1,9 @@
+#include <log.h>
 #include <spctr.h>
 #include <fstream>
-#include <iostream>
 
 void SPCTRFile::read(const char* filename, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] SPCTRFile::read " << this << "(" << filename << ", verboseLevel)" << std::endl;
+  if (verboseLevel>1) lout << "[I] SPCTRFile::read " << this << "(" << filename << ", verboseLevel)" << LEND;
   std::ifstream is(filename);
   is >> N >> M;
   spectrums.resize(M);
@@ -59,7 +59,7 @@ void SPCTRFile::fromSpectrum(std::vector<std::vector<double> >& spectrum, std::v
 }
 
 void SPCTRFile::singleSpectrum(std::vector<double>& ans, double time, int verboseLevel){
-  if (verboseLevel>2) std::cout << "[X] SPCTRFile::singleSpectrum " << this << "(&ans, " << time << ", verboseLevel)" << std::endl;
+  if (verboseLevel>2) lout << "[X] SPCTRFile::singleSpectrum " << this << "(&ans, " << time << ", verboseLevel)" << LEND;
   int a=0;
   int b=spectrums.size()-1;
   while (a<b){
@@ -75,16 +75,16 @@ void SPCTRFile::singleSpectrum(std::vector<double>& ans, double time, int verbos
     for (int i=0;i<N;++i) ans[i]=0;
   }else{
     double k=(time-spectrums[a-1].first)/(spectrums[a].first-spectrums[a-1].first);
-    //if (k>1 || k<0) std::cout << "QAQ k:" << k << std::endl;
+    //if (k>1 || k<0) lout << "QAQ k:" << k << LEND;
     for (int i=0;i<N;++i){
       ans[i]=k*spectrums[a].second[i]+(1-k)*spectrums[a-1].second[i];
-   //   if (ans[i]>1 || ans[i]<0) std::cout << ans[i] << std::endl;
+   //   if (ans[i]>1 || ans[i]<0) lout << ans[i] << LEND;
     }
   }
 }
 
 void SPCTRFile::getSpectrums(std::vector<double>& times, std::vector<std::vector<double> >& ans, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] SPCTRFile::getSpectrums " << this << "(&times, &ans, verboseLevel)" << std::endl;
+  if (verboseLevel>1) lout << "[I] SPCTRFile::getSpectrums " << this << "(&times, &ans, verboseLevel)" << LEND;
   for (double time : times){
     ans.push_back(std::vector<double>());
     singleSpectrum(ans.back(), time, verboseLevel);

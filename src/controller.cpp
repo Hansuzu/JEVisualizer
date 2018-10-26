@@ -1,12 +1,10 @@
 #include <controller.h>
+#include <log.h>
 #include <vector>
 #include <string>
 
-
-#include <bits/stdc++.h>
-
 void Controller::Track::loadConfig(std::string& configStr, int verboseLevel){
-//   std::cout << "Track::loadConfig" << configStr << std::endl;
+//   lout << "Track::loadConfig" << configStr << LEND;
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;
   configReader::readConfig(configStr, ans);
   for (std::pair<std::pair<std::string, std::string>, std::string>& conf : ans){
@@ -16,7 +14,7 @@ void Controller::Track::loadConfig(std::string& configStr, int verboseLevel){
       if (value=="WAV" || value=="1") type=WAV;
       else if (value=="MMP" || value=="2") type=MMP;
       else if (value=="SPCTR" || value=="3") type=SPCTR;
-      else if (verboseLevel) std::cout << "[W] Controller::Track::loadConfig " << this << ", unknown value for type '" << value << "'" << std::endl;
+      else if (verboseLevel) lout << "[W] Controller::Track::loadConfig " << this << ", unknown value for type '" << value << "'" << LEND;
     }
     else if (param=="f0") F0=std::stof(value);
     else if (param=="f1") F1=std::stof(value);
@@ -27,7 +25,7 @@ void Controller::Track::loadConfig(std::string& configStr, int verboseLevel){
     else if (param=="channel") channel=std::stoi(value);
     else if (param=="file") file=value;
     else if (verboseLevel){
-      std::cout << "[W] Controller::Track::loadConfig " << this << ", unknown parameter '" << param << "'" << std::endl;
+      lout << "[W] Controller::Track::loadConfig " << this << ", unknown parameter '" << param << "'" << LEND;
     }
   }
 }
@@ -87,16 +85,16 @@ void Controller::createSpectrums(){
 }
 
 void Controller::runVisualizer(){
-  std::cout << std::endl << std::endl << std::endl;
-  if (verboseLevel>1) std::cout << "[I] Controller::runVisualizer " << this << std::endl;
+  lout << LEND << LEND << LEND;
+  if (verboseLevel>1) lout << "[I] Controller::runVisualizer " << this << LEND;
     
   Visualizer visualizer(video_config_file.c_str(), verboseLevel);
   
-  std::cout << std::endl << std::endl << std::endl;
-  if (verboseLevel>1) std::cout << "[I] Controller::runVisualizer " << this << ", configurations loaded " << std::endl;
+  lout << LEND << LEND << LEND;
+  if (verboseLevel>1) lout << "[I] Controller::runVisualizer " << this << ", configurations loaded " << LEND;
   
   for (int i=0;i<(int)times.size();++i){
-    if (verboseLevel>1) std::cout << "[I] Controller::runVisualizer " << this << ", TIME: " << times[i] << std::endl;
+    if (verboseLevel>1) lout << "[I] Controller::runVisualizer " << this << ", TIME: " << times[i] << LEND;
     std::vector<std::vector<double>* > st;
     for (int j=0;j<(int)tracks.size();++j){
       st.push_back(tracks[j].getValues(i));
@@ -104,20 +102,20 @@ void Controller::runVisualizer(){
     visualizer.next(times[i], st, verboseLevel);
   }
   int v=system(on_end_command.c_str());
-  if (v) std::cout << "[E] Controller::runVisualizer " << this << ", system call returned " << v << std::endl;
+  if (v) lout << "[E] Controller::runVisualizer " << this << ", system call returned " << v << LEND;
 }
 
 void Controller::runExtractor(){
-  std::cout << std::endl << std::endl << std::endl;
-  if (verboseLevel>1) std::cout << "[I] Controller::runExtractor " << this << std::endl;
+  lout << LEND << LEND << LEND;
+  if (verboseLevel>1) lout << "[I] Controller::runExtractor " << this << LEND;
     
   Extractor extractor(extractor_config_file.c_str(), verboseLevel);
   
-  std::cout << std::endl << std::endl << std::endl;
-  if (verboseLevel>1) std::cout << "[I] Controller::runExtractor " << this << ", configurations loaded " << std::endl;
+  lout << LEND << LEND << LEND;
+  if (verboseLevel>1) lout << "[I] Controller::runExtractor " << this << ", configurations loaded " << LEND;
   
   for (int i=0;i<(int)times.size();++i){
-    if (verboseLevel>1) std::cout << "[I] Controller::runExtractor " << this << ", TIME: " << times[i] << std::endl;
+    if (verboseLevel>1) lout << "[I] Controller::runExtractor " << this << ", TIME: " << times[i] << LEND;
     std::vector<std::vector<double>* > st;
     for (int j=0;j<(int)tracks.size();++j){
       st.push_back(tracks[j].getValues(i));
@@ -128,7 +126,7 @@ void Controller::runExtractor(){
 
 
 void Controller::runCreateSPCTRs(){
-  if (verboseLevel>1) std::cout << "[I] Controller::runCreateSPCTRs " << this << "()" << std::endl;
+  if (verboseLevel>1) lout << "[I] Controller::runCreateSPCTRs " << this << "()" << LEND;
   for (int i=0;i<(int)tracks.size();++i){
     SPCTRFile of;
     of.fromSpectrum(tracks[i].getAllValues(), times, 1);
@@ -138,10 +136,10 @@ void Controller::runCreateSPCTRs(){
 
 
 void Controller::setConfigParam(std::string& param, std::string& paramKey, std::string& value){
-  if (verboseLevel>1) std::cout << "[I] Controller::setConfigParameter " << this << "('" << param <<"', '" << paramKey << "', '" << value << "')" << std::endl;
+  if (verboseLevel>1) lout << "[I] Controller::setConfigParameter " << this << "('" << param <<"', '" << paramKey << "', '" << value << "')" << LEND;
   if (param=="track"){
     int index=std::stoi(paramKey);
-    if (index<0) std::cout << "[E] Controller::setConfigParameter " << this << ", ERROR IN INDEX" << std::endl;
+    if (index<0) lout << "[E] Controller::setConfigParameter " << this << ", ERROR IN INDEX" << LEND;
     else{
       while ((int)tracks.size()<=index) tracks.push_back(Track());
       tracks[index].loadConfig(value, verboseLevel);
@@ -151,7 +149,7 @@ void Controller::setConfigParam(std::string& param, std::string& paramKey, std::
   else if (param=="extractor") extractor_config_file=value;
   else if (param=="on-end") on_end_command=value;
   else if (param=="a-frequency") aFrequency=std::stof(value);
-  else if (verboseLevel) std::cout << "[I] Controller::setConfigParam " << this << ", unknown parameter '" << param << "'" << std::endl;
+  else if (verboseLevel) lout << "[I] Controller::setConfigParam " << this << ", unknown parameter '" << param << "'" << LEND;
 }
 void Controller::readMainConfig(std::ifstream& co){
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;

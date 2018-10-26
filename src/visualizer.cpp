@@ -1,12 +1,12 @@
 #include <string>
-#include <iostream>
 #include <chrono>
+#include <log.h>
 #include <visualizer.h>
 
 
 void Visualizer::setFPEV(std::string& key, std::string& value, int verboseLevel){
   int index=std::stoi(key);
-  if (verboseLevel>1 ) std::cout << "[I] Visualizer::setFPEV " << this << "('" << index << "', '" << value << "')" << std::endl;
+  if (verboseLevel>1 ) lout << "[I] Visualizer::setFPEV " << this << "('" << index << "', '" << value << "')" << LEND;
   if (value=="frame") fpe.setIndex(index, 1);
   else if (value=="fps") fpe.setIndex(index, 2);
   else if (value=="w") fpe.setIndex(index, 3);
@@ -18,7 +18,7 @@ void Visualizer::setFPEV(std::string& key, std::string& value, int verboseLevel)
     fpe.setIndex(index, 5+fpeTracks.size());
   }else if (value=="null"||value=="0") fpe.setIndex(index, 0);
   else if (verboseLevel){
-     std::cout << "[W] Drawer::setFPEV " << this << ", unknown FPV: '" << value << "'" << std::endl;
+     lout << "[W] Drawer::setFPEV " << this << ", unknown FPV: '" << value << "'" << LEND;
   }
 }
 
@@ -48,11 +48,11 @@ void Visualizer::writeNewFrame(int ccframe, std::chrono::duration<double> timeEl
   if (verboseLevel>2){
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
-    std::cout << "[X] Visualizer::writNewFrame write frame " << ccframe << " to file finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+    lout << "[P] Visualizer::writNewFrame write frame " << ccframe << " to file finished, elapsed time=" << elapsed.count() << " s" << LEND;
     elapsed+=timeElapsedBeforeWrite;
-    std::cout << "[X] Visualizer::writNewFrame write frame " << cframe << " total elapsed time=" << elapsed.count() << " s" << std::endl;
+    lout << "[P] Visualizer::writNewFrame write frame " << cframe << " total elapsed time=" << elapsed.count() << " s" << LEND;
   }
-  if (verboseLevel>1) std::cout << "[I] Visualizer::writNewFrame " << this << " drawn frame " << ccframe << std::endl;
+  if (verboseLevel>1) lout << "[I] Visualizer::writNewFrame " << this << " drawn frame " << ccframe << LEND;
 }
 void Visualizer::launchWriteNewFrame(std::chrono::duration<double> timeElapsedBeforeWrite, int verboseLevel){
   waitWriteFrameToFinish();
@@ -64,36 +64,44 @@ void Visualizer::waitWriteFrameToFinish(){
 }
 
 void Visualizer::nextFrame(int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Visualizer::nextFrame " << this << ", frame " << cframe << std::endl;
+  if (verboseLevel>1) lout << "[I] Visualizer::nextFrame " << this << ", frame " << cframe << LEND;
   if (cframe>=firstFrame && cframe<=lastFrame){
     auto start = std::chrono::high_resolution_clock::now();
     updateFPE();
     // draw layers
+    layerIndependentDrawers.resize(layers.size());
     for (int i=0;i<(int)layers.size();++i){
-      layers[i]->draw(cframe, oframe, verboseLevel);
+      layerIndependentDrawers[i]=std::async(std::launch::async, &Layer::drawIndependent, layers[i], cframe, verboseLevel);
     }
+    for (int i=0;i<(int)layerIndependentDrawers.size();++i){
+      layerIndependentDrawers[i].get();
+    }
+    for (int i=0;i<(int)layers.size();++i){
+      layers[i]->drawToOframe(cframe, oframe, verboseLevel);
+    }
+    
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
     if (verboseLevel>2){
-      std::cout << "[X] Visualizer::nextFrame draw layers " << cframe << "finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+      lout << "[P] Visualizer::nextFrame draw layers of frame " << cframe << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
     }
     launchWriteNewFrame(elapsed, verboseLevel);
     
     finish = std::chrono::high_resolution_clock::now();
     elapsed = finish - lastFrameFinishTime;
     if (verboseLevel>2){
-      std::cout << "[X] Visualizer::nextFrame frame " << cframe << " time compared to previous call=" << elapsed.count() << " s" << std::endl;
+      lout << "[P] Visualizer::nextFrame frame " << cframe << " time compared to previous call=" << elapsed.count() << " s" << LEND;
     }
-    std::cout << cframe << " " << elapsed.count() << " s" << std::endl;
+    lout << cframe << " " << elapsed.count() << " s" << LEND;
     lastFrameFinishTime=std::chrono::high_resolution_clock::now();
-  }else if (cframe%100==0 && verboseLevel>1) std::cout << "[I] Visualizer::nextFrame " << this << "... skipped frame " << cframe << " ..." << std::endl;
+  }else if (cframe%100==0 && verboseLevel>1) lout << "[I] Visualizer::nextFrame " << this << "... skipped frame " << cframe << " ..." << LEND;
   ++cframe;
 }
   
 
 
 void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackValues, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Visualizer::next(" << time << ", &st, " << verboseLevel << ")" << std::endl; 
+  if (verboseLevel>1) lout << "[I] Visualizer::next(" << time << ", &st, " << verboseLevel << ")" << LEND; 
   tc.setMaxDownSpeed(maxDownSpeed);
   tc.setMaxUpSpeed(maxUpSpeed);
 
@@ -110,7 +118,7 @@ void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackVa
 
 
 void Visualizer::setConfigParam(std::string& param, std::string& key, std::string& value, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Visualizer::setConfigParam " << this << "('" << param << "', '" << key << "', '" << value << "', " << verboseLevel << ")" << std::endl;
+  if (verboseLevel>1) lout << "[I] Visualizer::setConfigParam " << this << "('" << param << "', '" << key << "', '" << value << "', " << verboseLevel << ")" << LEND;
   if (param=="fps"){
     fps=std::stod(value);
   }else if (param=="downspeed"){
@@ -135,7 +143,7 @@ void Visualizer::setConfigParam(std::string& param, std::string& key, std::strin
     while ((int)layers.size()<=index) layers.push_back(new Layer(w, h, &fpe, &tc));
     layers[index]->readConfig(value.c_str(), verboseLevel);
   }else if (verboseLevel){
-    std::cout << "[W] Visualizer::setConfigParam " << this << ", unknown parameter '" << param << "'" << std::endl;
+    lout << "[W] Visualizer::setConfigParam " << this << ", unknown parameter '" << param << "'" << LEND;
   }
 }
 

@@ -1,4 +1,4 @@
-#include <iostream>
+#include <log.h>
 #include <formula.h>
 
 
@@ -47,7 +47,7 @@ void Formula::split(std::string& s, std::vector<std::string>& res){
 }
 
 void Formula::parse(std::string& s, int verboseLevel){
-  if (verboseLevel>1) std::cout << "[I] Formula::parse " << this << "('" << s << "')" << std::endl;
+  if (verboseLevel>1) lout << "[I] Formula::parse " << this << "('" << s << "')" << LEND;
   if (s.size()==0) return;
   bool br=0;
   for (int i=0;i<(int)s.size();++i) if (s[i]=='('){br=1; break;}
