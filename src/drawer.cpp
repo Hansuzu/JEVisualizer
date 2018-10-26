@@ -57,7 +57,7 @@ void Drawer::drawRectangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Point& 
       p[4*x+0]=(color[3]*color[0]+(255-color[3])*p[4*x+0])/255;
       p[4*x+1]=(color[3]*color[1]+(255-color[3])*p[4*x+1])/255;
       p[4*x+2]=(color[3]*color[2]+(255-color[3])*p[4*x+2])/255;
-      p[4*x+3]=255-(255-p[4*x+3])*(255-p[4*x+3])/255/255;
+      p[4*x+3]=255-(255-p[4*x+3])*(255-color[3])/255;
     }
   }
 }
@@ -85,7 +85,7 @@ void Drawer::drawTriangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Scalar& 
       p[4*x+0]=(color[3]*color[0]+(255-color[3])*p[4*x+0])/255;
       p[4*x+1]=(color[3]*color[1]+(255-color[3])*p[4*x+1])/255;
       p[4*x+2]=(color[3]*color[2]+(255-color[3])*p[4*x+2])/255;
-      p[4*x+3]=255-(255-p[4*x+3])*(255-p[4*x+3])/255/255;
+      p[4*x+3]=255-(255-p[4*x+3])*(255-color[3])/255;
     }
   }
 }
@@ -108,7 +108,7 @@ void Drawer::update(int cframe){
 
 
 void Drawer::draw(int cframe, cv::Mat* frame, double xScale, double yScale, int verboseLevel){
-  if (verboseLevel>2) std::cout << "[X] Drawer::draw " << this << "(" << cframe << ") " << std::endl;
+  if (verboseLevel>3) std::cout << "[4] Drawer::draw " << this << "(" << cframe << ") " << std::endl;
   update(cframe);
   
   double x0d=xScale*x0.value();

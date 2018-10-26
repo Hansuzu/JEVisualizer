@@ -1,6 +1,6 @@
 CC=g++
 OPENCV_FLAGS=-I/usr/local/include/opencv -I/usr/local/include -L/usr/local/lib -lopencv_ml -lopencv_stitching -lopencv_superres -lopencv_dnn -lopencv_objdetect -lopencv_videostab -lopencv_photo -lopencv_shape -lopencv_video -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_flann -lopencv_core
-CFLAGS=-std=c++17 -O3 -march=native -Wall -Iinclude -Wextra -Wshadow
+CFLAGS=-std=c++17 -O3 -march=native -Wall -Iinclude -Wextra -Wshadow -pthread
 
 SRCDIR=src
 TARGETDIR=bin

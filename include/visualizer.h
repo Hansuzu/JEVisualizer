@@ -1,4 +1,6 @@
 #include <vector>
+#include <future>
+#include <chrono>
 #include <opencv2/core.hpp>        // Basic OpenCV structures (cv::Mat)
 #include <opencv2/highgui.hpp>     // Video write
 #include <fstream>
@@ -20,7 +22,8 @@ private:
   int w, h;   //width and height of output video
   
   cv::VideoWriter outputVideo;
-  cv::Mat* oframe; // a frame that is passed to layers to write in, this is then written to outputVideo
+  cv::Mat* oframe;     // a frame that is passed to layers to write in, this is then written to outputVideo
+  cv::Mat* oframeWrite;// a frame that is written to outputVideo, first oframe and oframeWrite are swapped, then oframeWrite is called asynchronously
   
   double ctime; // current time
   int cframe;   // current frame
@@ -44,6 +47,11 @@ private:
   void setFPEV(std::string& key, std::string& value, int verboseLevel); // handles the formula-parameters and pushes them to fpe, setConfigParam calls this
   void updateFPE(); // calls fpe.update
   
+  std::future<void> frameWriter;
+  void writeNewFrame(int cframe, std::chrono::duration<double> timeElapsedBeforeWrite, int verboseLevel);
+  void launchWriteNewFrame(std::chrono::duration<double> timeElapsedBeforeWrite, int verboseLevel);
+  void waitWriteFrameToFinish();
+  std::chrono::time_point<std::chrono::high_resolution_clock> lastFrameFinishTime;
   void nextFrame(int verboseLevel); //Renders a frame of video
 public:
   void next(double time, std::vector<std::vector<double>* >& newTrackValues, int verboseLevel); //calls nextFrame() when it's needed
@@ -58,10 +66,13 @@ public:
     co.open(configFile);
     readConfig(co, verboseLevel);
     oframe=new cv::Mat(cv::Size(w, h), CV_8UC3);
+    oframeWrite=new cv::Mat(cv::Size(w, h), CV_8UC3);
     outputVideo.open(ovfname, cv::VideoWriter::fourcc('t','h','e','o'), fps, cv::Size(w, h));
   }
   ~Visualizer(){
     delete oframe;
+    waitWriteFrameToFinish();
+    delete oframeWrite;
   }
 };
 

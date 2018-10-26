@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <chrono>
 #include <visualizer.h>
 
 
@@ -40,19 +41,51 @@ void Visualizer::updateFPE(){
   fpe.updateValues(fpevs);
 }
 
+  
+void Visualizer::writeNewFrame(int ccframe, std::chrono::duration<double> timeElapsedBeforeWrite, int verboseLevel){
+  auto start = std::chrono::high_resolution_clock::now();
+  outputVideo.write(*oframeWrite);
+  if (verboseLevel>2){
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    std::cout << "[X] Visualizer::writNewFrame write frame " << ccframe << " to file finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+    elapsed+=timeElapsedBeforeWrite;
+    std::cout << "[X] Visualizer::writNewFrame write frame " << cframe << " total elapsed time=" << elapsed.count() << " s" << std::endl;
+  }
+  if (verboseLevel>1) std::cout << "[I] Visualizer::writNewFrame " << this << " drawn frame " << ccframe << std::endl;
+}
+void Visualizer::launchWriteNewFrame(std::chrono::duration<double> timeElapsedBeforeWrite, int verboseLevel){
+  waitWriteFrameToFinish();
+  swap(oframe, oframeWrite);
+  frameWriter=std::async(std::launch::async, &Visualizer::writeNewFrame, this, cframe, timeElapsedBeforeWrite, verboseLevel);
+}
+void Visualizer::waitWriteFrameToFinish(){
+  if (frameWriter.valid()) frameWriter.get();
+}
 
 void Visualizer::nextFrame(int verboseLevel){
   if (verboseLevel>1) std::cout << "[I] Visualizer::nextFrame " << this << ", frame " << cframe << std::endl;
   if (cframe>=firstFrame && cframe<=lastFrame){
-    std::cout << cframe << std::endl;
+    auto start = std::chrono::high_resolution_clock::now();
     updateFPE();
     // draw layers
     for (int i=0;i<(int)layers.size();++i){
       layers[i]->draw(cframe, oframe, verboseLevel);
     }
-    // output the frame
-    outputVideo.write(*oframe);
-    if (verboseLevel>1) std::cout << "[I] Visualizer::nextFrame " << this << " drawn frame " << cframe << std::endl;
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    if (verboseLevel>2){
+      std::cout << "[X] Visualizer::nextFrame draw layers " << cframe << "finished, elapsed time=" << elapsed.count() << " s" << std::endl;
+    }
+    launchWriteNewFrame(elapsed, verboseLevel);
+    
+    finish = std::chrono::high_resolution_clock::now();
+    elapsed = finish - lastFrameFinishTime;
+    if (verboseLevel>2){
+      std::cout << "[X] Visualizer::nextFrame frame " << cframe << " time compared to previous call=" << elapsed.count() << " s" << std::endl;
+    }
+    std::cout << cframe << " " << elapsed.count() << " s" << std::endl;
+    lastFrameFinishTime=std::chrono::high_resolution_clock::now();
   }else if (cframe%100==0 && verboseLevel>1) std::cout << "[I] Visualizer::nextFrame " << this << "... skipped frame " << cframe << " ..." << std::endl;
   ++cframe;
 }

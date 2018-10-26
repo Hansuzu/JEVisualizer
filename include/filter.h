@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <future>
 #include <opencv2/imgproc.hpp>
 #include <config.h>
 #include <trackcontroller.h>
@@ -33,6 +34,7 @@ class Filter{
     }
     
   };
+  std::vector<std::future<void> > fs;    //To make async multithreading work...
   std::vector<ColorRule*> colorRules; // When type==SuperColor, these are used.
   
   
@@ -41,6 +43,10 @@ class Filter{
   TrackController* tc;
 private:
   void loadColorRule(std::string& rule, int verboseLevel);
+private:
+  void applyGaussianBlur(cv::Mat* frame1, cv::Mat* frame2);
+  void applyColor(cv::Mat* frame1, cv::Mat* frame2);
+  void applySuperColorRule(cv::Mat* frame1, cv::Mat* frame2, int i, int k);
 public:
   
   void loadConfig(std::string& config, int verboseLevel);

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include <filter.h>
 
 void Filter::loadColorRule(std::string& ruleStr, int verboseLevel){
@@ -82,92 +83,123 @@ void Filter::loadConfig(std::string& config, int verboseLevel){
   for (auto conf:ans) setConfigParam(conf.first.first, conf.first.second, conf.second, verboseLevel);
   if (verboseLevel>2) std::cout << "[X] Filter::loadConfig " << this << " OK " << std::endl;
 }
+
+
+double min(double a, double b){
+  return a<b?a:b;
+}
+double max(double a, double b){
+  return a>b?a:b;
+}
+
+void Filter::applyGaussianBlur(cv::Mat* frame1, cv::Mat* frame2){
+  int kX=kernelX.value();
+  int kY=kernelY.value();
+  cv::GaussianBlur(*frame1, *frame2, cv::Size((kX<<1)|1,(kY<<1)|1), 0, 0);
+}
+void Filter::applyColor(cv::Mat* frame1, cv::Mat* frame2){\
+  int w=frame1->size().width;
+  int h=frame1->size().height;
+  double rcv=255*rc.value();
+  double gcv=255*gc.value();
+  double bcv=255*bc.value();
+  double acv=255*ac.value();
+  cv::Scalar rv=r.value();
+  cv::Scalar gv=g.value();
+  cv::Scalar bv=b.value();
+  cv::Scalar av=a.value();
+  uchar* p1;
+  uchar* p2;
+  double nr, ng, nb, na;
+  for (int y=0;y<h;++y){
+    p1=frame1->ptr<uchar>(y);
+    p2=frame2->ptr<uchar>(y);
+    for (int x=0;x<w;++x){
+      nr=rcv+rv[0]*p1[x*4+0]+rv[1]*p1[x*4+1]+rv[2]*p1[x*4+2]+rv[3]*p1[x*4+3];
+      ng=gcv+gv[0]*p1[x*4+0]+gv[1]*p1[x*4+1]+gv[2]*p1[x*4+2]+gv[3]*p1[x*4+3];
+      nb=bcv+bv[0]*p1[x*4+0]+bv[1]*p1[x*4+1]+bv[2]*p1[x*4+2]+bv[3]*p1[x*4+3];
+      na=acv+av[0]*p1[x*4+0]+av[1]*p1[x*4+1]+av[2]*p1[x*4+2]+av[3]*p1[x*4+3];
+      p2[x*4+0]=min(max(nb, 0.0), 255.0);
+      p2[x*4+1]=min(max(ng, 0.0), 255.0);
+      p2[x*4+2]=min(max(nr, 0.0), 255.0);
+      p2[x*4+3]=min(max(na, 0.0), 255.0);
+    }
+  }
+}
+void Filter::applySuperColorRule(cv::Mat* frame1, cv::Mat* frame2, int i, int k){
+  int w=frame1->size().width;
+  int h=frame1->size().height;
+  
+  double rcv=255*colorRules[i]->rc.value();
+  double gcv=255*colorRules[i]->gc.value();
+  double bcv=255*colorRules[i]->bc.value();
+  double acv=255*colorRules[i]->ac.value();
+  int shiftX=colorRules[i]->shiftX.value();
+  int shiftY=colorRules[i]->shiftY.value();
+  cv::Scalar rv=colorRules[i]->r.value();
+  cv::Scalar gv=colorRules[i]->g.value();
+  cv::Scalar bv=colorRules[i]->b.value();
+  cv::Scalar av=colorRules[i]->a.value();
+  int dy=colorRules.size();
+  int y0=std::max(0, shiftY);
+  y0+=(i+k)%dy;//With same k, no two colorRules should write to same indices in array
+  int y1=std::min(h, h+shiftY);
+  int x0=std::max(0, shiftX);
+  int x1=std::min(w, w+shiftX);
+  
+  uchar* p1;
+  uchar* p2;
+  double nr, ng, nb, na;
+  for (int y=y0;y<y1;y+=dy){
+    p1=frame1->ptr<uchar>(y-shiftY);
+    p2=frame2->ptr<uchar>(y);
+    for (int x=x0;x<x1;++x){
+      nr=p2[4*x+2]+rcv+rv[0]*p1[(x-shiftX)*4+0]+rv[1]*p1[(x-shiftX)*4+1]+rv[2]*p1[(x-shiftX)*4+2]+rv[3]*p1[(x-shiftX)*4+3];
+      ng=p2[4*x+1]+gcv+gv[0]*p1[(x-shiftX)*4+0]+gv[1]*p1[(x-shiftX)*4+1]+gv[2]*p1[(x-shiftX)*4+2]+gv[3]*p1[(x-shiftX)*4+3];
+      nb=p2[4*x+0]+bcv+bv[0]*p1[(x-shiftX)*4+0]+bv[1]*p1[(x-shiftX)*4+1]+bv[2]*p1[(x-shiftX)*4+2]+bv[3]*p1[(x-shiftX)*4+3];
+      na=p2[4*x+3]+acv+av[0]*p1[(x-shiftX)*4+0]+av[1]*p1[(x-shiftX)*4+1]+av[2]*p1[(x-shiftX)*4+2]+av[3]*p1[(x-shiftX)*4+3];
+      p2[x*4+0]=min(max(nb, 0.0), 255.0);
+      p2[x*4+1]=min(max(ng, 0.0), 255.0);
+      p2[x*4+2]=min(max(nr, 0.0), 255.0);
+      p2[x*4+3]=min(max(na, 0.0), 255.0);
+    }
+  }
+}
 void Filter::apply(cv::Mat* frame1, cv::Mat* frame2, int verboseLevel){
   if (verboseLevel>1) std::cout << "[I] Filter::apply " << this << std::endl; 
   std::vector<double> tmp;
   fpe.updateValues(tmp);
   if (type==GaussianBlur){
-    if (verboseLevel>2) std::cout << "[X] Filter::apply type==GaussianBlur " << this << std::endl; 
-    int kX=kernelX.value();
-    int kY=kernelY.value();
-    cv::GaussianBlur(*frame1, *frame2, cv::Size((kX<<1)|1,(kY<<1)|1), 0, 0);
+    if (verboseLevel>2) std::cout << "[X] Filter::apply type==GaussianBlur " << this << std::endl;
+    auto start = std::chrono::high_resolution_clock::now();
+    applyGaussianBlur(frame1, frame2);
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    if (verboseLevel>2) std::cout << "[X] Filter::apply type==GaussianBlur " << this << " finished, elapsed time=" << elapsed.count() << " s" << std::endl;
   }else if (type==Color){
     if (verboseLevel>2) std::cout << "[X] Filter::apply type==Color " << this << std::endl; 
-    int w=frame1->size().width;
-    int h=frame1->size().height;
-    double rcv=255*rc.value();
-    double gcv=255*gc.value();
-    double bcv=255*bc.value();
-    double acv=255*ac.value();
-    cv::Scalar rv=r.value();
-    cv::Scalar gv=g.value();
-    cv::Scalar bv=b.value();
-    cv::Scalar av=a.value();
-    uchar* p1;
-    uchar* p2;
-    double nr, ng, nb, na;
-    for (int y=0;y<h;++y){
-      p1=frame1->ptr<uchar>(y);
-      p2=frame2->ptr<uchar>(y);
-      for (int x=0;x<w;++x){
-        nr=rcv+rv[0]*p1[x*4+0]+rv[1]*p1[x*4+1]+rv[2]*p1[x*4+2]+rv[3]*p1[x*4+3];
-        ng=gcv+gv[0]*p1[x*4+0]+gv[1]*p1[x*4+1]+gv[2]*p1[x*4+2]+gv[3]*p1[x*4+3];
-        nb=bcv+bv[0]*p1[x*4+0]+bv[1]*p1[x*4+1]+bv[2]*p1[x*4+2]+bv[3]*p1[x*4+3];
-        na=acv+av[0]*p1[x*4+0]+av[1]*p1[x*4+1]+av[2]*p1[x*4+2]+av[3]*p1[x*4+3];
-        nr=std::min(std::max(nr, 0.0), 255.0);
-        ng=std::min(std::max(ng, 0.0), 255.0);
-        nb=std::min(std::max(nb, 0.0), 255.0);
-        na=std::min(std::max(na, 0.0), 255.0);
-        p2[x*4+0]=nb;
-        p2[x*4+1]=ng;
-        p2[x*4+2]=nr;
-        p2[x*4+3]=na;
-      }
-    }
+    auto start = std::chrono::high_resolution_clock::now();
+    applyColor(frame1, frame2);
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    if (verboseLevel>2) std::cout << "[X] Filter::apply type==Color " << this << " finished, elapsed time=" << elapsed.count() << " s" << std::endl;
   }else if (type==SuperColor){
     if (verboseLevel>2) std::cout << "[X] Filter::apply type==SuperColor " << this << std::endl; 
-    int w=frame1->size().width;
-    int h=frame1->size().height;
+    auto start = std::chrono::high_resolution_clock::now();
     *frame2=cv::Vec4b(0,0,0,0);
-
-    for (int i=0;i<(int)colorRules.size();++i){
-      double rcv=255*colorRules[i]->rc.value();
-      double gcv=255*colorRules[i]->gc.value();
-      double bcv=255*colorRules[i]->bc.value();
-      double acv=255*colorRules[i]->ac.value();
-      int shiftX=colorRules[i]->shiftX.value();
-      int shiftY=colorRules[i]->shiftY.value();
-      cv::Scalar rv=colorRules[i]->r.value();
-      cv::Scalar gv=colorRules[i]->g.value();
-      cv::Scalar bv=colorRules[i]->b.value();
-      cv::Scalar av=colorRules[i]->a.value();
-      int y0=std::max(0, shiftY);
-      int y1=std::min(h, h+shiftY);
-      int x0=std::max(0, shiftX);
-      int x1=std::min(w, w+shiftX);
+    for (int k=0;k<(int)colorRules.size();++k){
+      //Stuff to make multithreading possible...
+      //With same k, no two colorRules should write to same indices in array
       
-      uchar* p1;
-      uchar* p2;
-      double nr, ng, nb, na;
-      for (int y=y0;y<y1;++y){
-        p1=frame1->ptr<uchar>(y-shiftY);
-        p2=frame2->ptr<uchar>(y);
-        for (int x=x0;x<x1;++x){
-          nr=p2[4*x+2]+rcv+rv[0]*p1[(x-shiftX)*4+0]+rv[1]*p1[(x-shiftX)*4+1]+rv[2]*p1[(x-shiftX)*4+2]+rv[3]*p1[(x-shiftX)*4+3];
-          ng=p2[4*x+1]+gcv+gv[0]*p1[(x-shiftX)*4+0]+gv[1]*p1[(x-shiftX)*4+1]+gv[2]*p1[(x-shiftX)*4+2]+gv[3]*p1[(x-shiftX)*4+3];
-          nb=p2[4*x+0]+bcv+bv[0]*p1[(x-shiftX)*4+0]+bv[1]*p1[(x-shiftX)*4+1]+bv[2]*p1[(x-shiftX)*4+2]+bv[3]*p1[(x-shiftX)*4+3];
-          na=p2[4*x+3]+acv+av[0]*p1[(x-shiftX)*4+0]+av[1]*p1[(x-shiftX)*4+1]+av[2]*p1[(x-shiftX)*4+2]+av[3]*p1[(x-shiftX)*4+3];
-          nr=std::min(std::max(nr, 0.0), 255.0);
-          ng=std::min(std::max(ng, 0.0), 255.0);
-          nb=std::min(std::max(nb, 0.0), 255.0);
-          na=std::min(std::max(na, 0.0), 255.0);
-          p2[x*4+0]=nb;
-          p2[x*4+1]=ng;
-          p2[x*4+2]=nr;
-          p2[x*4+3]=na;
-        }
+      fs.clear();
+      for (int i=0;i<(int)colorRules.size();++i){
+        fs.push_back(std::async(std::launch::async, &Filter::applySuperColorRule, this, frame1, frame2, i, k));
       }
+      for (std::future<void>& fut : fs) fut.get();
     }
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    if (verboseLevel>2) std::cout << "[X] Filter::apply type==SuperColor " << this << " finished, elapsed time=" << elapsed.count() << " s" << std::endl;
   }
 }
 
