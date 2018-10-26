@@ -46,8 +46,8 @@ void Formula::split(std::string& s, std::vector<std::string>& res){
   }
 }
 
-void Formula::parse(std::string& s, int verboseLevel){
-  if (verboseLevel>1) lout << "[I] Formula::parse " << this << "('" << s << "')" << LEND;
+void Formula::parse(std::string& s){
+  if (globalSettings::verboseLevel>1) lout << "[I] Formula::parse " << this << "('" << s << "')" << LEND;
   if (s.size()==0) return;
   bool br=0;
   for (int i=0;i<(int)s.size();++i) if (s[i]=='('){br=1; break;}
@@ -58,26 +58,26 @@ void Formula::parse(std::string& s, int verboseLevel){
     for (int i=0;i<(int)params.size();++i){
       if (i==0){
         C=new Formula(fpe);
-        C->parse(params[i], verboseLevel);
+        C->parse(params[i]);
       }else if (i==1){
         std::vector<std::string> array;
         split(params[i], array);
         for (int j=0;j<(int)array.size();++j){
           variables.push_back(new Formula(fpe));
-          variables.back()->parse(array[j], verboseLevel);
+          variables.back()->parse(array[j]);
         }
       }else if (i==2){
         minV=new Formula(fpe);
-        minV->parse(params[i], verboseLevel);
+        minV->parse(params[i]);
       }else if (i==3){
         maxV=new Formula(fpe);
-        maxV->parse(params[i], verboseLevel);
+        maxV->parse(params[i]);
       }else if (i==4){
         sinK=new Formula(fpe);
-        sinK->parse(params[i], verboseLevel);
+        sinK->parse(params[i]);
       }else if (i==5){
         inSin=new Formula(fpe);
-        inSin->parse(params[i], verboseLevel);
+        inSin->parse(params[i]);
       }
     }
   }else{

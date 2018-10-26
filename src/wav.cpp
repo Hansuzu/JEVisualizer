@@ -123,15 +123,15 @@ double WavFile::valueForJL(std::vector<long long>& sm, double jl,  int K){
   }
   return rv;
 }
-void WavFile::singleSpectrum(int sp, int ep, int ch, std::vector<double>& fs, std::vector<double>& ans, std::vector<long long>& sm, double thr, int verboseLevel){
-  if (verboseLevel>1) lout << "[I] WavFile::singleSpectrum(" << sp << ", " << ep << ", " << ch << ", &fs, &ans, &sm, " << thr << ", " << verboseLevel << ")" << LEND;
+void WavFile::singleSpectrum(int sp, int ep, int ch, std::vector<double>& fs, std::vector<double>& ans, std::vector<long long>& sm, double thr){
+  if (globalSettings::verboseLevel>1) lout << "[I] WavFile::singleSpectrum(" << sp << ", " << ep << ", " << ch << ", &fs, &ans, &sm, " << thr << ", " << globalSettings::verboseLevel << ")" << LEND;
   ans.resize(fs.size());
   for (int i=0;i<(int)ans.size();++i) ans[i]=0;
   if (ep>(int)channels[ch].size()) ep=channels[ch].size();
   sm.resize(ep-sp);
   sm[0]=channels[ch][sp];
   for (int i=sp+1;i<ep;++i) sm[i-sp]=sm[i-sp-1]+channels[ch][i];
-  if (verboseLevel>2){
+  if (globalSettings::verboseLevel>2){
     lout << "[X] WavFile::singleSpectum: ";
     for (int j=0;j<(int)fs.size();++j){
       lout << j << ":" << fs[j] << "hZ ";
@@ -148,9 +148,9 @@ void WavFile::singleSpectrum(int sp, int ep, int ch, std::vector<double>& fs, st
     double k=(1<<(fmt.bitsPerSample));
     ans[j]/=k;
     if (ans[j]<thr) ans[j]=0;
-    if (verboseLevel>2) lout <<  j << ":" << ans[j] << " ";
+    if (globalSettings::verboseLevel>2) lout <<  j << ":" << ans[j] << " ";
   }
-  if (verboseLevel>2) lout << LEND;
+  if (globalSettings::verboseLevel>2) lout << LEND;
 }
 
 
@@ -227,7 +227,7 @@ double WavFile::length(int ch){
   return channels[ch].size()/fmt.sampleRate;
 }
 
-void WavFile::spectrums(int channel, double fmp, double f0, double f1, double chlen, double thr, std::vector<std::vector<double> >& rv, std::vector<double>& times, int verboseLevel){
+void WavFile::spectrums(int channel, double fmp, double f0, double f1, double chlen, double thr, std::vector<std::vector<double> >& rv, std::vector<double>& times){
   std::vector<double> hz;
   double b=f0;
   while (b<f1){
@@ -240,7 +240,7 @@ void WavFile::spectrums(int channel, double fmp, double f0, double f1, double ch
     double t0=time;
     double t1=time+chlen;
     time=t1;
-    singleSpectrum(fmt.sampleRate*t0, fmt.sampleRate*t1, channel, hz, rv.back(), sm, thr, verboseLevel);
+    singleSpectrum(fmt.sampleRate*t0, fmt.sampleRate*t1, channel, hz, rv.back(), sm, thr);
     if (fmt.sampleRate*time>channels[0].size()) break;
   }
 }

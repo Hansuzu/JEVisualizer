@@ -9,61 +9,65 @@ HEADERDIR=include
 
 all:$(TARGETDIR)/JEVisualizer
 
-$(TARGETDIR)/JEVisualizer: $(SRCDIR)/main.cpp $(BUILDDIR)/controller.o $(BUILDDIR)/wav.o $(BUILDDIR)/mmp.o $(BUILDDIR)/spctr.o $(BUILDDIR)/extractor.o $(BUILDDIR)/visualizer.o $(BUILDDIR)/layer.o $(BUILDDIR)/drawer.o $(BUILDDIR)/filter.o $(BUILDDIR)/formulacolor.o $(BUILDDIR)/formula.o $(BUILDDIR)/fpe.o $(BUILDDIR)/trackcontroller.o $(BUILDDIR)/config.o $(BUILDDIR)/log.o
-	$(CC) $(CFLAGS) $(SRCDIR)/main.cpp $(BUILDDIR)/controller.o $(BUILDDIR)/wav.o $(BUILDDIR)/mmp.o $(BUILDDIR)/spctr.o $(BUILDDIR)/extractor.o $(BUILDDIR)/visualizer.o $(BUILDDIR)/layer.o $(BUILDDIR)/drawer.o $(BUILDDIR)/filter.o $(BUILDDIR)/formulacolor.o $(BUILDDIR)/formula.o $(BUILDDIR)/fpe.o $(BUILDDIR)/trackcontroller.o $(BUILDDIR)/config.o $(BUILDDIR)/log.o -o $(TARGETDIR)/JEVisualizer  $(OPENCV_FLAGS)
+$(TARGETDIR)/JEVisualizer: $(SRCDIR)/main.cpp $(BUILDDIR)/controller.o $(BUILDDIR)/wav.o $(BUILDDIR)/mmp.o $(BUILDDIR)/spctr.o $(BUILDDIR)/extractor.o $(BUILDDIR)/visualizer.o $(BUILDDIR)/layer.o $(BUILDDIR)/drawer.o $(BUILDDIR)/filter.o $(BUILDDIR)/formulacolor.o $(BUILDDIR)/formula.o $(BUILDDIR)/fpe.o $(BUILDDIR)/trackcontroller.o $(BUILDDIR)/config.o $(BUILDDIR)/log.o $(BUILDDIR)/globalsettings.o
+	$(CC) $(CFLAGS) $(SRCDIR)/main.cpp $(BUILDDIR)/controller.o $(BUILDDIR)/wav.o $(BUILDDIR)/mmp.o $(BUILDDIR)/spctr.o $(BUILDDIR)/extractor.o $(BUILDDIR)/visualizer.o $(BUILDDIR)/layer.o $(BUILDDIR)/drawer.o $(BUILDDIR)/filter.o $(BUILDDIR)/formulacolor.o $(BUILDDIR)/formula.o $(BUILDDIR)/fpe.o $(BUILDDIR)/trackcontroller.o $(BUILDDIR)/config.o $(BUILDDIR)/log.o $(BUILDDIR)/globalsettings.o -o $(TARGETDIR)/JEVisualizer  $(OPENCV_FLAGS)
 
 
-$(BUILDDIR)/controller.o: $(SRCDIR)/controller.cpp $(BUILDDIR)/config.o $(HEADERDIR)/log.h $(HEADERDIR)/controller.h $(BUILDDIR)/wav.o $(BUILDDIR)/mmp.o $(BUILDDIR)/spctr.o  $(BUILDDIR)/extractor.o $(BUILDDIR)/visualizer.o
+$(BUILDDIR)/controller.o: $(SRCDIR)/controller.cpp $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h $(BUILDDIR)/config.o $(HEADERDIR)/controller.h $(BUILDDIR)/wav.o $(BUILDDIR)/mmp.o $(BUILDDIR)/spctr.o  $(BUILDDIR)/extractor.o $(BUILDDIR)/visualizer.o
 	$(CC) $(CFLAGS) $(SRCDIR)/controller.cpp -o $(BUILDDIR)/controller.o -c  $(OPENCV_FLAGS)
 
 
-$(BUILDDIR)/wav.o: $(SRCDIR)/wav.cpp $(HEADERDIR)/wav.h $(HEADERDIR)/log.h
+$(BUILDDIR)/wav.o: $(SRCDIR)/wav.cpp $(HEADERDIR)/wav.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h
 	$(CC) $(CFLAGS) $(SRCDIR)/wav.cpp -o $(BUILDDIR)/wav.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/mmp.o: $(SRCDIR)/mmp.cpp $(HEADERDIR)/mmp.h $(HEADERDIR)/log.h
+$(BUILDDIR)/mmp.o: $(SRCDIR)/mmp.cpp $(HEADERDIR)/mmp.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h
 	$(CC) $(CFLAGS) $(SRCDIR)/mmp.cpp -o $(BUILDDIR)/mmp.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/spctr.o: $(SRCDIR)/spctr.cpp $(HEADERDIR)/spctr.h $(HEADERDIR)/log.h
+$(BUILDDIR)/spctr.o: $(SRCDIR)/spctr.cpp $(HEADERDIR)/spctr.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h
 	$(CC) $(CFLAGS) $(SRCDIR)/spctr.cpp -o $(BUILDDIR)/spctr.o -c  $(OPENCV_FLAGS)
 
 
 
-$(BUILDDIR)/extractor.o: $(SRCDIR)/extractor.cpp $(HEADERDIR)/extractor.h $(HEADERDIR)/config.h $(HEADERDIR)/log.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/filter.h
+$(BUILDDIR)/extractor.o: $(SRCDIR)/extractor.cpp $(HEADERDIR)/extractor.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/filter.h
 	$(CC) $(CFLAGS) $(SRCDIR)/extractor.cpp -o $(BUILDDIR)/extractor.o -c  $(OPENCV_FLAGS)
 
 
 
-$(BUILDDIR)/visualizer.o: $(SRCDIR)/visualizer.cpp $(HEADERDIR)/visualizer.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/layer.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h $(HEADERDIR)/drawer.h $(HEADERDIR)/filter.h
+$(BUILDDIR)/visualizer.o: $(SRCDIR)/visualizer.cpp $(HEADERDIR)/visualizer.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/layer.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h $(HEADERDIR)/drawer.h $(HEADERDIR)/filter.h
 	$(CC) $(CFLAGS) $(SRCDIR)/visualizer.cpp -o $(BUILDDIR)/visualizer.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/layer.o: $(SRCDIR)/layer.cpp $(HEADERDIR)/layer.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h $(HEADERDIR)/drawer.h $(HEADERDIR)/filter.h
+$(BUILDDIR)/layer.o: $(SRCDIR)/layer.cpp $(HEADERDIR)/layer.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h $(HEADERDIR)/drawer.h $(HEADERDIR)/filter.h
 	$(CC) $(CFLAGS) $(SRCDIR)/layer.cpp -o $(BUILDDIR)/layer.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/drawer.o: $(SRCDIR)/drawer.cpp $(HEADERDIR)/drawer.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h
+$(BUILDDIR)/drawer.o: $(SRCDIR)/drawer.cpp $(HEADERDIR)/drawer.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h
 	$(CC) $(CFLAGS) $(SRCDIR)/drawer.cpp -o $(BUILDDIR)/drawer.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/filter.o: $(SRCDIR)/filter.cpp $(HEADERDIR)/filter.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h
+$(BUILDDIR)/filter.o: $(SRCDIR)/filter.cpp $(HEADERDIR)/filter.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h
 	$(CC) $(CFLAGS) $(SRCDIR)/filter.cpp -o $(BUILDDIR)/filter.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/formulacolor.o: $(SRCDIR)/formulacolor.cpp $(HEADERDIR)/formulacolor.h $(HEADERDIR)/log.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h
+$(BUILDDIR)/formulacolor.o: $(SRCDIR)/formulacolor.cpp $(HEADERDIR)/formulacolor.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h
 	$(CC) $(CFLAGS) $(SRCDIR)/formulacolor.cpp -o $(BUILDDIR)/formulacolor.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/formula.o: $(SRCDIR)/formula.cpp $(HEADERDIR)/formula.h $(HEADERDIR)/log.h $(HEADERDIR)/fpe.h
+$(BUILDDIR)/formula.o: $(SRCDIR)/formula.cpp $(HEADERDIR)/formula.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h $(HEADERDIR)/fpe.h
 	$(CC) $(CFLAGS) $(SRCDIR)/formula.cpp -o $(BUILDDIR)/formula.o -c  $(OPENCV_FLAGS)
 
 $(BUILDDIR)/fpe.o: $(SRCDIR)/fpe.cpp $(HEADERDIR)/fpe.h $(HEADERDIR)/log.h
 	$(CC) $(CFLAGS) $(SRCDIR)/fpe.cpp -o $(BUILDDIR)/fpe.o -c  $(OPENCV_FLAGS)\
 
-$(BUILDDIR)/trackcontroller.o: $(SRCDIR)/trackcontroller.cpp $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/log.h
+$(BUILDDIR)/trackcontroller.o: $(SRCDIR)/trackcontroller.cpp $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h
 	$(CC) $(CFLAGS) $(SRCDIR)/trackcontroller.cpp -o $(BUILDDIR)/trackcontroller.o -c  $(OPENCV_FLAGS)
 
 
 
-$(BUILDDIR)/config.o: $(SRCDIR)/config.cpp $(HEADERDIR)/config.h $(HEADERDIR)/log.h
+$(BUILDDIR)/config.o: $(SRCDIR)/config.cpp $(HEADERDIR)/config.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h
 	$(CC) $(CFLAGS) $(SRCDIR)/config.cpp -o $(BUILDDIR)/config.o -c $(OPENCV_FLAGS)
 
-$(BUILDDIR)/log.o: $(SRCDIR)/log.cpp $(HEADERDIR)/log.h
+$(BUILDDIR)/log.o: $(SRCDIR)/log.cpp $(HEADERDIR)/log.h $(HEADERDIR)/globalsettings.h
 	$(CC) $(CFLAGS) $(SRCDIR)/log.cpp -o $(BUILDDIR)/log.o -c $(OPENCV_FLAGS)
+	
+$(BUILDDIR)/globalsettings.o: $(SRCDIR)/globalsettings.cpp $(HEADERDIR)/globalsettings.h
+	$(CC) $(CFLAGS) $(SRCDIR)/globalsettings.cpp -o $(BUILDDIR)/globalsettings.o -c $(OPENCV_FLAGS)
+
 
 
 clean:

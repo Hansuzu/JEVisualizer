@@ -1,6 +1,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <globalsettings.h>
 
 #define MMP_ERROR_OPENING_ERROR               1
 #define MMP_ERROR_READING_ERROR               2
@@ -57,14 +58,14 @@ private:
   };
   std::vector<Track> tracks;
   
-  void parseFromXML(int verboseLevel);
+  void parseFromXML();
   double timeToSecs(double time){return time/48/BPM*60;}
   double timeFromSecs(double time){return time/60*48*BPM;}
 public:
   std::vector<XML*> trackNodes;
-  int read(const char* filename, int verboseLevel);
+  int read(const char* filename);
 
   double length(int track){return timeToSecs(tracks[track].getLastNoteEndTime());}
-  void spectrums(int track, std::vector<double>& times, std::vector<std::vector<double> >& ans, int verboseLevel);
+  void spectrums(int track, std::vector<double>& times, std::vector<std::vector<double> >& ans);
   MMPFile():lmmsProjectNode(NULL), trackContainerNode(NULL){}  
 };

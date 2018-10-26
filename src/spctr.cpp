@@ -2,8 +2,8 @@
 #include <spctr.h>
 #include <fstream>
 
-void SPCTRFile::read(const char* filename, int verboseLevel){
-  if (verboseLevel>1) lout << "[I] SPCTRFile::read " << this << "(" << filename << ", verboseLevel)" << LEND;
+void SPCTRFile::read(const char* filename){
+  if (globalSettings::verboseLevel>1) lout << "[I] SPCTRFile::read " << this << "(" << filename << ")" << LEND;
   std::ifstream is(filename);
   is >> N >> M;
   spectrums.resize(M);
@@ -16,7 +16,7 @@ void SPCTRFile::read(const char* filename, int verboseLevel){
   }
 }
 
-void SPCTRFile::write(const char* filename, int){
+void SPCTRFile::write(const char* filename){
   std::ofstream os(filename);
   os << N << " " << M << "\n";
   for (int i=0;i<M;++i){
@@ -31,7 +31,7 @@ void SPCTRFile::write(const char* filename, int){
 }
 
 
-void SPCTRFile::fromSpectrum(std::vector<std::vector<double> >& spectrum, std::vector<double>& times, int){
+void SPCTRFile::fromSpectrum(std::vector<std::vector<double> >& spectrum, std::vector<double>& times){
   M=spectrum.size();
   N=0;
   double ltime=0;
@@ -58,8 +58,8 @@ void SPCTRFile::fromSpectrum(std::vector<std::vector<double> >& spectrum, std::v
   }
 }
 
-void SPCTRFile::singleSpectrum(std::vector<double>& ans, double time, int verboseLevel){
-  if (verboseLevel>2) lout << "[X] SPCTRFile::singleSpectrum " << this << "(&ans, " << time << ", verboseLevel)" << LEND;
+void SPCTRFile::singleSpectrum(std::vector<double>& ans, double time){
+  if (globalSettings::verboseLevel>2) lout << "[X] SPCTRFile::singleSpectrum " << this << "(&ans, " << time << ")" << LEND;
   int a=0;
   int b=spectrums.size()-1;
   while (a<b){
@@ -83,10 +83,10 @@ void SPCTRFile::singleSpectrum(std::vector<double>& ans, double time, int verbos
   }
 }
 
-void SPCTRFile::getSpectrums(std::vector<double>& times, std::vector<std::vector<double> >& ans, int verboseLevel){
-  if (verboseLevel>1) lout << "[I] SPCTRFile::getSpectrums " << this << "(&times, &ans, verboseLevel)" << LEND;
+void SPCTRFile::getSpectrums(std::vector<double>& times, std::vector<std::vector<double> >& ans){
+  if (globalSettings::verboseLevel>1) lout << "[I] SPCTRFile::getSpectrums " << this << "(&times, &ans)" << LEND;
   for (double time : times){
     ans.push_back(std::vector<double>());
-    singleSpectrum(ans.back(), time, verboseLevel);
+    singleSpectrum(ans.back(), time);
   }
 }

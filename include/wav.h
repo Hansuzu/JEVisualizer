@@ -1,6 +1,7 @@
 #include <fstream>
 #include <vector>
 #include <unordered_map>
+#include <globalsettings.h>
 
 //class WavFile is a class to open and read wav-files and extract soundspectrums out of them
 
@@ -59,6 +60,6 @@ public:
 private:
   double valueForJL(std::vector<long long>& sm, double jl, int K);
 public:
-  void singleSpectrum(int sp, int ep, int ch, std::vector<double>& fs, std::vector<double>& ans, std::vector<long long>& sm, double thr, int verboseLevel);
-  void spectrums(int channel, double fmp, double f0, double f1, double chlen, double thr, std::vector<std::vector<double> >& rv, std::vector<double>& times, int verboseLevel);
+  void singleSpectrum(int sp, int ep, int ch, std::vector<double>& fs, std::vector<double>& ans, std::vector<long long>& sm, double thr);
+  void spectrums(int channel, double fmp, double f0, double f1, double chlen, double thr, std::vector<std::vector<double> >& rv, std::vector<double>& times);
 };

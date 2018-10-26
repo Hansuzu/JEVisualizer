@@ -4,9 +4,9 @@
 #include <visualizer.h>
 
 
-void Visualizer::setFPEV(std::string& key, std::string& value, int verboseLevel){
+void Visualizer::setFPEV(std::string& key, std::string& value){
   int index=std::stoi(key);
-  if (verboseLevel>1 ) lout << "[I] Visualizer::setFPEV " << this << "('" << index << "', '" << value << "')" << LEND;
+  if (globalSettings::verboseLevel>1 ) lout << "[I] Visualizer::setFPEV " << this << "('" << index << "', '" << value << "')" << LEND;
   if (value=="frame") fpe.setIndex(index, 1);
   else if (value=="fps") fpe.setIndex(index, 2);
   else if (value=="w") fpe.setIndex(index, 3);
@@ -17,7 +17,7 @@ void Visualizer::setFPEV(std::string& key, std::string& value, int verboseLevel)
     tc.parseTrackIndices(value.substr(12,value.size()-12), fpeTracks.back());
     fpe.setIndex(index, 5+fpeTracks.size());
   }else if (value=="null"||value=="0") fpe.setIndex(index, 0);
-  else if (verboseLevel){
+  else if (globalSettings::verboseLevel){
      lout << "[W] Drawer::setFPEV " << this << ", unknown FPV: '" << value << "'" << LEND;
   }
 }
@@ -42,66 +42,77 @@ void Visualizer::updateFPE(){
 }
 
   
-void Visualizer::writeNewFrame(int ccframe, std::chrono::duration<double> timeElapsedBeforeWrite, int verboseLevel){
+void Visualizer::writeNewFrame(int ccframe, std::chrono::duration<double> timeElapsedBeforeWrite){
   auto start = std::chrono::high_resolution_clock::now();
   outputVideo.write(*oframeWrite);
-  if (verboseLevel>2){
+  if (globalSettings::verboseLevel>2){
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
     lout << "[P] Visualizer::writeNewFrame " << this << " write frame " << ccframe << " to file finished, elapsed time: " << elapsed.count()  << LEND;
     elapsed+=timeElapsedBeforeWrite;
     lout << "[P] Visualizer::writeNewFrame " << this << " write frame " << ccframe << " total elapsed time: " << elapsed.count()  << LEND;
   }
-  if (verboseLevel>1) lout << "[I] Visualizer::writNewFrame " << this << " drawn frame " << ccframe << LEND;
+  if (globalSettings::verboseLevel>1) lout << "[I] Visualizer::writNewFrame " << this << " drawn frame " << ccframe << LEND;
 }
-void Visualizer::launchWriteNewFrame(std::chrono::duration<double> timeElapsedBeforeWrite, int verboseLevel){
+void Visualizer::launchWriteNewFrame(std::chrono::duration<double> timeElapsedBeforeWrite){
   waitWriteFrameToFinish();
   swap(oframe, oframeWrite);
-  frameWriter=std::async(std::launch::async, &Visualizer::writeNewFrame, this, cframe, timeElapsedBeforeWrite, verboseLevel);
+  if (globalSettings::threadingLevel&1){
+    frameWriter=std::async(std::launch::async, &Visualizer::writeNewFrame, this, cframe, timeElapsedBeforeWrite);
+  }else{
+    writeNewFrame(cframe, timeElapsedBeforeWrite);
+  }
 }
 void Visualizer::waitWriteFrameToFinish(){
   if (frameWriter.valid()) frameWriter.get();
 }
 
-void Visualizer::nextFrame(int verboseLevel){
-  if (verboseLevel>1) lout << "[I] Visualizer::nextFrame " << this << ", frame " << cframe << LEND;
+void Visualizer::nextFrame(){
+  if (globalSettings::verboseLevel>1) lout << "[I] Visualizer::nextFrame " << this << ", frame " << cframe << LEND;
   if (cframe>=firstFrame && cframe<=lastFrame){
     auto start = std::chrono::high_resolution_clock::now();
     updateFPE();
     // draw layers
     layerIndependentDrawers.resize(layers.size());
-    for (int i=0;i<(int)layers.size();++i){
-      layerIndependentDrawers[i]=std::async(std::launch::async, &Layer::drawIndependent, layers[i], cframe, verboseLevel);
+    if (globalSettings::threadingLevel&2){
+      for (int i=0;i<(int)layers.size();++i){
+        layerIndependentDrawers[i]=std::async(std::launch::async, &Layer::drawIndependent, layers[i], cframe, ctime);
+      }
+      for (int i=0;i<(int)layerIndependentDrawers.size();++i){
+        layerIndependentDrawers[i].get();
+      }
+    }else{
+      for (int i=0;i<(int)layers.size();++i){
+        layers[i]->drawIndependent(cframe, ctime);
+      }
     }
-    for (int i=0;i<(int)layerIndependentDrawers.size();++i){
-      layerIndependentDrawers[i].get();
-    }
+    
     for (int i=0;i<(int)layers.size();++i){
-      layers[i]->drawToOframe(cframe, oframe, verboseLevel);
+      layers[i]->drawToOframe(cframe, ctime, oframe);
     }
     
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
-    if (verboseLevel>2){
+    if (globalSettings::verboseLevel>2){
       lout << "[P] Visualizer::nextFrame " << this << " draw layers of frame " << cframe << " finished, elapsed time: " << elapsed.count() << LEND;
     }
-    launchWriteNewFrame(elapsed, verboseLevel);
+    launchWriteNewFrame(elapsed);
     
     finish = std::chrono::high_resolution_clock::now();
     elapsed = finish - lastFrameFinishTime;
-    if (verboseLevel>2){
+    if (globalSettings::verboseLevel>2){
       lout << "[P] Visualizer::nextFrame " << this << " frame " << cframe << " time compared to previous call: " << elapsed.count() << LEND;
     }
     lout << cframe << " " << elapsed.count() << " s" << LEND;
     lastFrameFinishTime=std::chrono::high_resolution_clock::now();
-  }else if (cframe%100==0 && verboseLevel>1) lout << "[I] Visualizer::nextFrame " << this << "... skipped frame " << cframe << " ..." << LEND;
+  }else if (cframe%100==0 && globalSettings::verboseLevel>1) lout << "[I] Visualizer::nextFrame " << this << "... skipped frame " << cframe << " ..." << LEND;
   ++cframe;
 }
   
 
 
-void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackValues, int verboseLevel){
-  if (verboseLevel>1) lout << "[I] Visualizer::next " << this << " (" << time << ", &st, " << verboseLevel << ")" << LEND; 
+void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackValues){
+  if (globalSettings::verboseLevel>1) lout << "[I] Visualizer::next " << this << " (" << time << ", &st)" << LEND; 
   tc.setMaxDownSpeed(maxDownSpeed);
   tc.setMaxUpSpeed(maxUpSpeed);
 
@@ -111,14 +122,14 @@ void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackVa
     tc.updateValues(newTrackValues, ftime, time);
     
     ctime=(double)cframe/fps;
-    nextFrame(verboseLevel);
+    nextFrame();
   }
   tc.updateValues(newTrackValues, time, time);
 }
 
 
-void Visualizer::setConfigParam(std::string& param, std::string& key, std::string& value, int verboseLevel){
-  if (verboseLevel>1) lout << "[I] Visualizer::setConfigParam " << this << "('" << param << "', '" << key << "', '" << value << "', " << verboseLevel << ")" << LEND;
+void Visualizer::setConfigParam(std::string& param, std::string& key, std::string& value){
+  if (globalSettings::verboseLevel>1) lout << "[I] Visualizer::setConfigParam " << this << "('" << param << "', '" << key << "', '" << value << "')" << LEND;
   if (param=="fps"){
     fps=std::stod(value);
   }else if (param=="downspeed"){
@@ -136,19 +147,19 @@ void Visualizer::setConfigParam(std::string& param, std::string& key, std::strin
   }else if (param=="last-frame"){
     lastFrame=std::stoi(value);
   }else if (param=="fpv"){
-    setFPEV(key, value, verboseLevel);
+    setFPEV(key, value);
   }else if (param=="layer"){
     int index=layers.size();
     if (key.size()) index=std::stoi(key);
     while ((int)layers.size()<=index) layers.push_back(new Layer(w, h, &fpe, &tc));
-    layers[index]->readConfig(value.c_str(), verboseLevel);
-  }else if (verboseLevel){
+    layers[index]->readConfig(value.c_str());
+  }else if (globalSettings::verboseLevel){
     lout << "[W] Visualizer::setConfigParam " << this << ", unknown parameter '" << param << "'" << LEND;
   }
 }
 
-void Visualizer::readConfig(std::istream& co, int verboseLevel){
+void Visualizer::readConfig(std::istream& co){
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;
   configReader::readConfig(co, ans);
-  for (auto conf:ans) setConfigParam(conf.first.first, conf.first.second, conf.second, verboseLevel);
+  for (auto conf:ans) setConfigParam(conf.first.first, conf.first.second, conf.second);
 }

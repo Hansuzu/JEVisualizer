@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <globalsettings.h>
 #include <math.h>
 #include <fpe.h>
 
@@ -22,7 +23,7 @@ public:
   Formula(FormulaParameterEngine* pfpe): isConstant(1), c(0), C(NULL), frameK(NULL), minV(NULL), maxV(NULL), sinK(NULL), inSin(NULL), fpe(pfpe) {}
   double value();
   static void split(std::string& s, std::vector<std::string>& res);
-  void parse(std::string& s, int verboseLevel);
+  void parse(std::string& s);
   Formula* createCopy(){
     Formula* b=new Formula(fpe);
     *b=*this;

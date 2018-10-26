@@ -2,21 +2,26 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int verboseLevel=2;
 
 int mode=0;
 
 int main(int argc, const char** args){
   string config="main.config";
+  globalSettings::verboseLevel=1;
+  globalSettings::threadingLevel=7;
   for (int i=1;i<argc;++i){
     std::string arg=args[i];
     if (arg=="--config"){
       if (++i==argc) break;
       config=args[i];
     }else if (arg.size()>9 && arg.substr(0, 9)=="--verbose"){
-      verboseLevel=std::stoi(arg.substr(9));
+      globalSettings::verboseLevel=std::stoi(arg.substr(9));
     }else if (arg.size()>2 && arg.substr(0, 2)=="-v"){
-      verboseLevel=std::stoi(arg.substr(2));
+      globalSettings::verboseLevel=std::stoi(arg.substr(2));
+    }else if (arg.size()>11 && arg.substr(0, 11)=="--threading"){
+      globalSettings::threadingLevel=std::stoi(arg.substr(11));
+    }else if (arg.size()>2 && arg.substr(0, 2)=="-t"){
+      globalSettings::threadingLevel=std::stoi(arg.substr(2));
     }else if (arg=="--no-run"){
       mode=1;
     }else if (arg=="--extractor"){
@@ -27,7 +32,7 @@ int main(int argc, const char** args){
       cout << "unrecognized parameter: '" << arg << "'" << endl;
     }
   }
-  Controller controller(config, verboseLevel);
+  Controller controller(config);
   controller.loadFiles();
   controller.createSpectrums();
   cout << "spectrums ok" << endl;
@@ -52,22 +57,22 @@ int main(int argc, const char** args){
     std::vector<std::vector<double> > spectrums;
     std::vector<double> times;
     cout << "Analysing music..." << endl;
-    wfile.spectrums(FK, F0, F1, CHLEN, THR, spectrums, times, verboseLevel);
+    wfile.spectrums(FK, F0, F1, CHLEN, THR, spectrums, times, globalSettings::verboseLevel);
     cout << "Analysis ready." << endl;
     cout << "Will start visualizer" << endl;
     if (spectrums.size()!=times.size()){
       cout << "Internal error: spectrums.size()!=times.size()" << LEND;
     }else if (spectrums.size()){
-      Visualizer o(video_config_file.c_str(), spectrums[0].size(), verboseLevel);
+      Visualizer o(video_config_file.c_str(), spectrums[0].size(), globalSettings::verboseLevel);
       cout << "Writing video..." << endl;
       for (int i=0;i<(int)spectrums.size();++i){
-        if (verboseLevel>1){
+        if (globalSettings::verboseLevel>1){
           cout << times[i] << endl;
           for (int j=0;j<(int)spectrums[i].size();++j){
             cout << spectrums[i][j] << ", ";
           }cout << endl;
         }
-        o.next(times[i], spectrums[i], verboseLevel);
+        o.next(times[i], spectrums[i], globalSettings::verboseLevel);
       }
       if (on_end.size()) cout << system(on_end.c_str()) << endl;
     }

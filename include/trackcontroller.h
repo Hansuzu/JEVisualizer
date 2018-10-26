@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <globalsettings.h>
 
 #ifndef TRACKCONTROLLER_H
 #define TRACKCONTROLLER_H

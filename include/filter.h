@@ -2,6 +2,7 @@
 #include <vector>
 #include <future>
 #include <opencv2/imgproc.hpp>
+#include <globalsettings.h>
 #include <config.h>
 #include <trackcontroller.h>
 #include <fpe.h>
@@ -14,7 +15,7 @@
 
 class Filter{
   enum Type{Unset, GaussianBlur, Color, SuperColor, BoxBlur};
-  void setConfigParam(std::string& param, std::string& key, std::string& value, int verboseLevel);
+  void setConfigParam(std::string& param, std::string& key, std::string& value);
   Type type;
   Formula kernelX, kernelY;
   Formula rc, gc, bc, ac;  // When type=Color, color of a pixel will be (rc+r*old, gc+g*old, bc+b*old, ac+a*old)
@@ -42,7 +43,7 @@ class Filter{
   
   TrackController* tc;
 private:
-  void loadColorRule(std::string& rule, int verboseLevel);
+  void loadColorRule(std::string& rule);
 private:
   void applyGaussianBlur(cv::Mat* frame1, cv::Mat* frame2);
   void applyBoxBlur(cv::Mat* frame1, cv::Mat* frame2);
@@ -50,8 +51,8 @@ private:
   void applySuperColorRule(cv::Mat* frame1, cv::Mat* frame2, int i, int k);
 public:
   
-  void loadConfig(std::string& config, int verboseLevel);
-  void apply(cv::Mat* frame1, cv::Mat* frame2, int verboseLevel);
+  void loadConfig(std::string& config);
+  void apply(cv::Mat* frame1, cv::Mat* frame2);
   Filter(FormulaParameterEngine* pfpe, TrackController* ptc):
     type(Unset), kernelX(&fpe), kernelY(&fpe), 
     rc(&fpe), gc(&fpe), bc(&fpe), ac(&fpe), 

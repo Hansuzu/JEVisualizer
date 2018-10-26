@@ -173,7 +173,7 @@ void MMPFile::Track::getTime(int time, std::vector<double>& rv){
   for (int i=0;i<108;++i)rv[i]=keyBuffer[i];
 }
 
-void MMPFile::parseFromXML(int verboseLevel){
+void MMPFile::parseFromXML(){
   std::vector<XML*> res;
   if ((lmmsProjectNode=root.findOne("lmms-project"))){
     if (XML* head=lmmsProjectNode->findOne("head")){
@@ -184,12 +184,12 @@ void MMPFile::parseFromXML(int verboseLevel){
           v=bpm->findParam("value");
           if (v.first){
             BPM=std::stoi(v.second);
-            if (verboseLevel>1) lout << "[I] MMPFile::parseFromXML " << this << ", BPM (2):" << BPM << LEND;
+            if (globalSettings::verboseLevel>1) lout << "[I] MMPFile::parseFromXML " << this << ", BPM (2):" << BPM << LEND;
           }else lout << "[E] MMPFile::parseFromXML " << this << ", NO BPM (2)" << LEND;
         }else  lout << "[E] MMPFile::parseFromXML " << this << ", NO BPM (1)" << LEND;
       }else{
         BPM=std::stoi(v.second);
-        if (verboseLevel>1) lout << "[I] MMPFile::parseFromXML " << this << ", BPM:" << BPM << LEND;
+        if (globalSettings::verboseLevel>1) lout << "[I] MMPFile::parseFromXML " << this << ", BPM:" << BPM << LEND;
       }
     }
     if ((songNode=lmmsProjectNode->findOne("song"))){
@@ -202,7 +202,7 @@ void MMPFile::parseFromXML(int verboseLevel){
   std::vector<XML*> patterns;
   std::vector<XML*> notes;
   for (int i=0;i<(int)trackNodes.size();++i){
-    if (verboseLevel>1 ) lout << "[I] MMPFile::parseFromXML " << this << ", MPP FILE Track #" << i << ": " << trackNodes[i]->findParam("name").second << LEND;
+    if (globalSettings::verboseLevel>1 ) lout << "[I] MMPFile::parseFromXML " << this << ", MPP FILE Track #" << i << ": " << trackNodes[i]->findParam("name").second << LEND;
     patterns.clear();
     trackNodes[i]->find("pattern", patterns);
     tracks.push_back(Track());
@@ -222,7 +222,7 @@ void MMPFile::parseFromXML(int verboseLevel){
   }
 }
 
-int MMPFile::read(const char* filename, int verboseLevel){
+int MMPFile::read(const char* filename){
   std::ifstream is(filename);
   if (!is.is_open() || !is.good()) return MMP_ERROR_OPENING_ERROR;
   std::string str;
@@ -233,11 +233,11 @@ int MMPFile::read(const char* filename, int verboseLevel){
   root.type=XML::Type::Root;
   root.parse(str, 0);
 //   root.print(0);
-  parseFromXML(verboseLevel);
+  parseFromXML();
   return 0;
 }
 
-void MMPFile::spectrums(int track, std::vector<double>& times, std::vector<std::vector<double> >& ans, int){
+void MMPFile::spectrums(int track, std::vector<double>& times, std::vector<std::vector<double> >& ans){
   for (double time : times){
     ans.push_back(std::vector<double>());
     int timeT=timeFromSecs(time);

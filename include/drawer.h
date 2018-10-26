@@ -1,6 +1,7 @@
 #include <vector>
 #include <string>
 #include <opencv2/imgproc.hpp>
+#include <globalsettings.h>
 #include <config.h>
 #include <trackcontroller.h>
 #include <fpe.h>
@@ -16,7 +17,7 @@ private:
   // some magic to make fpe work (basically same as in visualizer.h)
   std::vector<std::vector<TrackController::Index> > fpeTracks;
   std::vector<double> fpevs;
-  void setFPEV(std::string& key, std::string& value, int verboseLevel);
+  void setFPEV(std::string& key, std::string& value);
   void updateFPE(int cframe);
   enum ColumnType{Rectangle, Triangle, Polygon};
   std::vector<std::pair<Formula*, Formula*> > polyCorners;
@@ -41,21 +42,21 @@ private:
 
   
   // own functions to draw simple things because opencv wasn't doing what I wanted it to do
-  void drawLine(cv::Point& a, cv::Point& b, cv::Scalar& color, double thickness, cv::Mat* frame, int veroseLevel);
-  void drawRectangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Point& d, cv::Scalar& color, cv::Mat* frame, int verboseLevel);
-  void drawTriangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Scalar& color, cv::Mat* frame, int verboseLevel);
-  void drawPolygon(std::vector<cv::Point>& pts, cv::Scalar& color, cv::Mat* frame, int verboseLevel);
+  void drawLine(cv::Point& a, cv::Point& b, cv::Scalar& color, double thickness, cv::Mat* frame);
+  void drawRectangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Point& d, cv::Scalar& color, cv::Mat* frame);
+  void drawTriangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Scalar& color, cv::Mat* frame);
+  void drawPolygon(std::vector<cv::Point>& pts, cv::Scalar& color, cv::Mat* frame);
   
   void update(int cframe); // draw calls first this
   
 public:
-  void draw(int cframe, cv::Mat* frame, double xScale, double yScale, int verboseLevel); // draws this
+  void draw(int cframe, cv::Mat* frame, double xScale, double yScale); // draws this
 
 private:
-  void setParameter(std::string& param, std::string& key, std::string& value, int verboseLevel); //parse calls this
+  void setParameter(std::string& param, std::string& key, std::string& value); //parse calls this
 
 public:
-  void parse(std::string& config, int verboseLevel); // given a string, parses the configuration
+  void parse(std::string& config); // given a string, parses the configuration
   Drawer(FormulaParameterEngine* pfpe, TrackController* ptc) : 
       x0(&fpe), y0(&fpe), x1(&fpe), y1(&fpe), lineColor0(&fpe), lineColor1(&fpe),
       fillColor0(&fpe), fillColor1(&fpe),  w(&fpe), h(&fpe), lineThickness(&fpe),

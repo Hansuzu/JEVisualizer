@@ -1,6 +1,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <globalsettings.h>
 
 
 #ifndef CONFIG_H

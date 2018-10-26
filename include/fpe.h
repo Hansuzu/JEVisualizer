@@ -1,5 +1,7 @@
 #include <vector>
 #include <iostream>
+#include <globalsettings.h>
+
 #ifndef FPE_H
 #define FPE_H
 

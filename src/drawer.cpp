@@ -2,15 +2,15 @@
 #include <drawer.h>
 
 
-void Drawer::setFPEV(std::string& key, std::string& value, int verboseLevel){
-  if (verboseLevel>1) lout << "[I] Drawer::setFPEV " << this << "('" << key << "', '" << value << "')" << LEND;
+void Drawer::setFPEV(std::string& key, std::string& value){
+  if (globalSettings::verboseLevel>1) lout << "[I] Drawer::setFPEV " << this << "('" << key << "', '" << value << "')" << LEND;
   int index=std::stoi(key);
   if (value.size()>12 && value.substr(0,12)=="track-values"){
     fpeTracks.push_back(std::vector<TrackController::Index>());
     tc->parseTrackIndices(value.substr(12,value.size()-12), fpeTracks.back());
     fpe.setIndex(index, 0+fpeTracks.size());
   }else if (value=="null"||value=="0") fpe.setIndex(index, 0);
-  else if (verboseLevel) {
+  else if (globalSettings::verboseLevel) {
      lout << "[W] Drawer::setFPEV " << this << ", unknown FPV: '" << value << "'" << LEND;
   }
 }
@@ -32,12 +32,13 @@ void Drawer::updateFPE(int){
 
 
 
-void Drawer::drawLine(cv::Point& a, cv::Point& b, cv::Scalar& color, double thickness, cv::Mat* frame, int verboseLevel){
-  if (verboseLevel>3) lout << "[4] Drawer::drawLine " << this << "(<" << a.x << "," << a.y << ">, <" << b.x << "," << b.y << ">, <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, " << thickness << ", *frame)" << LEND; 
+void Drawer::drawLine(cv::Point& a, cv::Point& b, cv::Scalar& color, double thickness, cv::Mat* frame){
+  if (globalSettings::verboseLevel>3) lout << "[4] Drawer::drawLine " << this << "(<" << a.x << "," << a.y << ">, <" << b.x << "," << b.y << ">, <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, " << thickness << ", *frame)" << LEND; 
   cv::line(*frame, a, b, color, thickness);
 }
-void Drawer::drawRectangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Point& d, cv::Scalar& color, cv::Mat* frame, int verboseLevel){
-  if (verboseLevel>3) lout << "[4] Drawer::drawRectangle " << this << "(... <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
+
+void Drawer::drawRectangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Point& d, cv::Scalar& color, cv::Mat* frame){
+  if (globalSettings::verboseLevel>3) lout << "[4] Drawer::drawRectangle " << this << "(... <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
   while (a.y>b.y){swap(a, b);swap(b, c);swap(c, d);}
   while (a.y>d.y){swap(a, d);swap(d, c);swap(c, b);}
   if (b.x>d.x) swap(b, d);
@@ -64,8 +65,8 @@ void Drawer::drawRectangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Point& 
     }
   }
 }
-void Drawer::drawTriangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Scalar& color, cv::Mat* frame, int verboseLevel){
-  if (verboseLevel>3) lout << "[4] Drawer::drawTriangle " << this << "(... <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
+void Drawer::drawTriangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Scalar& color, cv::Mat* frame){
+  if (globalSettings::verboseLevel>3) lout << "[4] Drawer::drawTriangle " << this << "(... <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
   if (a.y>b.y) swap(a, b);
   if (a.y>c.y) swap(a, c);
   if (b.y>c.y) swap(b, c);
@@ -95,10 +96,10 @@ void Drawer::drawTriangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Scalar& 
     }
   }
 }
-void Drawer::drawPolygon(std::vector<cv::Point>& pts, cv::Scalar& color, cv::Mat* frame, int verboseLevel){
-  if (verboseLevel>3) lout << "[4] Drawer::drawPolygon " << this << "(...[" << pts.size() << "], <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
+void Drawer::drawPolygon(std::vector<cv::Point>& pts, cv::Scalar& color, cv::Mat* frame){
+  if (globalSettings::verboseLevel>3) lout << "[4] Drawer::drawPolygon " << this << "(...[" << pts.size() << "], <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
   for (int i=0;i+2<(int)pts.size();++i){
-    drawTriangle(pts[i], pts[i+1], pts[i+2], color, frame, verboseLevel);
+    drawTriangle(pts[i], pts[i+1], pts[i+2], color, frame);
   }
 }
 
@@ -113,8 +114,8 @@ void Drawer::update(int cframe){
 }
 
 
-void Drawer::draw(int cframe, cv::Mat* frame, double xScale, double yScale, int verboseLevel){
-  if (verboseLevel>3) lout << "[4] Drawer::draw " << this << "(" << cframe << ") " << LEND;
+void Drawer::draw(int cframe, cv::Mat* frame, double xScale, double yScale){
+  if (globalSettings::verboseLevel>3) lout << "[4] Drawer::draw " << this << "(" << cframe << ") " << LEND;
   update(cframe);
   
   double x0d=xScale*x0.value();
@@ -160,19 +161,19 @@ void Drawer::draw(int cframe, cv::Mat* frame, double xScale, double yScale, int 
       cv::Point b(x2i, y2i);
       cv::Point c(x2i+avx, y2i+avy);
       cv::Point d(x1i+avx, y1i+avy);
-      drawRectangle(a, b, c, d, fillColor, frame, verboseLevel);
-      drawLine(a, b, color, vthickness, frame, verboseLevel);
-      drawLine(b, c, color, vthickness, frame, verboseLevel);
-      drawLine(c, d, color, vthickness, frame, verboseLevel);
-      drawLine(d, a, color, vthickness, frame, verboseLevel);
+      drawRectangle(a, b, c, d, fillColor, frame);
+      drawLine(a, b, color, vthickness, frame);
+      drawLine(b, c, color, vthickness, frame);
+      drawLine(c, d, color, vthickness, frame);
+      drawLine(d, a, color, vthickness, frame);
     }else if (columnType==Triangle){
       cv::Point a(x1i, y1i);
       cv::Point b(x2i, y2i);
       cv::Point c((x2i+x1i)/2+avx, (y2i+y1i)/2+avy);
-      drawTriangle(a, b, a, fillColor, frame, verboseLevel);
-      drawLine(a, b, color, vthickness, frame, verboseLevel);
-      drawLine(b, c, color, vthickness, frame, verboseLevel);
-      drawLine(c, a, color, vthickness, frame, verboseLevel);
+      drawTriangle(a, b, a, fillColor, frame);
+      drawLine(a, b, color, vthickness, frame);
+      drawLine(b, c, color, vthickness, frame);
+      drawLine(c, a, color, vthickness, frame);
     }else if (columnType==Polygon){
       cv::Point a(x1i, y1i);
       cv::Point b(x2i, y2i);
@@ -182,66 +183,66 @@ void Drawer::draw(int cframe, cv::Mat* frame, double xScale, double yScale, int 
       for (int j=0;j<(int)polyCornerVs.size();++j){
         polygonToDraw[j]=a+x*polyCornerVs[j].first+y*polyCornerVs[j].second;
       }
-      drawPolygon(polygonToDraw, fillColor, frame, verboseLevel);
-      for (int j=0;j<(int)polygonToDraw.size()-1;++j) drawLine(polygonToDraw[j], polygonToDraw[j+1], color, vthickness, frame, verboseLevel);
-      if (polygonToDraw.size()>2) drawLine(polygonToDraw[0], polygonToDraw[polygonToDraw.size()-1], color, vthickness, frame, verboseLevel);
+      drawPolygon(polygonToDraw, fillColor, frame);
+      for (int j=0;j<(int)polygonToDraw.size()-1;++j) drawLine(polygonToDraw[j], polygonToDraw[j+1], color, vthickness, frame);
+      if (polygonToDraw.size()>2) drawLine(polygonToDraw[0], polygonToDraw[polygonToDraw.size()-1], color, vthickness, frame);
     }
   }
 }
 
 
 
-void Drawer::setParameter(std::string& param, std::string& key, std::string& value, int verboseLevel){
-  if (verboseLevel>1) lout << "[I] Drawer::setParameter " << this << "('" << param << "', '" << key << "', '" << value << "') " << LEND;
-  if (param=="line-color-0") lineColor0.parse(value, verboseLevel);
-  else if (param=="line-color-1") lineColor1.parse(value, verboseLevel);
-  else if (param=="fill-color-0") fillColor0.parse(value, verboseLevel);
-  else if (param=="fill-color-1") fillColor1.parse(value, verboseLevel);
+void Drawer::setParameter(std::string& param, std::string& key, std::string& value){
+  if (globalSettings::verboseLevel>1) lout << "[I] Drawer::setParameter " << this << "('" << param << "', '" << key << "', '" << value << "') " << LEND;
+  if (param=="line-color-0") lineColor0.parse(value);
+  else if (param=="line-color-1") lineColor1.parse(value);
+  else if (param=="fill-color-0") fillColor0.parse(value);
+  else if (param=="fill-color-1") fillColor1.parse(value);
   else if (param=="column-type"){
     if (value=="RECTANGLE" || value=="0") columnType=Rectangle;
     else if (value=="TRIANGLE" || value=="0") columnType=Triangle;
     else if (value=="POLYGON" || value=="0") columnType=Polygon;
-    else if (verboseLevel){
+    else if (globalSettings::verboseLevel){
       lout << "[W] Drawer::setParameter " << this << ", unknown column-type '" << value << "'" << LEND;
     }
   }else if (param=="shape"){
     std::vector<std::string> res;
     Formula::split(value, res);
-    if (res.size()<3 && verboseLevel){
+    if (res.size()<3 && globalSettings::verboseLevel){
         lout << "[W] Drawer::setParameter " << this << ", problem in shape, less than 3 points '" << value << "'" << LEND;
     }
     for (auto point : res){
       std::vector<std::string> xy;
       Formula::split(point, xy);
-      if (xy.size()!=2 && verboseLevel){
+      if (xy.size()!=2 && globalSettings::verboseLevel){
         lout << "[W] Drawer::setParameter " << this << ", problem in shape, invalid point '" << point << "'" << LEND;
       }else{
         Formula* x = new Formula(&fpe);
-        x->parse(xy[0], verboseLevel);
+        x->parse(xy[0]);
         Formula* y = new Formula(&fpe);
-        y->parse(xy[1], verboseLevel);
+        y->parse(xy[1]);
         polyCorners.push_back({x, y});
       }
     }
   }
-  else if (param=="w") w.parse(value, verboseLevel);
-  else if (param=="h") h.parse(value, verboseLevel);
-  else if (param=="x0") x0.parse(value, verboseLevel);
-  else if (param=="x1") x1.parse(value, verboseLevel);
-  else if (param=="y0") y0.parse(value, verboseLevel);
-  else if (param=="y1") y1.parse(value, verboseLevel);
-  else if (param=="thickness") lineThickness.parse(value, verboseLevel);
-  else if (param=="fpv") setFPEV(key, value, verboseLevel);
+  else if (param=="w") w.parse(value);
+  else if (param=="h") h.parse(value);
+  else if (param=="x0") x0.parse(value);
+  else if (param=="x1") x1.parse(value);
+  else if (param=="y0") y0.parse(value);
+  else if (param=="y1") y1.parse(value);
+  else if (param=="thickness") lineThickness.parse(value);
+  else if (param=="fpv") setFPEV(key, value);
   else if (param=="i"){
     tc->parseTrackIndices(value, indices);
-  }else if (verboseLevel){
+  }else if (globalSettings::verboseLevel){
     lout << "[W] Drawer::setParameter " << this << ", unknown parameter '" << param << "'" << LEND;
   }
 }
 
-void Drawer::parse(std::string& config, int verboseLevel){
-  if (verboseLevel>2) lout << "[X] Drawer::parse " << this << " '" << config << "'" << LEND; 
+void Drawer::parse(std::string& config){
+  if (globalSettings::verboseLevel>2) lout << "[X] Drawer::parse " << this << " '" << config << "'" << LEND; 
   std::vector<std::pair<std::pair<std::string, std::string>, std::string> > ans;
   configReader::readConfig(config.c_str(), ans);
-  for (auto conf:ans)setParameter(conf.first.first, conf.first.second, conf.second, verboseLevel);
+  for (auto conf:ans)setParameter(conf.first.first, conf.first.second, conf.second);
 }
