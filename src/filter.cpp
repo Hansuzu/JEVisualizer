@@ -43,6 +43,7 @@ void Filter::setConfigParam(std::string& param, std::string& key, std::string& v
     if (value=="GAUSSIAN-BLUR" || value=="0") type=Type::GaussianBlur;
     else if (value=="COLOR" || value=="1") type=Type::Color;
     else if (value=="SUPER-COLOR" || value=="2") type=Type::SuperColor;
+    else if (value=="BOX-BLUR" || value=="3") type=Type::BoxBlur;
     else if (verboseLevel){
       lout << "[W] Filter::setConfigParam " << this << ", unknown filter-type '" << value<< "'" << LEND;
     }
@@ -92,6 +93,11 @@ double max(double a, double b){
   return a>b?a:b;
 }
 
+void Filter::applyBoxBlur(cv::Mat* frame1, cv::Mat* frame2){
+  int kX=kernelX.value();
+  int kY=kernelY.value();
+  cv::blur(*frame1, *frame2, cv::Size((kX<<1)|1,(kY<<1)|1));
+}
 void Filter::applyGaussianBlur(cv::Mat* frame1, cv::Mat* frame2){
   int kX=kernelX.value();
   int kY=kernelY.value();
@@ -170,26 +176,34 @@ void Filter::apply(cv::Mat* frame1, cv::Mat* frame2, int verboseLevel){
   std::vector<double> tmp;
   fpe.updateValues(tmp);
   if (type==GaussianBlur){
-    if (verboseLevel>2) lout << "[X] Filter::apply type==GaussianBlur " << this << LEND;
+    if (verboseLevel>2) lout << "[X] Filter::apply " << this << " type==GaussianBlur" << LEND;
     auto start = std::chrono::high_resolution_clock::now();
     applyGaussianBlur(frame1, frame2);
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
-    if (verboseLevel>2) lout << "[P] Filter::apply type==GaussianBlur " << this << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
+    if (verboseLevel>2) lout << "[P] Filter::apply " << this <<  " type==GaussianBlur finished, elapsed time: " << elapsed.count()  << LEND;
+  }else if(type==BoxBlur){
+    if (verboseLevel>2) lout << "[X] Filter::apply " << this << " type==BoxBlur" << LEND;
+    auto start = std::chrono::high_resolution_clock::now();
+    applyBoxBlur(frame1, frame2);
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    if (verboseLevel>2) lout << "[P] Filter::apply " << this <<  " type==BoxBlur finished, elapsed time: " << elapsed.count()  << LEND;
   }else if (type==Color){
-    if (verboseLevel>2) lout << "[X] Filter::apply type==Color " << this << LEND; 
+    if (verboseLevel>2) lout << "[X] Filter::apply " << this << " type==Color" << LEND; 
     auto start = std::chrono::high_resolution_clock::now();
     applyColor(frame1, frame2);
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
-    if (verboseLevel>2) lout << "[P] Filter::apply type==Color " << this << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
+    if (verboseLevel>2) lout << "[P] Filter::apply " << this << " type==Color finished, elapsed time: " << elapsed.count() << LEND;
   }else if (type==SuperColor){
-    if (verboseLevel>2) lout << "[X] Filter::apply type==SuperColor " << this << LEND; 
+    if (verboseLevel>2) lout << "[X] Filter::apply " << this << " type==SuperColor " << LEND; 
     auto start = std::chrono::high_resolution_clock::now();
     *frame2=cv::Vec4b(0,0,0,0);
     for (int k=0;k<(int)colorRules.size();++k){
       //Stuff to make multithreading possible...
       //With same k, no two colorRules should write to same indices in array
+      
       fs.clear();
       for (int i=0;i<(int)colorRules.size();++i){
         fs.push_back(std::async(std::launch::async, &Filter::applySuperColorRule, this, frame1, frame2, i, k));
@@ -198,7 +212,7 @@ void Filter::apply(cv::Mat* frame1, cv::Mat* frame2, int verboseLevel){
     }
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
-    if (verboseLevel>2) lout << "[P] Filter::apply type==SuperColor " << this << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
+    if (verboseLevel>2) lout << "[P] Filter::apply " << this << " type==SuperColor finished, elapsed time: " << elapsed.count() << LEND;
   }
 }
 

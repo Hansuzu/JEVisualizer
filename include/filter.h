@@ -13,7 +13,7 @@
 
 
 class Filter{
-  enum Type{Unset, GaussianBlur, Color, SuperColor};
+  enum Type{Unset, GaussianBlur, Color, SuperColor, BoxBlur};
   void setConfigParam(std::string& param, std::string& key, std::string& value, int verboseLevel);
   Type type;
   Formula kernelX, kernelY;
@@ -45,6 +45,7 @@ private:
   void loadColorRule(std::string& rule, int verboseLevel);
 private:
   void applyGaussianBlur(cv::Mat* frame1, cv::Mat* frame2);
+  void applyBoxBlur(cv::Mat* frame1, cv::Mat* frame2);
   void applyColor(cv::Mat* frame1, cv::Mat* frame2);
   void applySuperColorRule(cv::Mat* frame1, cv::Mat* frame2, int i, int k);
 public:

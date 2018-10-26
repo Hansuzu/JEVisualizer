@@ -48,9 +48,9 @@ void Visualizer::writeNewFrame(int ccframe, std::chrono::duration<double> timeEl
   if (verboseLevel>2){
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
-    lout << "[P] Visualizer::writNewFrame write frame " << ccframe << " to file finished, elapsed time=" << elapsed.count() << " s" << LEND;
+    lout << "[P] Visualizer::writeNewFrame " << this << " write frame " << ccframe << " to file finished, elapsed time: " << elapsed.count()  << LEND;
     elapsed+=timeElapsedBeforeWrite;
-    lout << "[P] Visualizer::writNewFrame write frame " << cframe << " total elapsed time=" << elapsed.count() << " s" << LEND;
+    lout << "[P] Visualizer::writeNewFrame " << this << " write frame " << ccframe << " total elapsed time: " << elapsed.count()  << LEND;
   }
   if (verboseLevel>1) lout << "[I] Visualizer::writNewFrame " << this << " drawn frame " << ccframe << LEND;
 }
@@ -83,14 +83,14 @@ void Visualizer::nextFrame(int verboseLevel){
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
     if (verboseLevel>2){
-      lout << "[P] Visualizer::nextFrame draw layers of frame " << cframe << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
+      lout << "[P] Visualizer::nextFrame " << this << " draw layers of frame " << cframe << " finished, elapsed time: " << elapsed.count() << LEND;
     }
     launchWriteNewFrame(elapsed, verboseLevel);
     
     finish = std::chrono::high_resolution_clock::now();
     elapsed = finish - lastFrameFinishTime;
     if (verboseLevel>2){
-      lout << "[P] Visualizer::nextFrame frame " << cframe << " time compared to previous call=" << elapsed.count() << " s" << LEND;
+      lout << "[P] Visualizer::nextFrame " << this << " frame " << cframe << " time compared to previous call: " << elapsed.count() << LEND;
     }
     lout << cframe << " " << elapsed.count() << " s" << LEND;
     lastFrameFinishTime=std::chrono::high_resolution_clock::now();
@@ -101,7 +101,7 @@ void Visualizer::nextFrame(int verboseLevel){
 
 
 void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackValues, int verboseLevel){
-  if (verboseLevel>1) lout << "[I] Visualizer::next(" << time << ", &st, " << verboseLevel << ")" << LEND; 
+  if (verboseLevel>1) lout << "[I] Visualizer::next " << this << " (" << time << ", &st, " << verboseLevel << ")" << LEND; 
   tc.setMaxDownSpeed(maxDownSpeed);
   tc.setMaxUpSpeed(maxUpSpeed);
 

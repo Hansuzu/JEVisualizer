@@ -44,8 +44,15 @@ private:
   void updateFPE(int cframe);
   
   void createBgBackground(bool force=0);
+  
+  void applyLayerFilters(int verboseLevel);
 public:
   void drawIndependent(int cframe, int verboseLevel); // draw layer-things that can be drawn without oframe (-> )
+private:
+  void drawImageToLayer(cv::Mat* oframe, int verboseLevel);
+  void applyImageFilters(int verboseLevel);
+  void drawLayerToImage(cv::Mat* oframe, int verboseLevel);
+public:
   void drawToOframe(int cframe, cv::Mat* oframe, int verboseLevel);    // draw layer to oframe (drawIndepent should be called before this)
 
 private:

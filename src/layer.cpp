@@ -45,7 +45,7 @@ void Layer::drawDrawers(int cframe, int verboseLevel){
   }
   auto finish = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = finish - start;
-  if (verboseLevel>2) lout << "[P] Layer::drawDrawers " << this << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
+  if (verboseLevel>2) lout << "[P] Layer::drawDrawers " << this << " finished, elapsed time: " << elapsed.count() << LEND;
 }
 
 bool Layer::isVisible(int cframe){
@@ -77,6 +77,21 @@ void Layer::createBgBackground(bool force){
   lLU=vLU;lLD=vLD;lRU=vRU;lRD=vRD;
 }
 
+void Layer::applyLayerFilters(int verboseLevel){
+  if (verboseLevel>2) lout << "[X] Layer::applyLayerFilters " << this << " apply layer filters" << LEND;
+  auto start = std::chrono::high_resolution_clock::now();
+  for (int i=0;i<(int)layerFilters.size();++i){
+    if (~i&1) layerFilters[i]->apply(frame1, frame2, verboseLevel);
+    else      layerFilters[i]->apply(frame2, frame1, verboseLevel);
+  }
+  if ((layerFilters.size())&1) swap(frame1, frame2);
+  if (verboseLevel>2){
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    lout << "[P] Layer::applyLayerFilters " << this << " finished, total elapsed time: " << elapsed.count() << LEND;
+  }
+}
+
 void Layer::drawIndependent(int cframe, int verboseLevel){
   if (verboseLevel>1) lout << "[I] Layer::drawIndependent " << this << "(" << cframe << ")" << LEND;
   if (isVisible(cframe)){
@@ -92,90 +107,90 @@ void Layer::drawIndependent(int cframe, int verboseLevel){
     }
     
     drawDrawers(cframe, verboseLevel);
+    applyLayerFilters(verboseLevel);
     
-    // apply layer filters
-    if (verboseLevel>2) lout << "[X] Layer::drawIndependent " << this << " apply layer filters" << LEND;
-    auto startLayerFilters = std::chrono::high_resolution_clock::now();
-    for (int i=0;i<(int)layerFilters.size();++i){
-      if (~i&1) layerFilters[i]->apply(frame1, frame2, verboseLevel);
-      else      layerFilters[i]->apply(frame2, frame1, verboseLevel);
-    }
-    if ((layerFilters.size())&1) swap(frame1, frame2);
     if (verboseLevel>2){
       auto finish = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double> elapsed = finish - startLayerFilters;
-      lout << "[P] Layer::drawIndependent " << this << " apply layer filters finished, elapsed time=" << elapsed.count() << " s" << LEND;
-      elapsed = finish - start;
-      lout << "[P] Layer::drawIndependent " << this << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
+      std::chrono::duration<double> elapsed = finish - start;
+      lout << "[P] Layer::drawIndependent " << this << " finished, total elapsed time: " << elapsed.count() << LEND;
     }
+  }
+}
+
+void Layer::drawImageToLayer(cv::Mat* oframe, int verboseLevel){
+  if (verboseLevel>2) lout << "[X] Layer::drawImageToLayer " << this << LEND;
+  auto start = std::chrono::high_resolution_clock::now();
+  
+  int w=oframe->size().width;
+  int h=oframe->size().height;
+  uchar* p1;
+  uchar* po;
+  for (int y=0;y<h;++y){
+    p1=frame1->ptr<uchar>(y);
+    po=oframe->ptr<uchar>(y);
+    for (int x=0;x<w;++x){
+      p1[4*x+0]=(p1[4*x+3]*(int)p1[4*x+0]+(255-p1[4*x+3])*(int)po[3*x+0])/255;
+      p1[4*x+1]=(p1[4*x+3]*(int)p1[4*x+1]+(255-p1[4*x+3])*(int)po[3*x+1])/255;
+      p1[4*x+2]=(p1[4*x+3]*(int)p1[4*x+2]+(255-p1[4*x+3])*(int)po[3*x+2])/255;
+      p1[4*x+3]=255;
+    }
+  }
+  if (verboseLevel>2){
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    lout << "[P] Layer::drawImageToLayer " << this << " finished, elapsed time: " << elapsed.count() << LEND;
+  }
+}
+void Layer::applyImageFilters(int verboseLevel){
+  if (verboseLevel>2) lout << "[X] Layer::applyImageFilters" << this << LEND;
+  auto start = std::chrono::high_resolution_clock::now();
+  for (int i=0;i<(int)imageFilters.size();++i){
+    if (~i&1) imageFilters[i]->apply(frame1, frame2, verboseLevel);
+    else      imageFilters[i]->apply(frame2, frame1, verboseLevel);
+  }
+  if ((imageFilters.size())&1) swap(frame1, frame2);
+  if (verboseLevel>2){
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    lout << "[P] Layer::applyImageFilters " << this << " finished, elapsed time: " << elapsed.count() << LEND;
+  }
+}
+void Layer::drawLayerToImage(cv::Mat* oframe, int verboseLevel){
+  if (verboseLevel>2) lout << "[X] Layer::drawLayerToImage " << this << LEND;
+  auto start = std::chrono::high_resolution_clock::now();
+  
+  int w=oframe->size().width;
+  int h=oframe->size().height;
+  uchar* p1;
+  uchar* po;
+  for (int y=0;y<h;++y){
+    p1=frame1->ptr<uchar>(y);
+    po=oframe->ptr<uchar>(y);
+    for (int x=0;x<w;++x){
+      po[3*x]=p1[4*x];
+      po[3*x+1]=p1[4*x+1];
+      po[3*x+2]=p1[4*x+2];
+    }
+  }
+  if (verboseLevel>2){
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    lout << "[P] Layer::drawLayerToImage " << this << " finished, elapsed time: " << elapsed.count() << LEND;
   }
 }
 
 void Layer::drawToOframe(int cframe, cv::Mat* oframe, int verboseLevel){
   if (verboseLevel>1) lout << "[I] Layer::drawToOframe " << this << "(" << cframe << ")" << LEND;
   if (isVisible(cframe)){
-    int w=oframe->size().width;
-    int h=oframe->size().height;
-    // draw image to layer
     auto start = std::chrono::high_resolution_clock::now();
-    if (verboseLevel>2) lout << "[X] Layer::drawToOframe " << this << " draw image to layer" << LEND;
-    auto startDrawImageToLayer = std::chrono::high_resolution_clock::now();
     
-    uchar* p1;
-    uchar* po;
-    for (int y=0;y<h;++y){
-      p1=frame1->ptr<uchar>(y);
-      po=oframe->ptr<uchar>(y);
-      for (int x=0;x<w;++x){
-        p1[4*x+0]=(p1[4*x+3]*(int)p1[4*x+0]+(255-p1[4*x+3])*(int)po[3*x+0])/255;
-        p1[4*x+1]=(p1[4*x+3]*(int)p1[4*x+1]+(255-p1[4*x+3])*(int)po[3*x+1])/255;
-        p1[4*x+2]=(p1[4*x+3]*(int)p1[4*x+2]+(255-p1[4*x+3])*(int)po[3*x+2])/255;
-        p1[4*x+3]=255;
-      }
-    }
-    if (verboseLevel>2){
-      auto finish = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double> elapsed = finish - startDrawImageToLayer;
-      lout << "[P] Layer::drawToOframe " << this << " draw image to layer finished, elapsed time=" << elapsed.count() << " s" << LEND;
-    }
-    
-    // apply image filters
-    if (verboseLevel>2) lout << "[X] Layer::drawToOframe " << this << " apply image filters" << LEND;
-    auto startImageFilters = std::chrono::high_resolution_clock::now();
-    for (int i=0;i<(int)imageFilters.size();++i){
-      if (~i&1) imageFilters[i]->apply(frame1, frame2, verboseLevel);
-      else      imageFilters[i]->apply(frame2, frame1, verboseLevel);
-    }
-    if (verboseLevel>2){
-      auto finish = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double> elapsed = finish - startImageFilters;
-      lout << "[P] Layer::drawToOframe " << this << " apply image filters finished, elapsed time=" << elapsed.count() << " s" << LEND;
-    }
-    
-    if ((imageFilters.size())&1) swap(frame1, frame2);
-    
-    if (verboseLevel>2) lout << "[X] Layer::drawToOframe " << this << " draw layer to image" << LEND;
-    auto startDrawLayerToImage = std::chrono::high_resolution_clock::now();
-    
-    for (int y=0;y<h;++y){
-      p1=frame1->ptr<uchar>(y);
-      po=oframe->ptr<uchar>(y);
-      for (int x=0;x<w;++x){
-        po[3*x]=p1[4*x];
-        po[3*x+1]=p1[4*x+1];
-        po[3*x+2]=p1[4*x+2];
-      }
-    }
-    
-    if (verboseLevel>2){
-      auto finish = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double> elapsed = finish - startDrawLayerToImage;
-      lout << "[P] Layer::drawToOframe draw layer to image finished, elapsed time=" << elapsed.count() << " s" << LEND;
-    }
+    drawImageToLayer(oframe, verboseLevel);
+    applyImageFilters(verboseLevel);
+    drawLayerToImage(oframe, verboseLevel);
     
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
-    if (verboseLevel>2) lout << "[P] Layer::drawToOframe " << this << " finished, elapsed time=" << elapsed.count() << " s" << LEND;
+    if (verboseLevel>2) lout << "[P] Layer::drawToOframe " << this << " finished, elapsed time: " << elapsed.count() << LEND;
   }
 }
 
