@@ -1,7 +1,5 @@
 bin/*
 !bin/examples
-bin/examples/simple/output/
-!bin/examples/simple/output/.gitkeep
 build
 doc/*
 !doc/documentation.pdf
