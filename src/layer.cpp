@@ -101,57 +101,34 @@ void Layer::bgVideoMoveFrame(){ // Move bgVideoFrame to frame1
   }
 }
 
-void Layer::bgVideoRewind(){ // Open bgVideo and set the position to firstFrame
-  if (globalSettings::verboseLevel>2) lout << "[X] Layer::bgVideoRewind " << this << " " << LEND;
-  if (bgVideo.isOpened()) bgVideo.release();
-  bgVideo.open(bgVideoFileName);
-  if (!bgVideo.isOpened()){
-    lout << "[E] Layer::bgVideoRewind " << this << ", could not open file '" << bgVideoFileName << "'" << LEND;
+
+void Layer::bgVideoGetFrame(int frameIndex){
+  if (globalSettings::verboseLevel>2) lout << "[X] Layer::bgVideoGetFrame " << this << " (" << frameIndex << ")" << LEND;
+  int minFrame=std::max(0, bgVideoFirstFrame);
+  int maxFrame=std::min((int)bgVideo.get(cv::CAP_PROP_FRAME_COUNT)-1, bgVideoLastFrame);
+  if (maxFrame<minFrame){
+    lout << "[E] Layer::bgVideoGetFrame " << this << " (" << frameIndex << "), maxFrame<minFrame " << maxFrame << "<" << minFrame << LEND;
     return;
   }
-  int frames=bgVideo.get(cv::CAP_PROP_FRAME_COUNT);
-  int firstVideoFrame=bgVideoFirstFrame;
-  if (frames<=firstVideoFrame){
-    if (videoOnEnd==None){
-      bgVideo.release();
-      *bgVideoFrame=cv::Scalar(0,0,0,0);
-      return;
-    }
-    else if (videoOnEnd==LastFrame) firstVideoFrame=frames-1;
-    else if (videoOnEnd==Replay) firstVideoFrame=firstFrame%frames;
+  if (frameIndex<minFrame){
+    frameIndex=minFrame+((frameIndex-minFrame)%(maxFrame-minFrame+1));
+    frameIndex+=maxFrame-minFrame+1;
   }
-  for (int i=0;i<firstVideoFrame;++i){
-    bgVideo.grab();
+  if (frameIndex>maxFrame){
+    if (videoOnEnd==None){
+      frameIndex=maxFrame+1;
+    }else if (videoOnEnd==LastFrame){
+      frameIndex=maxFrame;
+    }else{
+      frameIndex=minFrame+((frameIndex-minFrame)%(maxFrame-minFrame+1));
+    }
+  }
+  if (frameIndex != bgVideo.get(cv::CAP_PROP_POS_FRAMES)){
+    if (bgVideo.get(cv::CAP_PROP_POS_FRAMES)<frameIndex && frameIndex-bgVideo.get(cv::CAP_PROP_POS_FRAMES)<100){
+      for (int i=0;i<frameIndex-bgVideo.get(cv::CAP_PROP_POS_FRAMES);++i) bgVideo.grab();
+    }else bgVideo.set(cv::CAP_PROP_POS_FRAMES, frameIndex);
   }
   bgVideo.read(*bgVideoFrame);
-}
-
-void Layer::bgVideoNextFrame(){
-  if (globalSettings::verboseLevel>2) lout << "[X] Layer::bgVideoNextFrame " << this << " " << LEND;
-  if (bgVideo.get(cv::CAP_PROP_POS_FRAMES) >= bgVideo.get(cv::CAP_PROP_FRAME_COUNT)-1){
-    if (videoOnEnd==None){
-      *bgVideoFrame=cv::Scalar(0,0,0,0);
-    }else if (videoOnEnd==LastFrame){
-      bgVideoDeltaTime=-1000000000;
-    }else if (videoOnEnd==Replay){
-      bgVideoRewind();
-    }
-  }else{
-    bgVideo.read(*bgVideoFrame);
-  }
-}
-
-void Layer::bgVideoGrabNextFrame(){
-  if (globalSettings::verboseLevel>2) lout << "[X] Layer::bgVideoGrabNextFrame " << this << " " << LEND;
-  if (bgVideo.get(cv::CAP_PROP_POS_FRAMES) >= bgVideo.get(cv::CAP_PROP_FRAME_COUNT)-1){
-    if (videoOnEnd==None){
-      *bgVideoFrame=cv::Scalar(0,0,0,0);
-    }else if (videoOnEnd==LastFrame){
-      bgVideoDeltaTime=-1000000000;
-    }else if (videoOnEnd==Replay){
-      bgVideoRewind();
-    }
-  }else bgVideo.grab();
 }
 
 void Layer::createBgVideoBackground(int cframe, double ctime){
@@ -160,21 +137,26 @@ void Layer::createBgVideoBackground(int cframe, double ctime){
   if (cframe<bgVideoBegin || cframe>bgVideoEnd){
     *bgVideoFrame=cv::Scalar(0,0,0,0);
   }else{
+    if (!bgVideo.isOpened()) bgVideo.open(bgVideoFileName);
+    if (!bgVideo.isOpened()){
+      lout << "[E] Layer::createBgVideoBackground " << this << ", could not open video file '" << bgVideoFileName << "'" << LEND;
+      return;
+    }
     double speed=bgVideoPlaySpeed.value();
     double dTime=cframe?ctime/cframe:0;
     dTime*=speed;
     bgVideoDeltaTime+=dTime;
     if (cframe==bgVideoBegin){
-      bgVideoRewind();
-      bgVideoDeltaTime=0;
-    }
-    while (bgVideoDeltaTime*bgVideo.get(cv::CAP_PROP_FPS)>=2){
-      bgVideoGrabNextFrame();
-      bgVideoDeltaTime-=1.0/bgVideo.get(cv::CAP_PROP_FPS);
-    }
-    if (bgVideoDeltaTime*bgVideo.get(cv::CAP_PROP_FPS)>=1){
-      bgVideoNextFrame();
-      bgVideoDeltaTime-=1.0/bgVideo.get(cv::CAP_PROP_FPS);
+      int frameIndex=bgVideoFirstFrame;
+      if (dTime<0) --frameIndex;
+      bgVideoGetFrame(frameIndex);
+    }else{
+      int frames=(int)(bgVideoDeltaTime*bgVideo.get(cv::CAP_PROP_FPS));
+      if (frames != 0){
+        bgVideoDeltaTime-=(double)frames/bgVideo.get(cv::CAP_PROP_FPS);
+        --frames;
+        bgVideoGetFrame(bgVideo.get(cv::CAP_PROP_POS_FRAMES)+frames);
+      }
     }
     bgVideoMoveFrame();
   }
@@ -379,7 +361,7 @@ void Layer::setConfigParam(std::string& param, std::string& key, std::string& va
   }else if (param=="fpv"){
     setFPEV(key, value);
   }else if (globalSettings::verboseLevel){
-    lout << "[W] Layer::setConfigParam " << this << ", unknown parameter '" << value << "'" << LEND;
+    lout << "[W] Layer::setConfigParam " << this << ", unknown parameter '" << param << "'" << LEND;
   }
 }
 

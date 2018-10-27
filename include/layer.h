@@ -59,7 +59,7 @@ private:
   void bgVideoMoveFrame();
   void bgVideoRewind();
   void bgVideoGrabNextFrame();
-  void bgVideoNextFrame();
+  void bgVideoGetFrame(int frameIndex);
   
   void createBgColorBackground(bool force=0);
   void createBgVideoBackground(int cframe, double ctime);
