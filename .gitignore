@@ -1,8 +1,7 @@
 bin/*
-!bin/main.config
-!bin/layer1.config
-!bin/layer0.config
-!bin/visualizer.config
+!bin/examples
+bin/examples/simple/output/
+!bin/examples/simple/output/.gitkeep
 build
 doc/*
 !doc/documentation.pdf

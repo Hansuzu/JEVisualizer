@@ -63,6 +63,10 @@ void Layer::createBgColorBackground(bool force){
   cv::Scalar vLD=LD.value();
   cv::Scalar vRU=RU.value();
   cv::Scalar vRD=RD.value();
+//   lout << vLU[0] << vLU[1] << vLU[2] << vLU[3] << LEND;
+//   lout << vLD[0] << vLD[1] << vLD[2] << vLD[3] << LEND;
+//   lout << vRU[0] << vRU[1] << vRU[2] << vRU[3] << LEND;
+//   lout << vRD[0] << vRD[1] << vRD[2] << vRD[3] << LEND;
   double df=std::max(std::max(dif(vLU, lLU), dif(vLD, lLD)), std::max(dif(vRU, lRU), dif(vRD, lRD)));
   if (!force && df<1) return;
   int w=frame1->size().width;
@@ -73,6 +77,7 @@ void Layer::createBgColorBackground(bool force){
     for (int y=0;y<h;++y){
       cv::Scalar color=(U*(h-y)+D*y)/h;
       cv::Vec4b c(color[0], color[1], color[2], color[3]);
+//       lout << (int)c[0] << "," << (int)c[1] << "," << (int)c[2] << "," << (int)c[3] << LEND;
       background->at<cv::Vec4b>(cv::Point(x, y))=c;
     }
   }

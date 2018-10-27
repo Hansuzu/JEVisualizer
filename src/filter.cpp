@@ -94,14 +94,14 @@ double max(double a, double b){
 }
 
 void Filter::applyBoxBlur(cv::Mat* frame1, cv::Mat* frame2){
-  int kX=kernelX.value();
-  int kY=kernelY.value();
-  cv::blur(*frame1, *frame2, cv::Size((kX<<1)|1,(kY<<1)|1));
+  int kX=2*kernelX.value();
+  int kY=2*kernelY.value();
+  cv::blur(*frame1, *frame2, cv::Size(kX|1,kY|1));
 }
 void Filter::applyGaussianBlur(cv::Mat* frame1, cv::Mat* frame2){
-  int kX=kernelX.value();
-  int kY=kernelY.value();
-  cv::GaussianBlur(*frame1, *frame2, cv::Size((kX<<1)|1,(kY<<1)|1), 0, 0);
+  int kX=2*kernelX.value();
+  int kY=2*kernelY.value();
+  cv::GaussianBlur(*frame1, *frame2, cv::Size(kX|1,kY|1), 0, 0);
 }
 void Filter::applyColor(cv::Mat* frame1, cv::Mat* frame2){\
   int w=frame1->size().width;
