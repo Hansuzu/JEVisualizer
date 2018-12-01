@@ -170,7 +170,7 @@ void Drawer::draw(int cframe, cv::Mat* frame, double xScale, double yScale){
       cv::Point a(x1i, y1i);
       cv::Point b(x2i, y2i);
       cv::Point c((x2i+x1i)/2+avx, (y2i+y1i)/2+avy);
-      drawTriangle(a, b, a, fillColor, frame);
+      drawTriangle(a, b, c, fillColor, frame);
       drawLine(a, b, color, vthickness, frame);
       drawLine(b, c, color, vthickness, frame);
       drawLine(c, a, color, vthickness, frame);
@@ -200,8 +200,8 @@ void Drawer::setParameter(std::string& param, std::string& key, std::string& val
   else if (param=="fill-color-1") fillColor1.parse(value);
   else if (param=="column-type"){
     if (value=="RECTANGLE" || value=="0") columnType=Rectangle;
-    else if (value=="TRIANGLE" || value=="0") columnType=Triangle;
-    else if (value=="POLYGON" || value=="0") columnType=Polygon;
+    else if (value=="TRIANGLE" || value=="1") columnType=Triangle;
+    else if (value=="POLYGON" || value=="2") columnType=Polygon;
     else if (globalSettings::verboseLevel){
       lout << "[W] Drawer::setParameter " << this << ", unknown column-type '" << value << "'" << LEND;
     }

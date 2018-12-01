@@ -16,6 +16,8 @@ void FormulaParameterEngine::updateValues(std::vector<double>& ivalues){
       values[i]=pvalues[-indices[i]-1];
     }else if (indices[i]>0 && indices[i]-1<(int)ivalues.size()){
       values[i]=ivalues[indices[i]-1];
+    }else{
+      values[i]=0;
     }
   }
 }

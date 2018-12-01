@@ -29,6 +29,16 @@ public:
     *b=*this;
     return b;
   }
+  void setFPE(FormulaParameterEngine* fpe){
+    if (o.C)C=o.C->setFPE(fpe);
+    for (int i=0;i<(int)variables.size();++i) variables[i]->setFPE(fpe);
+    if (minV)    minV->setFPE(fpe);
+    if (maxV)    maxV->setFPE(fpe);
+    if (frameK)  frameK->setFPE(fpe);
+    if (sinK)    sinK->setFPE(fpe);
+    if (inSin)   inSin->setFPE(fpe);
+    this.fpe=fpe;
+  }
   Formula& operator=(const Formula& o){
     isConstant=o.isConstant;
     c=o.c;
