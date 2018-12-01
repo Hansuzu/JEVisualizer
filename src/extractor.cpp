@@ -67,8 +67,9 @@ void Extractor::nextFrame(){
 
 void Extractor::next(double time, std::vector<std::vector<double>*>& newTrackValues){
   if (globalSettings::verboseLevel>1) lout << "[I] Extractor::next(" << time << ", &st)" << LEND; 
-  tc.setMaxDownSpeed(maxDownSpeed);
-  tc.setMaxUpSpeed(maxUpSpeed);
+  // TODO: maxDownSpeed and maxUpSpeed
+//   tc.setMaxDownSpeed(maxDownSpeed);
+//   tc.setMaxUpSpeed(maxUpSpeed);
   while (((double)cframe)/fps<time){
     double ftime=(double)cframe/fps;
     

@@ -113,8 +113,9 @@ void Visualizer::nextFrame(){
 
 void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackValues){
   if (globalSettings::verboseLevel>1) lout << "[I] Visualizer::next " << this << " (" << time << ", &st)" << LEND; 
-  tc.setMaxDownSpeed(maxDownSpeed);
-  tc.setMaxUpSpeed(maxUpSpeed);
+  tc.setMaxDownSpeeds(maxDownSpeeds);
+  tc.setMaxUpSpeeds(maxUpSpeeds);
+  tc.setMultipliers(multipliers);
 
   while (((double)cframe)/fps<time){
     double ftime=(double)cframe/fps;
@@ -133,9 +134,17 @@ void Visualizer::setConfigParam(std::string& param, std::string& key, std::strin
   if (param=="fps"){
     fps=std::stod(value);
   }else if (param=="downspeed"){
-    maxDownSpeed=std::stod(value);
+    int k=std::stoi(key);
+    while ((int)maxDownSpeeds.size()<=k) maxDownSpeeds.push_back(1000000);
+    maxDownSpeeds[k]=std::stod(value);
   }else if (param=="upspeed"){
-    maxUpSpeed=std::stod(value);
+    int k=std::stoi(key);
+    while ((int)maxUpSpeeds.size()<=k) maxUpSpeeds.push_back(1000000);
+    maxUpSpeeds[k]=std::stod(value);
+  }else if (param=="multiplier"){
+    int k=std::stoi(key);
+    while ((int)multipliers.size()<=k) multipliers.push_back(1);
+    multipliers[k]=std::stod(value);
   }else if (param=="w" || param=="width"){
     w=std::stoi(value);
   }else if (param=="h" || param=="height"){

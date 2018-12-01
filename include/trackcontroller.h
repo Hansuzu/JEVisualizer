@@ -18,13 +18,15 @@ public:
     double maxDownSpeed; //TODO: check how these are used and configured...
     double maxUpSpeed;
     double updateTime;
+    double multiplier;
   public:
     int size(){return values.size();}
     void update(std::vector<double>* newValues, double time, double newValueTime);
     void clean(double time);
     void setMaxDownSpeed(double speed){maxDownSpeed=speed;}
     void setMaxUpSpeed(double speed){maxUpSpeed=speed;}
-    Track():maxDownSpeed(100000),maxUpSpeed(100000),updateTime(-1000000){}
+    void setMultiplier(double k){multiplier=k;}
+    Track():maxDownSpeed(100000),maxUpSpeed(100000),updateTime(-1000000),multiplier(1){}
   };
   
 private:
@@ -45,14 +47,20 @@ public:
   void setMaxDownSpeed(int track, double speed){
     if (track>=0 && track<=(int)tracks.size()) tracks[track].setMaxDownSpeed(speed);
   }
-  void setMaxDownSpeed(double speed){
-    for (int i=0;i<(int)tracks.size();++i) setMaxDownSpeed(i, speed);
+  void setMaxDownSpeeds(std::vector<double>& speeds){
+    for (int i=0;i<std::min((int)tracks.size(), (int)speeds.size());++i) setMaxDownSpeed(i, speeds[i]);
   }
   void setMaxUpSpeed(int track, double speed){
     if (track>=0 && track<=(int)tracks.size()) tracks[track].setMaxUpSpeed(speed);
   }
-  void setMaxUpSpeed(double speed){
-    for (int i=0;i<(int)tracks.size();++i) setMaxUpSpeed(i, speed);
+  void setMaxUpSpeeds(std::vector<double>& speeds){
+    for (int i=0;i<std::min((int)tracks.size(), (int)speeds.size());++i) setMaxUpSpeed(i, speeds[i]);
+  }
+  void setMultiplier(int track, double multiplier){
+    if (track>=0 && track<=(int)tracks.size()) tracks[track].setMultiplier(multiplier);
+  }
+  void setMultipliers(std::vector<double>& multipliers){
+    for (int i=0;i<std::min((int)tracks.size(), (int)multipliers.size());++i) setMultiplier(i, multipliers[i]);
   }
     
   void updateValues(std::vector<std::vector<double>*>& newValues, double time, double newValueTime); // Update the values of tracks

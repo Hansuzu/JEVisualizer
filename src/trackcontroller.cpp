@@ -11,7 +11,7 @@ void TrackController::Track::update(std::vector<double>* newValues, double time,
   double k=dtime/(newValueTime-updateTime);
   
   for (int j=0;j<(int)values.size();++j){
-    values[j]=(1-k)*values[j]+k*limitValue(values[j], (*newValues)[j], dtime, maxDownSpeed, maxUpSpeed);
+    values[j]=(1-k)*values[j]+k*limitValue(values[j], multiplier*(*newValues)[j], dtime, maxDownSpeed, maxUpSpeed);
   }
   updateTime=time;
 }
