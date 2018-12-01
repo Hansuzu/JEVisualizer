@@ -21,7 +21,7 @@ public:
     void find(std::string tag, std::vector<XML*>& res);
     std::pair<bool, std::string> findParam(std::string paramName);
     XML* findOne(std::string tag);
-    XML():type(Type::Unset),depth(0){}
+    XML():name(),params(),type(Type::Unset),depth(0),contents(){}
   };
 private:
   XML root;
@@ -37,6 +37,7 @@ private:
       int key;
       int volume;
       Note(int tb, int te, int k, int v):timeBegins(tb),timeEnds(te),key(k),volume(v){}
+      Note(const Note& o):timeBegins(o.timeBegins),timeEnds(o.timeEnds),key(o.key),volume(o.volume){}
       bool operator<(const Note&)const{return 0;}
     };
   private:
@@ -47,8 +48,10 @@ private:
     int currentTime;
     int currentEventIndex;
   public:
+    std::vector<Note>& getNotes(){return notes;}
     double getLastNoteEndTime(){return lastNoteEndTime;}
     void setNote(int pos, int len, int key, int vol);
+    void setNote(Note& note, int deltaPos); // for beat/bassline notes
     void initSimulation();
     void getTime(int time, std::vector<double>& rv);
     Track(){
@@ -57,6 +60,11 @@ private:
     }
   };
   std::vector<Track> tracks;
+  struct BBInstrument{
+    std::vector<std::pair<int, Track> > bbtracks; // steps, track
+  };
+  std::vector<BBInstrument> bbinstruments;
+  std::vector<Track> bbitracks;
   
   void parseFromXML();
   double timeToSecs(double time){return time/48/BPM*60;}
@@ -65,7 +73,7 @@ public:
   std::vector<XML*> trackNodes;
   int read(const char* filename);
 
-  double length(int track){return timeToSecs(tracks[track].getLastNoteEndTime());}
-  void spectrums(int track, std::vector<double>& times, std::vector<std::vector<double> >& ans);
+  double length(int track, bool bbi){return timeToSecs(bbi?bbitracks[track].getLastNoteEndTime():tracks[track].getLastNoteEndTime());}
+  void spectrums(int track, std::vector<double>& times, std::vector<std::vector<double> >& ans, bool usebb);
   MMPFile():lmmsProjectNode(NULL), trackContainerNode(NULL){}  
 };

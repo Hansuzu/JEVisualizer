@@ -35,13 +35,14 @@ public:
     
     double F0,F1,FK,CHLEN,THR;
     int channel,track;
+    int bbi; // beat/bassline instrument
     std::string file;
   public:
     void loadConfig(std::string& configStr);
     Track():
       mLength(0), type(Undefined),wavFile(NULL),mmpFile(NULL),spctrFile(NULL),
       F0(16.35),F1(8000),FK(1.0594630943592953),CHLEN(1),THR(0.01),
-      channel(0),track(0),file("") { }
+      channel(0),track(0),bbi(0),file("") { }
     double length(){return mLength;}
     void load();
     void createSpectrum(std::vector<double>& times);

@@ -21,8 +21,10 @@ void Controller::Track::loadConfig(std::string& configStr){
     else if (param=="fk") FK=std::stof(value);
     else if (param=="chlen") CHLEN=std::stof(value);
     else if (param=="thr") THR=std::stof(value);
-    else if (param=="track") track=std::stoi(value);
-    else if (param=="channel") channel=std::stoi(value);
+    else if (param=="track"){
+      if (value[0]=='B') bbi=1, track=std::stoi(value.substr(1));
+      else track=std::stoi(value);
+    }else if (param=="channel") channel=std::stoi(value);
     else if (param=="file") file=value;
     else if (globalSettings::verboseLevel){
       lout << "[W] Controller::Track::loadConfig " << this << ", unknown parameter '" << param << "'" << LEND;
@@ -38,7 +40,7 @@ void Controller::Track::load(){
   }else if (type==MMP){
     mmpFile=new MMPFile;
     mmpFile->read(file.c_str());
-    mLength=mmpFile->length(track);
+    mLength=mmpFile->length(track, bbi);
   }else if (type==SPCTR){
     spctrFile=new SPCTRFile;
     spctrFile->read(file.c_str());
@@ -51,7 +53,7 @@ void Controller::Track::createSpectrum(std::vector<double>& times){
   if (type==WAV){
     wavFile->spectrums(channel, FK, F0, F1, CHLEN, THR, values, times);
   }else if (type==MMP){
-    mmpFile->spectrums(track, times, values);
+    mmpFile->spectrums(track, times, values, bbi);
   }else if (type==SPCTR){
     spctrFile->getSpectrums(times, values);
   }else{
