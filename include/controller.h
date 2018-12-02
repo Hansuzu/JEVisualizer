@@ -34,6 +34,7 @@ public:
     SPCTRFile* spctrFile;
     
     double F0,F1,FK,CHLEN,THR;
+    double SHIFT;
     int channel,track;
     int bbi; // beat/bassline instrument
     std::string file;

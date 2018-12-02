@@ -61,5 +61,5 @@ private:
   double valueForJL(std::vector<long long>& sm, double jl, int K);
 public:
   void singleSpectrum(int sp, int ep, int ch, std::vector<double>& fs, std::vector<double>& ans, std::vector<long long>& sm, double thr);
-  void spectrums(int channel, double fmp, double f0, double f1, double chlen, double thr, std::vector<std::vector<double> >& rv, std::vector<double>& times);
+  void spectrums(int channel, double fmp, double f0, double f1, double chlen, double thr, std::vector<std::vector<double> >& rv, std::vector<double>& times, double shift);
 };

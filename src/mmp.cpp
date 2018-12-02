@@ -311,8 +311,9 @@ int MMPFile::read(const char* filename){
   return 0;
 }
 
-void MMPFile::spectrums(int track, std::vector<double>& times, std::vector<std::vector<double> >& ans, bool usebb){
+void MMPFile::spectrums(int track, std::vector<double>& times, double shift, std::vector<std::vector<double> >& ans, bool usebb){
   for (double time : times){
+    time+=shift;
     ans.push_back(std::vector<double>());
     int timeT=timeFromSecs(time);
     if (usebb) bbitracks[track].getTime(timeT, ans.back());

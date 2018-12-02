@@ -74,6 +74,6 @@ public:
   int read(const char* filename);
 
   double length(int track, bool bbi){return timeToSecs(bbi?bbitracks[track].getLastNoteEndTime():tracks[track].getLastNoteEndTime());}
-  void spectrums(int track, std::vector<double>& times, std::vector<std::vector<double> >& ans, bool usebb);
+  void spectrums(int track, std::vector<double>& times, double shift, std::vector<std::vector<double> >& ans, bool usebb);
   MMPFile():lmmsProjectNode(NULL), trackContainerNode(NULL){}  
 };

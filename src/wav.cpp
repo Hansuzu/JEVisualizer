@@ -227,7 +227,7 @@ double WavFile::length(int ch){
   return channels[ch].size()/fmt.sampleRate;
 }
 
-void WavFile::spectrums(int channel, double fmp, double f0, double f1, double chlen, double thr, std::vector<std::vector<double> >& rv, std::vector<double>& times){
+void WavFile::spectrums(int channel, double fmp, double f0, double f1, double chlen, double thr, std::vector<std::vector<double> >& rv, std::vector<double>& times, double shift){
   std::vector<double> hz;
   double b=f0;
   while (b<f1){
@@ -236,6 +236,7 @@ void WavFile::spectrums(int channel, double fmp, double f0, double f1, double ch
   }
   std::vector<long long> sm;
   for (double time : times){
+    time+=shift;
     rv.push_back(std::vector<double>());
     double t0=time;
     double t1=time+chlen;

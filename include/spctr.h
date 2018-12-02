@@ -20,7 +20,7 @@ public:
 private:
   void singleSpectrum(std::vector<double>& ans, double time);
 public:
-  void getSpectrums(std::vector<double>& times, std::vector<std::vector<double> >& ans);
+  void getSpectrums(std::vector<double>& times, double shift, std::vector<std::vector<double> >& ans);
   
   SPCTRFile(){}  
 };

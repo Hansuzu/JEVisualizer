@@ -83,9 +83,10 @@ void SPCTRFile::singleSpectrum(std::vector<double>& ans, double time){
   }
 }
 
-void SPCTRFile::getSpectrums(std::vector<double>& times, std::vector<std::vector<double> >& ans){
+void SPCTRFile::getSpectrums(std::vector<double>& times, double shift, std::vector<std::vector<double> >& ans){
   if (globalSettings::verboseLevel>1) lout << "[I] SPCTRFile::getSpectrums " << this << "(&times, &ans)" << LEND;
   for (double time : times){
+    time+=shift;
     ans.push_back(std::vector<double>());
     singleSpectrum(ans.back(), time);
   }
