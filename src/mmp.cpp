@@ -240,6 +240,7 @@ void MMPFile::parseFromXML(){
           for (int j=0;j<(int)patterns.size();++j){
             int steps=std::stoi(patterns[j]->findParam("steps").second);
             bbinstruments.back().bbtracks.push_back({steps, Track()});
+            notes.clear();
             patterns[j]->find("note", notes);
             for (int k=0;k<(int)notes.size();++k){
               int key=std::stoi(notes[k]->findParam("key").second);
@@ -261,7 +262,7 @@ void MMPFile::parseFromXML(){
           int lent=bbinstruments[k].bbtracks[bbtrackindex].first*12;
           for (int ppos=pos;ppos<pos+len;ppos+=lent){ // loop through starting positions of beat/bassline
             std::vector<Track::Note>& bnotes=bbinstruments[k].bbtracks[bbtrackindex].second.getNotes();
-            for (int ni=0;ni<(int)bnotes.size();++ni){ // add each note
+            for (int ni=1;ni<(int)bnotes.size();++ni){ // add each note, -1 because of the hack :Dd
               bbitracks[k].setNote(bnotes[ni], ppos);
             }
           }
@@ -274,6 +275,8 @@ void MMPFile::parseFromXML(){
     patterns.clear();
     trackNodes[i]->find("pattern", patterns);
     for (int j=0;j<(int)patterns.size();++j){
+      int muted=std::stoi(patterns[j]->findParam("muted").second);
+      if (muted) continue;
       notes.clear();
       patterns[j]->find("note", notes);
       int patternPos=std::stoi(patterns[j]->findParam("pos").second);

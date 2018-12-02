@@ -56,7 +56,7 @@ private:
     void getTime(int time, std::vector<double>& rv);
     Track(){
       lastNoteEndTime=0;
-      setNote(-1000000000, 1000000000, 0, 0); //avoid index-checking on
+      setNote(-1000000000, 2000000000, 0, 0); //avoid index-checking on
     }
   };
   std::vector<Track> tracks;
