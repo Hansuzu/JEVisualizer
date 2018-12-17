@@ -39,7 +39,7 @@ $(BUILDDIR)/visualizer.o: $(SRCDIR)/visualizer.cpp $(HEADERDIR)/visualizer.h $(H
 $(BUILDDIR)/layer.o: $(SRCDIR)/layer.cpp $(HEADERDIR)/layer.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h $(HEADERDIR)/drawer.h $(HEADERDIR)/filter.h
 	$(CC) $(CFLAGS) $(SRCDIR)/layer.cpp -o $(BUILDDIR)/layer.o -c  $(OPENCV_FLAGS)
 
-$(BUILDDIR)/drawer.o: $(SRCDIR)/drawer.cpp $(HEADERDIR)/drawer.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h
+$(BUILDDIR)/drawer.o: $(SRCDIR)/drawer.cpp $(HEADERDIR)/drawer.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h $(HEADERDIR)/drawingfunctions.cpp
 	$(CC) $(CFLAGS) $(SRCDIR)/drawer.cpp -o $(BUILDDIR)/drawer.o -c  $(OPENCV_FLAGS)
 
 $(BUILDDIR)/filter.o: $(SRCDIR)/filter.cpp $(HEADERDIR)/filter.h $(HEADERDIR)/globalsettings.h $(HEADERDIR)/log.h $(HEADERDIR)/config.h $(HEADERDIR)/trackcontroller.h $(HEADERDIR)/fpe.h $(HEADERDIR)/formula.h $(HEADERDIR)/formulacolor.h

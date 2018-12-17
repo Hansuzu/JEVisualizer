@@ -10,7 +10,7 @@ void Layer::setFPEV(std::string& key, std::string& value){
   else if (value=="layer-height") fpe.setIndex(index, 2);
   else if (value.size()>12 && value.substr(0,12)=="track-values"){
     fpeTracks.push_back(std::vector<TrackController::Index>());
-    tc->parseTrackIndices(value.substr(12,value.size()-12), fpeTracks.back());
+    tc->parseTrackIndices(value.substr(12), fpeTracks.back());
     fpe.setIndex(index, 2+fpeTracks.size());
   }else if (value=="null"||value=="0") fpe.setIndex(index, 0);
   else if (globalSettings::verboseLevel){
