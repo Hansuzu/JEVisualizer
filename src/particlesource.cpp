@@ -233,11 +233,11 @@ void ParticleSource::draw(int cframe, cv::Mat* frame, double xScale, double ySca
     // Draw a particle
     double x = particle.x*xScale;
     double y = particle.y*yScale;
-    cv::Point p1(x-10, y-10);
-    cv::Point p2(x-10, y+10);
-    cv::Point p3(x+10, y+10);
-    cv::Point p4(x+10, y-10);
-    cv::Scalar color(255, 255, 255, 255);
+    cv::Point p1(x-2, y-2);
+    cv::Point p2(x-2, y+2);
+    cv::Point p3(x+2, y+2);
+    cv::Point p4(x+2, y-2);
+    cv::Scalar color(255, 255, 255, 120);
     drawingFunctions::drawRectangle(p1, p2, p3, p4, color, frame);
   }
 }
