@@ -1,6 +1,6 @@
 #include <log.h>
 #include <drawer.h>
-
+#include <drawingfunctions.h>
 
 void Drawer::setFPEV(std::string& key, std::string& value){
   if (globalSettings::verboseLevel>1) lout << "[I] Drawer::setFPEV " << this << "('" << key << "', '" << value << "')" << LEND;
@@ -31,77 +31,6 @@ void Drawer::updateFPE(int){
 
 
 
-
-void Drawer::drawLine(cv::Point& a, cv::Point& b, cv::Scalar& color, double thickness, cv::Mat* frame){
-  if (globalSettings::verboseLevel>3) lout << "[4] Drawer::drawLine " << this << "(<" << a.x << "," << a.y << ">, <" << b.x << "," << b.y << ">, <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, " << thickness << ", *frame)" << LEND; 
-  cv::line(*frame, a, b, color, thickness);
-}
-
-void Drawer::drawRectangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Point& d, cv::Scalar& color, cv::Mat* frame){
-  if (globalSettings::verboseLevel>3) lout << "[4] Drawer::drawRectangle " << this << "(... <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
-  while (a.y>b.y){swap(a, b);swap(b, c);swap(c, d);}
-  while (a.y>d.y){swap(a, d);swap(d, c);swap(c, b);}
-  if (b.x>d.x) swap(b, d);
-  int by=std::max(std::min(a.y, frame->rows-1), 0);
-  int ey=std::max(std::min(c.y, frame->rows-1), 0);
-  uchar* p;
-  int bx, ex;
-  double ac;
-  for (int y=by;y<=ey;++y){
-    if (y<b.y)  bx=(b.y-a.y)?a.x+(b.x-a.x)*(y-a.y)/(b.y-a.y):std::min(a.x, b.x);
-    else        bx=(c.y-b.y)?b.x+(c.x-b.x)*(y-b.y)/(c.y-b.y):std::min(b.x, c.x);
-    if (y<d.y)  ex=(d.y-a.y)?a.x+(d.x-a.x)*(y-a.y)/(d.y-a.y):std::max(a.x, d.x);
-    else        ex=(c.y-d.y)?d.x+(c.x-d.x)*(y-d.y)/(c.y-d.y):std::max(d.x, c.x);
-    bx=std::max(std::min(bx, frame->cols-1), 0);
-    ex=std::max(std::min(ex, frame->cols-1), 0);
-    p=frame->ptr<uchar>(y);
-    for (int x=bx;x<=ex;++x){
-      p[4*x+3]=255-(255-p[4*x+3])*(255-color[3])/255;
-      if (p[4*x+3]==0) continue;
-      ac=color[3]/p[4*x+3];
-      p[4*x+0]=ac*color[0]+(1-ac)*p[4*x+0];
-      p[4*x+1]=ac*color[1]+(1-ac)*p[4*x+1];
-      p[4*x+2]=ac*color[2]+(1-ac)*p[4*x+2];
-    }
-  }
-}
-void Drawer::drawTriangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Scalar& color, cv::Mat* frame){
-  if (globalSettings::verboseLevel>3) lout << "[4] Drawer::drawTriangle " << this << "(... <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
-  if (a.y>b.y) swap(a, b);
-  if (a.y>c.y) swap(a, c);
-  if (b.y>c.y) swap(b, c);
-  
-  int by=std::max(std::min(a.y, frame->rows-1), 0);
-  int ey=std::max(std::min(c.y, frame->rows-1), 0);
-  uchar* p;
-  int bx, ex;
-  double ac;
-  for (int y=by;y<=ey;++y){
-    if (y<b.y)  bx=(b.y-a.y)?a.x+(b.x-a.x)*(y-a.y)/(b.y-a.y):std::min(a.x, b.x);
-    else        bx=(c.y-b.y)?b.x+(c.x-b.x)*(y-b.y)/(c.y-b.y):std::min(b.x, c.x);
-    ex=(c.y-a.y)?a.x+(c.x-a.x)*(y-a.y)/(c.y-a.y):std::max(a.x, c.x);
-    
-    bx=std::max(std::min(bx, frame->cols-1), 0);
-    ex=std::max(std::min(ex, frame->cols-1), 0);
-    if (bx>ex) std::swap(bx, ex);
-    
-    p=frame->ptr<uchar>(y);
-    for (int x=bx;x<=ex;++x){
-      p[4*x+3]=255-(255-p[4*x+3])*(255-color[3])/255;
-      if (p[4*x+3]==0) continue;
-      ac=color[3]/p[4*x+3];
-      p[4*x+0]=ac*color[0]+(1-ac)*p[4*x+0];
-      p[4*x+1]=ac*color[1]+(1-ac)*p[4*x+1];
-      p[4*x+2]=ac*color[2]+(1-ac)*p[4*x+2];
-    }
-  }
-}
-void Drawer::drawPolygon(std::vector<cv::Point>& pts, cv::Scalar& color, cv::Mat* frame){
-  if (globalSettings::verboseLevel>3) lout << "[4] Drawer::drawPolygon " << this << "(...[" << pts.size() << "], <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
-  for (int i=0;i+2<(int)pts.size();++i){
-    drawTriangle(pts[i], pts[i+1], pts[i+2], color, frame);
-  }
-}
 
 
 
@@ -161,19 +90,19 @@ void Drawer::draw(int cframe, cv::Mat* frame, double xScale, double yScale){
       cv::Point b(x2i, y2i);
       cv::Point c(x2i+avx, y2i+avy);
       cv::Point d(x1i+avx, y1i+avy);
-      drawRectangle(a, b, c, d, fillColor, frame);
-      drawLine(a, b, color, vthickness, frame);
-      drawLine(b, c, color, vthickness, frame);
-      drawLine(c, d, color, vthickness, frame);
-      drawLine(d, a, color, vthickness, frame);
+      drawingFunctions::drawRectangle(a, b, c, d, fillColor, frame);
+      drawingFunctions::drawLine(a, b, color, vthickness, frame);
+      drawingFunctions::drawLine(b, c, color, vthickness, frame);
+      drawingFunctions::drawLine(c, d, color, vthickness, frame);
+      drawingFunctions::drawLine(d, a, color, vthickness, frame);
     }else if (columnType==Triangle){
       cv::Point a(x1i, y1i);
       cv::Point b(x2i, y2i);
       cv::Point c((x2i+x1i)/2+avx, (y2i+y1i)/2+avy);
-      drawTriangle(a, b, a, fillColor, frame);
-      drawLine(a, b, color, vthickness, frame);
-      drawLine(b, c, color, vthickness, frame);
-      drawLine(c, a, color, vthickness, frame);
+      drawingFunctions::drawTriangle(a, b, c, fillColor, frame);
+      drawingFunctions::drawLine(a, b, color, vthickness, frame);
+      drawingFunctions::drawLine(b, c, color, vthickness, frame);
+      drawingFunctions::drawLine(c, a, color, vthickness, frame);
     }else if (columnType==Polygon){
       cv::Point a(x1i, y1i);
       cv::Point b(x2i, y2i);
@@ -183,9 +112,9 @@ void Drawer::draw(int cframe, cv::Mat* frame, double xScale, double yScale){
       for (int j=0;j<(int)polyCornerVs.size();++j){
         polygonToDraw[j]=a+x*polyCornerVs[j].first+y*polyCornerVs[j].second;
       }
-      drawPolygon(polygonToDraw, fillColor, frame);
-      for (int j=0;j<(int)polygonToDraw.size()-1;++j) drawLine(polygonToDraw[j], polygonToDraw[j+1], color, vthickness, frame);
-      if (polygonToDraw.size()>2) drawLine(polygonToDraw[0], polygonToDraw[polygonToDraw.size()-1], color, vthickness, frame);
+      drawingFunctions::drawPolygon(polygonToDraw, fillColor, frame);
+      for (int j=0;j<(int)polygonToDraw.size()-1;++j) drawingFunctions::drawLine(polygonToDraw[j], polygonToDraw[j+1], color, vthickness, frame);
+      if (polygonToDraw.size()>2) drawingFunctions::drawLine(polygonToDraw[0], polygonToDraw[polygonToDraw.size()-1], color, vthickness, frame);
     }
   }
 }
@@ -200,8 +129,8 @@ void Drawer::setParameter(std::string& param, std::string& key, std::string& val
   else if (param=="fill-color-1") fillColor1.parse(value);
   else if (param=="column-type"){
     if (value=="RECTANGLE" || value=="0") columnType=Rectangle;
-    else if (value=="TRIANGLE" || value=="0") columnType=Triangle;
-    else if (value=="POLYGON" || value=="0") columnType=Polygon;
+    else if (value=="TRIANGLE" || value=="1") columnType=Triangle;
+    else if (value=="POLYGON" || value=="2") columnType=Polygon;
     else if (globalSettings::verboseLevel){
       lout << "[W] Drawer::setParameter " << this << ", unknown column-type '" << value << "'" << LEND;
     }

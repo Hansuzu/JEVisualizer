@@ -1,6 +1,7 @@
 bin/*
 !bin/examples
 build
+tmp
 doc/*
 !doc/documentation.pdf
 !doc/documentation.tex
