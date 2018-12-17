@@ -1,17 +1,8 @@
-#include <opencv2/imgproc.hpp>
+#include <drawingfunctions.h>
+#include <log.h>
 
-#ifndef DRAWINGFUNCTIONS_H
-#define DRAWINGFUNCTIONS_H
 
-// own functions to draw simple things because opencv wasn't doing what I wanted it to do
 namespace drawingFunctions{
-  void drawLine(cv::Point& a, cv::Point& b, cv::Scalar& color, double thickness, cv::Mat* frame);
-  void drawRectangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Point& d, cv::Scalar& color, cv::Mat* frame);
-  void drawTriangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Scalar& color, cv::Mat* frame);
-  void drawPolygon(std::vector<cv::Point>& pts, cv::Scalar& color, cv::Mat* frame);
-
-
-    
   void drawLine(cv::Point& a, cv::Point& b, cv::Scalar& color, double thickness, cv::Mat* frame){
     if (globalSettings::verboseLevel>3) lout << "[4] drawingFunctions::drawLine (<" << a.x << "," << a.y << ">, <" << b.x << "," << b.y << ">, <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, " << thickness << ", *frame)" << LEND; 
     // TODO: implement own draw line function
@@ -46,6 +37,7 @@ namespace drawingFunctions{
       }
     }
   }
+  
   void drawTriangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Scalar& color, cv::Mat* frame){
     if (globalSettings::verboseLevel>3) lout << "[4] drawingFunctions::drawTriangle (... <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
     if (a.y>b.y) swap(a, b);
@@ -77,6 +69,7 @@ namespace drawingFunctions{
       }
     }
   }
+
   void drawPolygon(std::vector<cv::Point>& pts, cv::Scalar& color, cv::Mat* frame){
     if (globalSettings::verboseLevel>3) lout << "[4] drawingFunctions::drawPolygon (...[" << pts.size() << "], <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
     for (int i=0;i+2<(int)pts.size();++i){
@@ -84,5 +77,3 @@ namespace drawingFunctions{
     }
   }
 }
-
-#endif

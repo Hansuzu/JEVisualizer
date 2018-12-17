@@ -11,6 +11,7 @@
 #include <formulacolor.h>
 #include <drawer.h>
 #include <filter.h>
+#include <particlesource.h>
 
 #ifndef LAYER_H
 #define LAYER_H
@@ -40,11 +41,14 @@ private:
   double bgVideoDeltaTime; // The amount of time (videospeed scaled) passed after the last frame
   bool hasBgVideo;
   
-  std::vector<Drawer*> drawers;      // all drawers
-  std::vector<Filter*> layerFilters; // filters that are applied to the layer before it is rendered on the output-frame
-  std::vector<Filter*> imageFilters; // filters that are applied to the output-frame after this layer is rendered on it
+  std::vector<Drawer*> drawers;                 // all drawers
+  std::vector<Filter*> layerFilters;            // filters that are applied to the layer before it is rendered on the output-frame
+  std::vector<Filter*> imageFilters;            // filters that are applied to the output-frame after this layer is rendered on it
+  std::vector<ParticleSource*> particleSources; // all particleSources;
+  
   TrackController* tc;               // Pointer to the track-controller, through this the Layer has access to the track data
-  void drawDrawers(int cframe); //function to draw all drawers of the layer
+  void drawDrawers(int cframe);   //function to draw all drawers of the layer
+  void drawParticles(int cframe); //function to draw all particles of the layer
   
   bool isVisible(int cframe, double ctime); // checks whether the layer is Visible: 
   FormulaParameterEngine fpe; // parameter to formulas

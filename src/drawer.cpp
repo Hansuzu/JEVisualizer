@@ -1,6 +1,6 @@
 #include <log.h>
 #include <drawer.h>
-#include <drawingfunctions.cpp>
+#include <drawingfunctions.h>
 
 void Drawer::setFPEV(std::string& key, std::string& value){
   if (globalSettings::verboseLevel>1) lout << "[I] Drawer::setFPEV " << this << "('" << key << "', '" << value << "')" << LEND;

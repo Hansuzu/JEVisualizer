@@ -48,6 +48,20 @@ void Layer::drawDrawers(int cframe){
   if (globalSettings::verboseLevel>2) lout << "[P] Layer::drawDrawers " << this << " finished, elapsed time: " << elapsed.count() << LEND;
 }
 
+
+void Layer::drawParticles(int cframe){
+  if (globalSettings::verboseLevel>1) lout << "[I] Layer::drawParticles " << this << "(" << cframe << ")" << LEND;
+  auto start = std::chrono::high_resolution_clock::now();
+  double xs=frame1->cols/layerWidth;
+  double ys=frame1->rows/layerHeight;
+  for (int i=0;i<(int)particleSources.size();++i){
+    particleSources[i]->draw(cframe, frame1, xs, ys);
+  }
+  auto finish = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = finish - start;
+  if (globalSettings::verboseLevel>2) lout << "[P] Layer::drawParticles " << this << " finished, elapsed time: " << elapsed.count() << LEND;
+}
+
 bool Layer::isVisible(int cframe, double){
   return cframe>=firstFrame && cframe<=lastFrame; // TODO: visibility parameter in config...
 }
@@ -199,6 +213,7 @@ void Layer::drawIndependent(int cframe, double ctime){
     }
     
     drawDrawers(cframe);
+    drawParticles(cframe);
     applyLayerFilters();
     
     if (globalSettings::verboseLevel>2){
@@ -306,6 +321,9 @@ void Layer::setConfigParam(std::string& param, std::string& key, std::string& va
   }else if (param=="image-filter"){
     imageFilters.push_back(new Filter(&fpe, tc));
     imageFilters.back()->loadConfig(value);
+  }else if (param=="particle-source"){
+    particleSources.push_back(new ParticleSource(&fpe, tc));
+    particleSources.back()->loadConfig(value);
   }else if (param=="bg-color"){
     hasBgColor=1;
     std::vector<std::string> res;
