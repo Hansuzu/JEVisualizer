@@ -2,7 +2,7 @@
 
 - Particles (in progress)
 - "Mask-layers"
-- GUI for creating and editing config files
+- GUI for creating and editing config files (in progress)
 - Documentation (in progress)
 - Support for different input formats
 - Support for different output formats
