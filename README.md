@@ -36,4 +36,4 @@ Run example 'simple'
 - Currently supports only 16-bits wav files as an input.
 - Not sure if any other output-format than ogv currently works
 - JEVisualizer doesn't currently add sounds to the output video. Use for example ffmpeg to add sounds.
-- 
+
