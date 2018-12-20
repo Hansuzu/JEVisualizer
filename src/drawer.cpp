@@ -82,8 +82,8 @@ void Drawer::draw(int cframe, cv::Mat* frame, double xScale, double yScale){
     if (values.size()==1) p=1;
     else p=(double)i/(double)(values.size()-1);
     
-    cv::Scalar color(255*(p*lColor0+(1-p)*lColor1));
-    cv::Scalar fillColor(255*(p*fColor0+(1-p)*fColor1));
+    cv::Scalar color(255*(p*lColor1+(1-p)*lColor0));
+    cv::Scalar fillColor(255*(p*fColor1+(1-p)*fColor0));
     
     if (columnType==Rectangle){
       cv::Point a(x1i, y1i);
