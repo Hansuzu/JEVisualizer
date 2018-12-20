@@ -298,6 +298,8 @@ class JESpectrumDrawerEditor:
 
         self.update_preview()
 
+    def mix_colors(self, c0, c1, k):
+        return (int((1-k)*c0[0]+k*c1[0]), int((1-k)*c0[1]+k*c1[1]), int((1-k)*c0[2]+k*c1[2]), int((1-k)*c0[3]+k*c1[3]))
 
     def draw_preview(self, img, x0, y0, x1, y1, width, height, heights, fc0, lc0, fc1, lc1, column):
         dx=x1-x0
@@ -308,8 +310,8 @@ class JESpectrumDrawerEditor:
         for i in range(len(heights)):
             h=heights[i]
             pos=float(i)/len(heights)
-            fc=(int((1-pos)*fc0[0]+pos*fc1[0]), int((1-pos)*fc0[1]+pos*fc1[1]), int((1-pos)*fc0[2]+pos*fc1[2]), int((1-pos)*fc0[3]+pos*fc1[3]))
-            lc=(int((1-pos)*lc0[0]+pos*lc1[0]), int((1-pos)*lc0[1]+pos*lc1[1]), int((1-pos)*lc0[2]+pos*lc1[2]), int((1-pos)*lc0[3]+pos*lc1[3]))
+            fc = self.mix_colors(fc0, fc1, pos)
+            lc = self.mix_colors(lc0, lc1, pos)
             ix0=x0+dx*(pos+1.0/len(heights)*dW)
             iy0=y0+dy*(pos+1.0/len(heights)*dW)
             ix1=x0+dx*(pos+1.0/len(heights)-1.0/len(heights)*dW)
@@ -339,8 +341,12 @@ class JESpectrumDrawerEditor:
             else:
                 fc1=fc0
                 lc1=lc0
+            l=(((x0-x1)**2+(y0-y1)**2)**0.5)*(1.0/len(heights))*W*0.6
+            if l<0:l=2.0
+            c0=self.mix_colors(fc0, lc0, 2.0/l)
+            c1=self.mix_colors(fc1, lc1, 2.0/l)
             #Use fill color as a border color to make the preview look more what it will
-            return self.draw_preview(img, x0*xk, y0*yk, x1*xk, y1*yk, W, H, heights, fc0, fc0, fc1, fc1, COLUMN)
+            return self.draw_preview(img, x0*xk, y0*yk, x1*xk, y1*yk, W, H, heights, c0, c0, c1, c1, COLUMN)
             #return self.draw_preview(img, x0*xk, y0*yk, x1*xk, y1*yk, W, H, heights, fc0, lc0, fc1, lc1, COLUMN)
         return img
 
@@ -351,7 +357,7 @@ class JESpectrumDrawerEditor:
         a=self.cint(t[0], 0)
         b=self.cint(t[1], 0)
         if a>b: a,b=b,a
-        for i in range(a, b+1): heights.append(random.random()/10)
+        for i in range(a, b+1): heights.append((random.random()*0.4)**3)
         return heights
 
     def create_heights(self, iTRACK, iINDICES, track_values):

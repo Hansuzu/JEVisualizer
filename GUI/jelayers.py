@@ -12,7 +12,7 @@ class JELayers:
         for i in range(20):
             self.track_values.append([])
             for i in range(500):
-                self.track_values[-1].append(random.random()/10)
+                self.track_values[-1].append((random.random()*0.4)**3)
 
 
     def view_layers(self):

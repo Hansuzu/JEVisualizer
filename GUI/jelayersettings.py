@@ -216,7 +216,7 @@ class JELayerSettings:
         self.canvasbg(self.bgpreview)
 
     def write_config(self, f):
-        if self.bgtype=="COLOR": f.write("BG-COLOR=\""+self.bgvalue+"\"\n")
+        if self.bgtype=="COLOR": f.write("BG-COLOR=["+self.bgvalue+"]\n")
         elif self.bgtype=="IMAGE": f.write("BG-IMAGE=\""+self.bgvalue+"\"\n")
         elif self.bgtype=="VIDEO": f.write("BG-VIDEO=\""+self.bgvalue+"\"\n")
         f.write("W="+self.W+"\n")
