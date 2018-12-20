@@ -27,6 +27,21 @@ Run example 'simple'
 ./JEVisualizer --config examples/simple/main.config
 ```
 
+## GUI
+With GUI it is possible to create simple configurations for JEVisualizer. Current version of GUI supports only very few simple features.
+
+Requirements for GUI:
+```
+python
+tkinter
+PIL
+```
+Executing GUI: in directory GUI
+```
+python gui.py
+```
+
+## Documentation
 
 [Documentation](https://github.com/Hansuzu/JEVisualizer/blob/master/doc/documentation.pdf) is here. It is not covering everything and it is not necessarily up to date. I will update it and add more documentation when I have time and motivation, and when I believe that the features I'm documenting won't be changed on the very next commit.
 
@@ -36,4 +51,5 @@ Run example 'simple'
 - Currently supports only 16-bits wav files as an input.
 - Not sure if any other output-format than ogv currently works
 - JEVisualizer doesn't currently add sounds to the output video. Use for example ffmpeg to add sounds.
+- In config files the paths to other files are relative to the directory from which the JEVisualizer is executed (this means for example that configurations created with GUI work only when JEVisualizer is executed from the GUI directory) Fixing this is on TODO list
 
