@@ -3,8 +3,9 @@ from jelayer import *
 import random
 
 class JELayers:
-    def __init__(self, parent):
+    def __init__(self, parent, settings):
         self.parent = parent
+        self.settings = settings
         self.master = None
         self.layers=[]
 
@@ -60,7 +61,7 @@ class JELayers:
         self.updatelayers()
 
     def newlayer(self):
-        self.layers.append(JELayer(self, len(self.layers)))
+        self.layers.append(JELayer(self, len(self.layers), self.settings))
         self.layers[-1].view(self.frame)
         self.layers[-1].edit()
 

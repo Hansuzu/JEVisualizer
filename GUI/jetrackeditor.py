@@ -1,21 +1,22 @@
 from tkinter import *
 
 class JETrackEditor:
-    def __init__(self, parent, mediadir):
+    def __init__(self, parent, mediadir, settings):
         self.parent = parent
         self.mediadir = mediadir
+        self.settings = settings
         self.master = None
         self.stuff = {}
 
-        self.TYPE="WAV"
-        self.FILE=""
-        self.SHIFT="0.0"
-        self.F0="16.35159783"
-        self.F1="10000"
-        self.FK="1.0594630943592953"
-        self.CHLEN="1.0"
-        self.THR="0.001"
-        self.TRACK="0"
+        self.TYPE=self.settings.get("TRACK_TYPE", "WAV")
+        self.FILE=self.settings.get("TRACK_FILE", "")
+        self.SHIFT=self.settings.get("TRACK_SHIFT", "")
+        self.F0=self.settings.get("TRACK_LOWEST_FREQUENCY", "")
+        self.F1=self.settings.get("TRACK_HIGHEST_FREQUENCY", "")
+        self.FK=self.settings.get("TRACK_FREQUENCY_MULTIPLIER", "")
+        self.CHLEN=self.settings.get("TRACK_MAXIMUM_SAMPLE_LENGTH", "")
+        self.THR=self.settings.get("TRACK_THRESOLD", "")
+        self.TRACK=self.settings.get("TRACK_MMP_TRACK", "")
 
         self.vTYPE=StringVar()
         self.vFILE=StringVar()

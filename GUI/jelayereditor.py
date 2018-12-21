@@ -1,5 +1,4 @@
 from tkinter import *
-from tkinter.colorchooser import *
 from jelayersettings import *
 from jespectrumdrawers import *
 from jefilters import *
@@ -8,16 +7,17 @@ from PIL import Image, ImageTk, ImageDraw
 import os.path
 
 class JELayerEditor:
-    def __init__(self, parent, mediadir):
+    def __init__(self, parent, mediadir, settings):
         self.parent = parent
         self.mediadir = mediadir
+        self.settings = settings
         self.master = None
         self.disable_update_preview = False
 
-        self.settings = JELayerSettings(self, self.mediadir)
-        self.drawers =  JESpectrumDrawers(self)
-        self.filters = JEFilters(self)
-        self.ifilters = JEIFilters(self)
+        self.lsettings = JELayerSettings(self, self.mediadir, self.settings)
+        self.drawers =  JESpectrumDrawers(self, self.settings)
+        self.filters = JEFilters(self, self.settings)
+        self.ifilters = JEIFilters(self, self.settings)
 
         self.track_values=[]
         for i in range(20):
@@ -27,19 +27,19 @@ class JELayerEditor:
 
 
     def save(self):
-        self.settings.save()
+        self.lsettings.save()
         self.drawers.save()
         self.filters.save()
         self.ifilters.save()
 
     def load(self):
-        self.settings.load()
+        self.lsettings.load()
         self.drawers.load()
         self.filters.load()
         self.ifilters.load()
 
     def copy_from(self, o):
-        self.settings.copy_from(o.settings)
+        self.lsettings.copy_from(o.lsettings)
         self.drawers.copy_from(o.drawers)
         self.filters.copy_from(o.filters)
         self.ifilters.copy_from(o.ifilters)
@@ -48,7 +48,7 @@ class JELayerEditor:
         if not self.master: return
         self.master.destroy()
         self.master=None
-        self.settings.window_closed()
+        self.lsettings.window_closed()
         self.drawers.window_closed()
         self.filters.window_closed()
         self.ifilters.window_closed()
@@ -72,7 +72,7 @@ class JELayerEditor:
         self.ifilterframe = Frame(master)
         self.ifilterframe.grid(row=3, column=0)
 
-        self.settings.view(self.settingsframe)
+        self.lsettings.view(self.settingsframe)
         self.drawers.view(self.drawerframe)
         self.filters.view(self.filterframe)
         self.ifilters.view(self.ifilterframe)
@@ -88,21 +88,21 @@ class JELayerEditor:
     def update_preview(self):
         self.preview_base = Image.new('RGBA', (128, 72), (0, 0, 0, 0))
         if self.disable_update_preview: return self.preview_base
-        img = self.settings.update_preview(self.preview_base, self.track_values)
+        img = self.lsettings.update_preview(self.preview_base, self.track_values)
         img = self.drawers.update_preview(img, self.track_values)
         img = self.filters.update_preview(img, self.track_values)
         img = self.ifilters.update_preview(img, self.track_values)
         return img
 
     def create_preview(self, img, track_values):
-        img = self.settings.create_preview(img, track_values)
+        img = self.lsettings.create_preview(img, track_values)
         img = self.drawers.create_preview(img, track_values)
         img = self.filters.create_preview(img, track_values)
         img = self.ifilters.create_preview(img, track_values)
         return img
 
-    def get_W(self): return self.settings.get_W()
-    def get_H(self): return self.settings.get_H()
+    def get_W(self): return self.lsettings.get_W()
+    def get_H(self): return self.lsettings.get_H()
 
     def ok(self):
         self.save()
@@ -110,7 +110,7 @@ class JELayerEditor:
         self.close_master()
 
     def write_config(self, f):
-        self.settings.write_config(f)
+        self.lsettings.write_config(f)
         self.drawers.write_config(f)
         self.filters.write_config(f)
         self.ifilters.write_config(f)

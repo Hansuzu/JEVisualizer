@@ -5,8 +5,9 @@ from PIL import Image, ImageTk, ImageDraw
 import os.path
 
 class JEIFilters:
-    def __init__(self, parent):
+    def __init__(self, parent, settings):
         self.parent = parent
+        self.settings = settings
         self.master = None
         self.ifilters = []
         
@@ -18,7 +19,7 @@ class JEIFilters:
     def copy_from(self, o):
         self.ifilters = []
         for i in range(len(o.ifilters)):
-            self.ifilters.append(JEFilter(self))
+            self.ifilters.append(JEFilter(self, self.frame, len(self.ifilters), self.settings))
             self.ifilters[i].copy_from(o.ifilters[i])
 
     def view(self, master):
@@ -45,7 +46,7 @@ class JEIFilters:
             self.ifilters[i].set_row(i)
 
     def newifilter(self):
-        self.ifilters.append(JEFilter(self, self.frame, len(self.ifilters)))
+        self.ifilters.append(JEFilter(self, self.frame, len(self.ifilters), self.settings))
 
     def removeifilter(self, index):
         del self.ifilters[index]

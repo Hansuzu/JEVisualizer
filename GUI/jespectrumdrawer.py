@@ -2,15 +2,13 @@ from tkinter import *
 from jespectrumdrawereditor import *
 
 class JESpectrumDrawer:
-    def __init__(self, parent, row):
+    def __init__(self, parent, row, settings):
         self.parent = parent
         self.row = row
+        self.settings = settings
         self.master = None
 
-        self.editor = JESpectrumDrawerEditor(self)
-
-    def copy_from(self, o):
-        self.editor.copy_from(o.editor)
+        self.editor = JESpectrumDrawerEditor(self, self.settings)
 
     def view(self, master):
         if self.master: return
@@ -23,13 +21,23 @@ class JESpectrumDrawer:
         self.header = Label(self.frame, textvariable=self.title, font=("Times", 12, "bold"))
         self.header.grid(row=0, column=0)
 
-        self.edit_button = Button(self.frame, text="Edit", command=self.edit)
+        self.edit_button = Button(self.frame, text="Copy", command=self.create_copy)
         self.edit_button.grid(row=0, column=1)
+        self.edit_button = Button(self.frame, text="Edit", command=self.edit)
+        self.edit_button.grid(row=0, column=2)
         self.delete_button = Button(self.frame, text="Delete", command=self.delete)
-        self.delete_button.grid(row=0, column=2)
+        self.delete_button.grid(row=0, column=3)
 
         self.preview = Canvas(self.master, width=128, height=72)
         self.preview.grid(row=self.row, column=3)
+
+    def copy_from(self, o):
+        self.editor.copy_from(o.editor)
+
+    def create_copy(self):
+        cop = JESpectrumDrawer(self.parent, self.row, self.settings)
+        cop.copy_from(self)
+        self.parent.adddrawer(cop)
 
     def window_closed(self):
         self.master = None

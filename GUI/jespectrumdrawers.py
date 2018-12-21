@@ -2,8 +2,9 @@ from tkinter import *
 from jespectrumdrawer import *
 
 class JESpectrumDrawers:
-    def __init__(self, parent):
+    def __init__(self, parent, settings):
         self.parent = parent
+        self.settings = settings
         self.master = None
         self.drawers=[]
 
@@ -16,7 +17,7 @@ class JESpectrumDrawers:
     def copy_from(self, o):
         self.drawers=[]
         for i in range(len(o.drawers)):
-            self.drawers.append(JESpectrumDrawer(self, i))
+            self.drawers.append(JESpectrumDrawer(self, i, self.settings))
             self.drawers[i].copy_from(o.drawers[i])
 
     def view(self, master):
@@ -44,13 +45,20 @@ class JESpectrumDrawers:
             self.drawers[i].set_row(i)
 
     def newdrawer(self):
-        self.drawers.append(JESpectrumDrawer(self, len(self.drawers)))
+        self.drawers.append(JESpectrumDrawer(self, len(self.drawers), self.settings))
         self.drawers[-1].view(self.frame)
         self.drawers[-1].edit()
 
     def removedrawer(self, index):
         del self.drawers[index]
         self.updatedrawers()
+
+    def adddrawer(self, drawer):
+        self.drawers.append(drawer)
+        self.drawers[-1].view(self.frame)
+        ix = len(self.drawers)-1
+        self.drawers[ix].set_row(ix)
+        self.drawers[ix].edited()
 
     def edited(self):
         self.parent.update_preview()

@@ -2,9 +2,10 @@ from tkinter import *
 from jefiltereditor import *
 
 class JEFilter:
-    def __init__(self, parent, masterframe, row):
+    def __init__(self, parent, masterframe, row, settings):
         self.parent = parent
         self.masterframe = masterframe
+        self.settings = settings
         self.row=row
         self.frame = Frame(masterframe)
         self.frame.grid(row=row, sticky=N)

@@ -2,8 +2,9 @@ from tkinter import *
 from jetrack import *
 
 class JETracks:
-    def __init__(self, parent):
+    def __init__(self, parent, settings):
         self.parent = parent
+        self.settings = settings
         self.master = None
         self.tracks=[]
 
@@ -31,7 +32,7 @@ class JETracks:
         self.updatetracks()
 
     def newtrack(self):
-        self.tracks.append(JETrack(self, self.frame, len(self.tracks)))
+        self.tracks.append(JETrack(self, self.frame, len(self.tracks), self.settings))
 
     def write_config(self, main, visualizer):
         main.write("\n// Tracks\n")

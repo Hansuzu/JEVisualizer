@@ -8,8 +8,9 @@ from jevideosettings import *
 from jevisualizerrunner import *
 
 class JEVisualizerGUI:
-    def __init__(self, master):
+    def __init__(self, master, settings):
         self.master = master
+        self.settings = settings
         master.title("JEVGUI")
         EW = 40
 
@@ -36,16 +37,16 @@ class JEVisualizerGUI:
         self.layerframe = Frame(self.right)
         self.layerframe.grid()
 
-        self.commonsettings = JECommonSettings(self)
+        self.commonsettings = JECommonSettings(self, self.settings)
         self.commonsettings.view(self.commonsettings_frame)
 
-        self.videosettings = JEVideoSettings(self)
+        self.videosettings = JEVideoSettings(self, self.settings)
         self.videosettings.view(self.videosettings_frame)
     
-        self.tracks = JETracks(self)
+        self.tracks = JETracks(self, self.settings)
         self.tracks.view(self.trackframe)
 
-        self.layers = JELayers(self)
+        self.layers = JELayers(self, self.settings)
         self.layers.view(self.layerframe)
 
         self.buttons = Frame(master)
@@ -56,7 +57,7 @@ class JEVisualizerGUI:
         self.run_button = Button(self.buttons, text="Run JEVisualizer", command=self.run_JEVisualizer)
         self.run_button.grid(row=0, column=2)
 
-        self.visualizer_runner = JEVisualizerRunner(self, self.master)
+        self.visualizer_runner = JEVisualizerRunner(self, self.master, self.settings)
 
     
     def getmediadir(self):
@@ -91,6 +92,17 @@ class JEVisualizerGUI:
         self.visualizer_runner.run_JEVisualizer(command)
         
 
+settingsf=open("default_variables")
+t=settingsf.readlines()
+settingsf.close()
+settings={}
+for l in t:
+    if l[-1]=="\n": l=l[:-1]
+    l=l.split("=")
+    p=l[0]
+    v="=".join(l[1:])
+    settings[p]=v
+
 root = Tk()
-gui = JEVisualizerGUI(root)
+gui = JEVisualizerGUI(root, settings)
 root.mainloop()

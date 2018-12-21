@@ -3,10 +3,11 @@ from jetrackeditor import *
 import random
 
 class JETrack:
-    def __init__(self, parent, masterframe, row):
+    def __init__(self, parent, masterframe, row, settings):
         self.parent = parent
         self.masterframe = masterframe
-        self.row=row
+        self.row = row
+        self.settings = settings
         self.frame = Frame(masterframe)
         self.frame.grid(row=row, sticky=N)
 
@@ -19,7 +20,7 @@ class JETrack:
         self.delete_button = Button(self.frame, text="Delete", command=self.delete)
         self.delete_button.grid(row=0, column=2)
 
-        self.editor = JETrackEditor(self, self.parent.getmediadir())
+        self.editor = JETrackEditor(self, self.parent.getmediadir(), self.settings)
 
         self.update_name()
         self.edit()

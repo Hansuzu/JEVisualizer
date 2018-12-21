@@ -10,10 +10,9 @@
 
 ## GUI:
 - Fix crashing
-- Better UI for running JEVisualizer
 - Filters
 - Load config
-- Default values to a text file
 - More optimized preview thing
 - Button to create spctr files
+- More other buttons to make using easier
 

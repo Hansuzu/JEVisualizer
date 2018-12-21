@@ -2,14 +2,15 @@ from tkinter import *
 from jelayereditor import *
 
 class JELayer:
-    def __init__(self, parent, row):
+    def __init__(self, parent, row, settings):
         self.parent = parent
         self.row=row
+        self.settings = settings
         self.master =  None
 
         self.title=StringVar()
 
-        self.editor = JELayerEditor(self, self.parent.getmediadir())
+        self.editor = JELayerEditor(self, self.parent.getmediadir(), self.settings)
 
 
 
@@ -94,7 +95,7 @@ class JELayer:
         self.editor.copy_from(o.editor)
         
     def create_copy(self):
-        cop = JELayer(self.parent, self.row)
+        cop = JELayer(self.parent, self.row, self.settings)
         cop.copy_from(self)
         self.parent.addlayer(cop)
 

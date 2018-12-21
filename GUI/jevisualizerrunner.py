@@ -3,9 +3,10 @@ from subprocess import Popen, PIPE
 import threading
 
 class JEVisualizerRunner:
-    def __init__(self, parent, master):
+    def __init__(self, parent, master, settings):
         self.parent = parent
         self.master = master
+        self.settings = settings
         self.window = None
     
     def destroy_window(self): 
@@ -32,7 +33,9 @@ class JEVisualizerRunner:
             msg=stdout_line.split(" ")
             if msg[0][0]=="#":
                 self.parti = int(msg[0][1:])
-                self.part.set(str(self.parti)+"/3")
+                if self.parti==1:  self.part.set(str(self.parti)+"/3 creating spectrums...")
+                if self.parti==2:  self.part.set(str(self.parti)+"/3 rendering video...")
+                if self.parti==3:  self.part.set(str(self.parti)+"/3 executing command...")
                 self.percents.set("0%")
                 self.estimated_time_left.set("N/A")
                 self.fps_value.set("")

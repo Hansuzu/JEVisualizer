@@ -1,14 +1,16 @@
 from tkinter import *
+from tkinter.colorchooser import *
 from PIL import Image, ImageTk, ImageDraw
 import os
 
 class JELayerSettings:
-    def __init__(self, parent, mediadir):
+    def __init__(self, parent, mediadir, settings):
         self.parent = parent
         self.mediadir = mediadir
+        self.settings = settings
         self.master = None
 
-        self.bgtype="NONE"
+        self.bgtype=self.settings.get("LAYER_BACKGROUND_TYPE", "NONE")
         self.bgvalue=""
         self.W="1280"
         self.H="720"
@@ -69,9 +71,9 @@ class JELayerSettings:
         self.bgpreview = Canvas(master, width=128, height=72)
         self.bgpreview.grid(row=3, column=3)
 
+        self.load()
         self.change_bgtype(None)
 
-        self.load()
 
 
     def window_closed(self):
@@ -159,19 +161,19 @@ class JELayerSettings:
         if bgtype=="COLOR":
             self.bglabel = Label(self.master, text="Background-color")
             self.bglabel.grid(row=3, column=0)
-            if old_bgtype != bgtype: self.vbgvalue.set("[0,0,0,255]")
+            if old_bgtype != bgtype: self.vbgvalue.set(self.settings.get("LAYER_BACKGROUND_COLOR", ""))
             self.bgbrowsebutton = Button(self.master, text='Select Color', command=self.bgcolor_chooser)
             self.bgbrowsebutton.grid(row=3, column=2)
         elif bgtype=="IMAGE":
             self.bglabel = Label(self.master, text="Background image")
             self.bglabel.grid(row=3, column=0)
-            if old_bgtype != bgtype: self.vbgvalue.set("")
+            if old_bgtype != bgtype: self.vbgvalue.set(self.settings.get("LAYER_BACKGROUND_IMAGE", ""))
             self.bgbrowsebutton = Button(self.master, text="Browse", command=self.browse_bgimage_dir)
             self.bgbrowsebutton.grid(row=3, column=2)
         elif bgtype=="VIDEO":
             self.bglabel = Label(self.master, text="Background video")
             self.bglabel.grid(row=3, column=0)
-            if old_bgtype != bgtype: self.vbgvalue.set("")
+            if old_bgtype != bgtype: self.vbgvalue.set(self.settings.get("LAYER_BACKGROUND_VIDEO", ""))
             self.bgbrowsebutton = Button(self.master, text="Browse", command=self.browse_bgvideo_dir)
             self.bgbrowsebutton.grid(row=3, column=2)
         self.edited()

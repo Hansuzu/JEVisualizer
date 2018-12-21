@@ -4,24 +4,26 @@ import random
 from PIL import Image, ImageTk, ImageDraw
 
 class JESpectrumDrawerEditor:
-    def __init__(self, parent):
+    def __init__(self, parent, settings):
         self.parent = parent
         self.master = None
+        self.settings = settings
         self.stuff = {}
         self.disable_update_preview = False
 
 
-        self.iTRACK="0"
-        self.iINDICES="0-110"
-        self.FC0="[255,0,0,255]"
-        self.LC0="[255,255,255,255]"
-        self.FC1="[0,0,255,255]"
-        self.LC1="[255,255,255,255]"
-        self.W="0.8"
-        self.H="100"
-        self.COLUMN="RECTANGLE"
-        self.ENABLEC1=0
-        self.TYPE="LINE"
+        self.iTRACK=self.settings.get("LAYER_SPECTRUM_DRAWER_TRACK", "")
+        self.iINDICES=self.settings.get("LAYER_SPECTRUM_DRAWER_INDICES", "")
+        self.FC0=self.settings.get("LAYER_SEPCTRUM_DRAWER_FILL_COLOR_0", "")
+        self.LC0=self.settings.get("LAYER_SEPCTRUM_DRAWER_LINE_COLOR_0", "")
+        self.FC1=self.settings.get("LAYER_SEPCTRUM_DRAWER_FILL_COLOR_1", "")
+        self.LC1=self.settings.get("LAYER_SEPCTRUM_DRAWER_LINE_COLOR_1", "")
+        self.W=self.settings.get("LAYER_SPECTRUM_DRAWER_COLUMN_WIDTH", "")
+        self.H=self.settings.get("LAYER_SPECTRUM_DRAWER_COLUMN_HEIGHT", "")
+        self.COLUMN=self.settings.get("LAYER_SPECTRUM_DRAWER_COLUMN_TYPE", "")
+        try:   self.ENABLEC1=int(self.settings.get("LAYER_SPECTRUM_DRAWER_ENABLE_SECOND_COLOR", "0"))
+        except:self.ENABLEC1=0
+        self.TYPE=self.settings.get("LAYER_SPECTRUM_DRAWER_TYPE", "")
         self.X0="0.0"
         self.Y0=str(self.parent.get_H()/2)
         self.X1=str(self.parent.get_W())
