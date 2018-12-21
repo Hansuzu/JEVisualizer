@@ -5,7 +5,7 @@ from jecommonsettings import *
 from jelayers import *
 from jetracks import *
 from jevideosettings import *
-import os
+from jevisualizerrunner import *
 
 class JEVisualizerGUI:
     def __init__(self, master):
@@ -55,8 +55,8 @@ class JEVisualizerGUI:
         self.config_button.grid(row=0, column=1)
         self.run_button = Button(self.buttons, text="Run JEVisualizer", command=self.run_JEVisualizer)
         self.run_button.grid(row=0, column=2)
-        self.close_button = Button(self.buttons, text="Close", command=master.quit)
-        self.close_button.grid(row=0, column=3)
+
+        self.visualizer_runner = JEVisualizerRunner(self, self.master)
 
     
     def getmediadir(self):
@@ -86,13 +86,10 @@ class JEVisualizerGUI:
         visualizer.close()
         messagebox.showinfo("JEVGUI: Config files created", "Config files created")
 
-
     def run_JEVisualizer(self):
         command = self.commonsettings.get_jevisualizer_command()
-        print command
-        command=command.replace("$PARAMS$", "")
-        os.system(command)
-
+        self.visualizer_runner.run_JEVisualizer(command)
+        
 
 root = Tk()
 gui = JEVisualizerGUI(root)

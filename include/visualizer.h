@@ -36,6 +36,9 @@ private:
   
   FormulaParameterEngine fpe; // Contains information about parameters that can be used in formulas
   TrackController tc; // Contains values of tracks and other stuff, a pointer to this is passed to layers
+  
+  std::chrono::system_clock::time_point times[16]; // used to calculate the expected time left
+  int timesi;
 private:
   int firstFrame;  // first frame to actually render (nextFrame checks if firstFrame<=cframe)
   int lastFrame;   // last frame to actually render  (nextFrame checks if cframe<=lastFrame)
@@ -59,13 +62,13 @@ private:
   void nextFrame(); //Renders a frame of video
 public:
   void next(double time, std::vector<std::vector<double>* >& newTrackValues); //calls nextFrame() when it's needed
-
+  void setEndTime(double time); // controller informs Visualizer the time of last spectrums
 private:
   void setConfigParam(std::string& param, std::string& paramKey, std::string& value); // Handles one statement of config-file
   void readConfig(std::istream& co); // loads a configuration from a file, calls setConfigParam for each configuratino statement
 public:
   
-  Visualizer(const char* configFile):fps(20), w(640), h(480),ctime(0), cframe(0),ovfname("default.ogv"),fpe(NULL),firstFrame(0),lastFrame(1000000000){
+  Visualizer(const char* configFile):fps(20), w(640), h(480),ctime(0), cframe(0),ovfname("default.ogv"),fpe(NULL),timesi(0),firstFrame(0),lastFrame(1000000000){
     std::ifstream co;
     co.open(configFile);
     readConfig(co);

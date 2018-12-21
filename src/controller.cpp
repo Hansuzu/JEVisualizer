@@ -73,6 +73,12 @@ void Controller::loadFiles(){
   }
 }
 void Controller::createSpectrums(){
+  if (globalSettings::outputFormat==0){
+    lout << "Creating spectrums..." << LEND;
+  }else if (globalSettings::outputFormat==1){
+    lout << "#1" << LEND;
+  }
+    
   times.clear();
   double time=0;
   for (int i=0;i<(int)tracks.size();++i){
@@ -88,14 +94,22 @@ void Controller::createSpectrums(){
 }
 
 void Controller::runVisualizer(){
-  lout << LEND << LEND << LEND;
+  if (globalSettings::outputFormat==0){
+    lout << LEND << LEND << LEND;
+  }else if (globalSettings::outputFormat==1){
+    lout << "#2" << LEND;
+  }
   if (globalSettings::verboseLevel>1) lout << "[I] Controller::runVisualizer " << this << LEND;
     
   Visualizer visualizer(video_config_file.c_str());
   
-  lout << LEND << LEND << LEND;
+  if (globalSettings::outputFormat==0){
+    lout << LEND << LEND << LEND;
+  }
+  
   if (globalSettings::verboseLevel>1) lout << "[I] Controller::runVisualizer " << this << ", configurations loaded " << LEND;
   
+  if (times.size()) visualizer.setEndTime(times.back());
   for (int i=0;i<(int)times.size();++i){
     if (globalSettings::verboseLevel>1) lout << "[I] Controller::runVisualizer " << this << ", TIME: " << times[i] << LEND;
     std::vector<std::vector<double>* > st;
@@ -103,6 +117,11 @@ void Controller::runVisualizer(){
       st.push_back(tracks[j].getValues(i));
     }
     visualizer.next(times[i], st);
+  }
+  if (globalSettings::outputFormat==0){
+    lout << "Executing end-command..." << LEND;
+  }else if (globalSettings::outputFormat==1){
+    lout << "#3" << LEND;
   }
   int v=system(on_end_command.c_str());
   if (v) lout << "[E] Controller::runVisualizer " << this << ", system call returned " << v << LEND;
@@ -131,6 +150,7 @@ void Controller::runExtractor(){
 void Controller::runCreateSPCTRs(){
   if (globalSettings::verboseLevel>1) lout << "[I] Controller::runCreateSPCTRs " << this << "()" << LEND;
   for (int i=0;i<(int)tracks.size();++i){
+    if (tracks[i].type==Track::SPCTR) continue;
     SPCTRFile of;
     of.fromSpectrum(tracks[i].getAllValues(), times);
     of.write((tracks[i].getFileName()+".spctr").c_str());

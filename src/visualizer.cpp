@@ -1,5 +1,4 @@
 #include <string>
-#include <chrono>
 #include <log.h>
 #include <visualizer.h>
 
@@ -92,6 +91,14 @@ void Visualizer::nextFrame(){
     }
     
     auto finish = std::chrono::high_resolution_clock::now();
+    times[(++timesi)&15]=finish;
+    std::chrono::duration<double> elapsed16=times[timesi&15]-times[(timesi+1)&15];
+    double avg_time=elapsed16.count()/16;
+    double ofps=1.0/avg_time;
+    int frames_left=lastFrame-cframe;
+    double expected_time_left=frames_left*avg_time;
+    double percents_done = 100.0*((double)cframe-firstFrame+1)/(lastFrame-firstFrame+1);
+    
     std::chrono::duration<double> elapsed = finish - start;
     if (globalSettings::verboseLevel>2){
       lout << "[P] Visualizer::nextFrame " << this << " draw layers of frame " << cframe << " finished, elapsed time: " << elapsed.count() << LEND;
@@ -103,7 +110,11 @@ void Visualizer::nextFrame(){
     if (globalSettings::verboseLevel>2){
       lout << "[P] Visualizer::nextFrame " << this << " frame " << cframe << " time compared to previous call: " << elapsed.count() << LEND;
     }
-    lout << cframe << " " << elapsed.count() << " s" << LEND;
+    if (globalSettings::outputFormat==0){
+      lout << cframe << " " << elapsed.count() << " s " << percents_done << "% " << " FPS: " << ofps << " Expected time left: " << expected_time_left << LEND;
+    }else if (globalSettings::outputFormat==1){
+      lout << firstFrame << " " << cframe << " " << lastFrame << " " << elapsed.count() << " " << percents_done << " " << ofps << " " << expected_time_left << LEND;
+    }
     lastFrameFinishTime=std::chrono::high_resolution_clock::now();
   }else if (cframe%100==0 && globalSettings::verboseLevel>1) lout << "[I] Visualizer::nextFrame " << this << "... skipped frame " << cframe << " ..." << LEND;
   ++cframe;
@@ -116,7 +127,7 @@ void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackVa
   tc.setMaxDownSpeeds(maxDownSpeeds);
   tc.setMaxUpSpeeds(maxUpSpeeds);
   tc.setMultipliers(multipliers);
-
+  
   while (((double)cframe)/fps<time){
     double ftime=(double)cframe/fps;
     
@@ -126,6 +137,14 @@ void Visualizer::next(double time, std::vector<std::vector<double>*>& newTrackVa
     nextFrame();
   }
   tc.updateValues(newTrackValues, time, time);
+}
+
+void Visualizer::setEndTime(double time) {
+  if (globalSettings::verboseLevel>1) lout << "[I] Visualizer::setEndTime " << this << " (" << time << ")" << LEND; 
+  int maxFrame = ceil(time*fps);
+  if (firstFrame<0) firstFrame+=maxFrame;
+  if (lastFrame<0) lastFrame+=maxFrame; 
+  if (maxFrame<lastFrame)lastFrame=maxFrame;
 }
 
 

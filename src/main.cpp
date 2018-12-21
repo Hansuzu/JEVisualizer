@@ -9,6 +9,7 @@ int main(int argc, const char** args){
   string config="main.config";
   globalSettings::verboseLevel=1;
   globalSettings::threadingLevel=7;
+  globalSettings::outputFormat=0; // 
   for (int i=1;i<argc;++i){
     std::string arg=args[i];
     if (arg=="--config"){
@@ -24,6 +25,10 @@ int main(int argc, const char** args){
       globalSettings::threadingLevel=std::stoi(arg.substr(2));
     }else if (arg=="--no-run"){
       mode=1;
+    }else if (arg=="-G"){
+      // python-GUI-readable output
+      globalSettings::verboseLevel=0;
+      globalSettings::outputFormat=1;
     }else if (arg=="--extractor"){
       mode=2;
     }else if (arg=="--spctr"){
@@ -35,7 +40,9 @@ int main(int argc, const char** args){
   Controller controller(config);
   controller.loadFiles();
   controller.createSpectrums();
-  cout << "spectrums ok" << endl;
+  if (globalSettings::outputFormat==0){
+    cout << "spectrums loaded" << endl;
+  }
   if (mode==0){
     controller.runVisualizer();
   }else if (mode==2){
