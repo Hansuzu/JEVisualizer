@@ -115,4 +115,10 @@ class JELayerEditor:
         self.filters.write_config(f)
         self.ifilters.write_config(f)
         
+    def load_config(self, conf):
+        self.lsettings.load_config(conf)
+        self.drawers.load_config(conf)
+        self.filters.load_config(conf)
+        self.ifilters.load_config(conf)
+
         

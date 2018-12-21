@@ -100,22 +100,6 @@ class JETrackEditor:
         self.master.lift()
         self.master.focus()
 
-    
-    def write_config(self, main, visualizer, row):
-        visualizer.write("DOWNSPEED#"+str(row)+"=0.04\n")
-        visualizer.write("UPSPEED#"+str(row)+"=0.04\n")
-
-        main.write("    TYPE="+self.TYPE+"\n")
-        main.write("    FILE=\""+self.FILE+"\"\n")
-        main.write("    SHIFT="+self.SHIFT+"\n")
-        if self.TYPE=="WAV":
-            main.write("    F0="+self.F0+"\n")
-            main.write("    F1="+self.F1+"\n")
-            main.write("    FK="+self.FK+"\n")
-            main.write("    CHLEN="+self.CHLEN+"\n")
-            main.write("    THR="+self.THR+"\n")
-        elif self.TYPE=="MMP":
-            main.write("    TRACK="+self.TRACK)
 
     def ok(self):
         self.save()
@@ -161,4 +145,40 @@ class JETrackEditor:
             self.stuff["tracklabel"].grid(row=4, column=0)
             self.stuff["trackentry"] = Entry(self.master, textvariable=self.vTRACK)
             self.stuff["trackentry"].grid(row=4, column=1)
+
+
+    
+    def write_config(self, main, visualizer, row):
+        visualizer.write("DOWNSPEED#"+str(row)+"=0.04\n")
+        visualizer.write("UPSPEED#"+str(row)+"=0.04\n")
+
+        main.write("    TYPE="+self.TYPE+"\n")
+        main.write("    FILE=\""+self.FILE+"\"\n")
+        main.write("    SHIFT="+self.SHIFT+"\n")
+        if self.TYPE=="WAV":
+            main.write("    F0="+self.F0+"\n")
+            main.write("    F1="+self.F1+"\n")
+            main.write("    FK="+self.FK+"\n")
+            main.write("    CHLEN="+self.CHLEN+"\n")
+            main.write("    THR="+self.THR+"\n")
+        elif self.TYPE=="MMP":
+            main.write("    TRACK="+self.TRACK)
+
+    def load_config(self, conf, visualizer, row):
+        for i in visualizer:
+            if i[0] and i[1][0]=="DOWNSPEED" and i[1][1]==row:
+                pass
+            if i[0] and i[1][0]=="UPSPEED" and i[1][1]==row:
+                pass
+        for i in conf:
+            if i[0] and i[1][0]=="TYPE": self.TYPE=i[2]
+            if i[0] and i[1][0]=="FILE": self.FILE=i[2]
+            if i[0] and i[1][0]=="SHIFT": self.SHIFT=i[2]
+            if i[0] and i[1][0]=="F0": self.F0=i[2]
+            if i[0] and i[1][0]=="F1": self.F1=i[2]
+            if i[0] and i[1][0]=="FK": self.FK=i[2]
+            if i[0] and i[1][0]=="CHLEN": self.CHLEN=i[2]
+            if i[0] and i[1][0]=="THR": self.THR=i[2]
+            if i[0] and i[1][0]=="TRACK": self.TRACK=i[2]
+            
 

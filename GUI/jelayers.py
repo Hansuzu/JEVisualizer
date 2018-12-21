@@ -67,3 +67,17 @@ class JELayers:
 
     def write_config(self, visualizer, path):
         for layer in self.layers: layer.write_config(visualizer, path)
+
+    def load_config(self, visualizer):
+        while len(self.layers): del self.layers[-1]
+        tmplayers=[]
+        for i in visualizer:
+            if i[0] and i[1][0]=="LAYER":
+                tmplayers.append([i[1][1], i[2]])
+        tmplayers.sort()
+        for i in range(len(tmplayers)):
+            layer=JELayer(self, i, self.settings)
+            self.addlayer(layer)
+            layer.load_config(tmplayers[i][1])
+        
+

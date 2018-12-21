@@ -1,5 +1,6 @@
 from tkinter import *
 from jefiltereditor import *
+import configreader
 
 class JEFilter:
     def __init__(self, parent, masterframe, row, settings):
@@ -41,3 +42,7 @@ class JEFilter:
 
     def write_config(self, f, name):
         f.write(name+"={\n\n}\n")
+
+    def load_config(self, confstr):
+        conf=configreader.readConfigFromString(confstr)
+        

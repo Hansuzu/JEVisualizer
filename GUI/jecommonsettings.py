@@ -98,15 +98,21 @@ class JECommonSettings:
         return ofilepath
 
     def get_ofilename(self):
-        return self.outputfileentry.get()
+        return self.vOutputfile.get()
+
+    def set_ofilename(self, ofilename):
+        return self.vOutputfile.set(ofilename)
     
     def get_osfilename(self):
         return self.outputsfileentry.get()
 
     def get_oec_command(self):
-        oec=self.oecommandentry.get()
+        oec=self.vOecommand.get()
         oec=self.replace_vars(oec)
         return oec
+    def set_oec_command(self, oec):
+        self.vOecommand.set(oec)
+        
 
     def replace_vars(self, s):
         CDIR=self.vConfp.get()
@@ -129,11 +135,10 @@ class JECommonSettings:
         entry.insert(0, dirname)
 
     def browse_soundfile(self):
-        current = self.sfileentry.get()
+        current = self.vSfile.get()
         if current=="": current=self.mediaentry.get()
         dirname = filedialog.askopenfilename(initialdir=current)
-        self.sfileentry.delete(0, END)
-        self.sfileentry.insert(0, dirname)
+        self.vSfile.set(dirname)
         
     def browse_cf_dir(self):
         self.browse_dir(self.confpentry)

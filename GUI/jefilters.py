@@ -62,3 +62,10 @@ class JEFilters:
 
     def write_config(self, f):
         for filtr in self.filters: filtr.write_config(self, f, "FILTER")
+
+    def load_config(self, conf):
+        while len(self.filters): del self.filters[-1]
+        for i in conf:
+            if i[0] and i[1][0]=="FILTER":
+                self.filters.append(JEFilter, self, self.frame, len(self.filters), self.settings)
+                self.filters[-1].load_config(i[2])

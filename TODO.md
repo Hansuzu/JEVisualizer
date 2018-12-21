@@ -10,9 +10,9 @@
 
 ## GUI:
 - Fix crashing
-- Filters
-- Load config
-- More optimized preview thing
+- Add suppor for filters
+- Optimized preview thing and fix bugs
 - Button to create spctr files
 - More other buttons to make using easier
+- Other types of spectrums than lines
 

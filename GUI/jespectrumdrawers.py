@@ -73,3 +73,11 @@ class JESpectrumDrawers:
 
     def write_config(self, f):
         for drawer in self.drawers: drawer.write_config(f)
+
+    def load_config(self, conf):
+        while len(self.drawers): del self.drawers[-1]
+        for i in conf:
+            if i[0] and i[1][0]=="DRAWER":
+                self.drawers.append(JESpectrumDrawer(self, len(self.drawers), self.settings))
+                self.drawers[-1].load_config(i[2])
+

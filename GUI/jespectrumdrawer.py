@@ -1,5 +1,6 @@
 from tkinter import *
 from jespectrumdrawereditor import *
+import configreader
 
 class JESpectrumDrawer:
     def __init__(self, parent, row, settings):
@@ -81,3 +82,7 @@ class JESpectrumDrawer:
 
     def write_config(self, f):
         self.editor.write_config(f)
+
+    def load_config(self, confstr):
+        conf=configreader.readConfigFromString(confstr)
+        self.editor.load_config(conf)

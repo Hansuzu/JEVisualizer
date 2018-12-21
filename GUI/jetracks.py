@@ -31,13 +31,34 @@ class JETracks:
         del self.tracks[row]
         self.updatetracks()
 
+    def addtrack(self, track):
+        self.tracks.append(track)
+        self.tracks[-1].view(self.frame)
+        ix = len(self.tracks)-1
+        self.tracks[ix].set_row(ix)
+        self.tracks[ix].edited()
+
     def newtrack(self):
-        self.tracks.append(JETrack(self, self.frame, len(self.tracks), self.settings))
+        self.tracks.append(JETrack(self, len(self.tracks), self.settings))
+        self.tracks[-1].view(self.frame)
+        self.tracks[-1].edit()
 
     def write_config(self, main, visualizer):
         main.write("\n// Tracks\n")
         visualizer.write("\n// Track settings\n")
         for track in self.tracks:
             track.write_config(main, visualizer)
+
+    def load_config(self, main, visualizer):
+        while len(self.tracks): del self.tracks[-1]
+        tmptracks=[]
+        for i in main:
+            if i[0] and i[1][0]=="TRACK":
+                tmptracks.append([i[1][1], i[2]])
+        tmptracks.sort()
+        for i in range(len(tmptracks)):
+            track=JETrack(self, i, self.settings)
+            track.load_config(tmptracks[i][0], tmptracks[i][1], visualizer)
+            self.addtrack(track)
         
-        
+

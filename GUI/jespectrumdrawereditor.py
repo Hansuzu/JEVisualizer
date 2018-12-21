@@ -248,6 +248,10 @@ class JESpectrumDrawerEditor:
         c=c.replace("[", "").replace("]", "").split(",")
         while len(c)<4:c.append(0)
         return (self.cint(c[0]), self.cint(c[1]), self.cint(c[2]), self.cint(c[3]))
+    def parse_colorf(self, c):
+        c=c.replace("[", "").replace("]", "").split(",")
+        while len(c)<4:c.append(0)
+        return (self.cfloat(c[0]), self.cfloat(c[1]), self.cfloat(c[2]), self.cfloat(c[3]))
 
     def update_column0_preview(self, can2=False):
         if not self.master: return
@@ -495,6 +499,10 @@ class JESpectrumDrawerEditor:
         pc=self.parse_color(color)
         return str("["+str(float(pc[0])/255)+","+str(float(pc[1])/255)+","+str(float(pc[2])/255)+","+str(float(pc[3])/255)+"]")
 
+    def convert_color_back(self, color):
+        pc=self.parse_colorf(color[1:-1])
+        return str(int(round(pc[0]*255)))+","+str(int(round(pc[1]*255)))+","+str(int(round(pc[2]*255)))+","+str(int(round(pc[3]*255)))
+
     def write_config(self, f):
         f.write("DRAWER={\n")
         f.write("    COLUMN-TYPE="+self.COLUMN+"\n")
@@ -511,3 +519,28 @@ class JESpectrumDrawerEditor:
         f.write("    FILL-COLOR-1="+self.convert_color(self.FC1)+"\n")
         f.write("    THICKNESS=1"+"\n")
         f.write("}\n\n")
+
+    def load_config(self, conf):
+        for i in conf:
+            if i[0] and i[1][0]=="COLUMN_TYPE": self.COLUMN=i[2]
+            if i[0] and i[1][0]=="X0": self.X0=i[2]
+            if i[0] and i[1][0]=="Y0": self.Y0=i[2]
+            if i[0] and i[1][0]=="X1": self.X1=i[2]
+            if i[0] and i[1][0]=="Y1": self.Y1=i[2]
+            if i[0] and i[1][0]=="W": self.W=i[2]
+            if i[0] and i[1][0]=="H": self.H=i[2]
+            if i[0] and i[1][0]=="i":
+                t=i[2].split(":")
+                if len(t)==1: t.append("")
+                self.iTRACK=t[0]
+                self.iINDICES=t[1]
+            if i[0] and i[1][0]=="LINE-COLOR-0":
+                self.LC0=self.convert_color_back(i[2])
+            if i[0] and i[1][0]=="LINE-COLOR-1":
+                self.LC1=self.convert_color_back(i[2])
+            if i[0] and i[1][0]=="FILL-COLOR-0":
+                self.FC0=self.convert_color_back(i[2])
+            if i[0] and i[1][0]=="FILL-COLOR-1":
+                self.FC1=self.convert_color_back(i[2])
+        self.ENABLEC1=True
+ 

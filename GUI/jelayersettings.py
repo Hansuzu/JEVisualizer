@@ -223,4 +223,20 @@ class JELayerSettings:
         elif self.bgtype=="VIDEO": f.write("BG-VIDEO=\""+self.bgvalue+"\"\n")
         f.write("W="+self.W+"\n")
         f.write("H="+self.H+"\n")
+
+    def load_config(self, conf):
+        for i in conf:
+            if i[0] and i[1][0]=="BG-COLOR":
+                self.bgtype="COLOR"
+                self.bgvalue=i[2][1:-1]
+            if i[0] and i[1][0]=="BG-IMAGE":
+                self.bgtype="IMAGE"
+                self.bgvalue=i[2]
+            if i[0] and i[1][0]=="VIDEO":
+                self.bgtype="VIDEO"
+                self.bgvalue=i[1]
+            if i[0] and i[1][0]=="W":
+                self.W=i[2]
+            if i[0] and i[1][0]=="H":
+                self.H=i[2]
         

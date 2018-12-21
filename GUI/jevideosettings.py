@@ -102,8 +102,7 @@ class JEVideoSettings:
         self.heightentry.insert(0, str(h))
 
 
-    def write_config(self, visualizer, ofilename):
-        visualizer.write("OUTPUT-FILE=\""+ofilename+"\"\n")
+    def write_config(self, visualizer):
         visualizer.write("W="+self.vW.get()+"\n")
         visualizer.write("H="+self.vH.get()+"\n")
         visualizer.write("FPS="+self.vFPS.get()+"\n")  
@@ -113,3 +112,26 @@ class JEVideoSettings:
         visualizer.write("LAST-FRAME="+self.vLastframe.get()+"\n")
         visualizer.write("\nFPV#0=frame\n")
 
+    def load_config(self, visualizer):
+        got_ff=0
+        fot_lf=0
+        for i in visualizer:
+            if i[0] and (i[1][0]=="W" or i[1][0]=="WIDTH"): self.vW.set(i[2])
+            if i[0] and (i[1][0]=="H" or i[1][0]=="HEIGHT"): self.vW.set(i[2])
+            if i[0] and i[1][0]=="FPS": self.vFPS.set(i[2])
+            if i[1][0]=="FIRST-FRAME":
+                if i[0]:
+                   self.vFirstframe.set(i[2])
+                   self.vEnablefirstframe.set(1)
+                   got_ff=True
+                elif not got_ff:
+                   self.vFirstframe.set(i[2])
+                   self.vEnablefirstframe.set(0)
+            if i[1][0]=="LAST-FRAME":
+                if i[0]:
+                    self.vLastframe.set(i[2])
+                    self.vEnablelastframe.set(1)
+                elif not got_ff:
+                    self.vLastframe.set(i[2])
+                    self.vEnablelastframe.set(0)
+            

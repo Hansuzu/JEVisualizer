@@ -1,15 +1,23 @@
 from tkinter import *
 from jetrackeditor import *
-import random
+import configreader
 
 class JETrack:
-    def __init__(self, parent, masterframe, row, settings):
+    def __init__(self, parent, row, settings):
         self.parent = parent
-        self.masterframe = masterframe
+        self.master = None
         self.row = row
         self.settings = settings
-        self.frame = Frame(masterframe)
-        self.frame.grid(row=row, sticky=N)
+
+
+        self.editor = JETrackEditor(self, self.parent.getmediadir(), self.settings)
+
+
+    def view(self, master):
+        self.master = master
+
+        self.frame = Frame(master)
+        self.frame.grid(row=self.row, sticky=N)
 
         self.title=StringVar()
         self.header = Label(self.frame, textvariable=self.title, font=("Times", 12, "bold"))
@@ -20,10 +28,7 @@ class JETrack:
         self.delete_button = Button(self.frame, text="Delete", command=self.delete)
         self.delete_button.grid(row=0, column=2)
 
-        self.editor = JETrackEditor(self, self.parent.getmediadir(), self.settings)
-
         self.update_name()
-        self.edit()
 
         
     def update_name(self):
@@ -31,7 +36,7 @@ class JETrack:
 
 
     def edit(self):
-        window = Toplevel(self.masterframe)
+        window = Toplevel(self.master)
         self.editor.view(window)
         # editor...
 
@@ -52,3 +57,8 @@ class JETrack:
         main.write("TRACK#"+str(self.row)+"={\n")
         self.editor.write_config(main, visualizer, self.row)
         main.write("}\n\n")
+
+    def load_config(self, tid, confstr, visualizer):
+        conf=configreader.readConfigFromString(confstr)
+        self.editor.load_config(conf, visualizer, tid)
+
