@@ -44,6 +44,7 @@ void Filter::setConfigParam(std::string& param, std::string& key, std::string& v
     else if (value=="COLOR" || value=="1") type=Type::Color;
     else if (value=="SUPER-COLOR" || value=="2") type=Type::SuperColor;
     else if (value=="BOX-BLUR" || value=="3") type=Type::BoxBlur;
+    else if (value=="SUPER-COLOR-2" || value=="4") type=Type::SuperColor2;
     else if (globalSettings::verboseLevel){
       lout << "[W] Filter::setConfigParam " << this << ", unknown filter-type '" << value<< "'" << LEND;
     }
@@ -103,7 +104,7 @@ void Filter::applyGaussianBlur(cv::Mat* frame1, cv::Mat* frame2){
   int kY=2*kernelY.value();
   cv::GaussianBlur(*frame1, *frame2, cv::Size(kX|1,kY|1), 0, 0);
 }
-void Filter::applyColor(cv::Mat* frame1, cv::Mat* frame2){\
+void Filter::applyColor(cv::Mat* frame1, cv::Mat* frame2){
   int w=frame1->size().width;
   int h=frame1->size().height;
   double rcv=255*rc.value();
@@ -171,7 +172,64 @@ void Filter::applySuperColorRule(cv::Mat* frame1, cv::Mat* frame2, int i, int k)
     }
   }
 }
-void Filter::apply(cv::Mat* frame1, cv::Mat* frame2){
+
+void Filter::applySuperColorRule2(cv::Mat* frame1, cv::Mat* frame2, cv::Mat* refFrame, int i, int k){
+  // supercolorrule that is applied to each pixel separately (very slow :((( but allows to use refFrame to make some cool stuff )
+  int w=frame1->size().width;
+  int h=frame1->size().height;
+  
+  double rcv, gcv, bcv, acv;
+  int shiftX, shiftY;
+  cv::Scalar rv, gv, bv, av;
+  
+  int dy=colorRules.size();
+  int y0=(i+k)%dy;//With same k, no two colorRules should write to same indices in array
+  
+  uchar* p1;
+  uchar* p2;
+  uchar* rp;
+  double nr, ng, nb, na;
+  double r0, g0, b0, a0;
+  
+  int xx, yy;
+  
+  if (!refFrame){
+    refFrame=frame1; /// TODO: some better solution..?
+    std::cout << "NO REFFRAME?!?!?" << std::endl;
+  }
+  for (int y=y0;y<h;y+=dy){
+    p2=frame2->ptr<uchar>(y);
+    rp=refFrame->ptr<uchar>(y);
+    for (int x=0;x<w;++x){
+        r0=rp[x*4+2];g0=rp[x*4+1];b0=rp[x*4+0];a0=rp[x*4+3];
+        
+        rcv=255*colorRules[i]->rc.value(r0, g0, b0, a0);
+        gcv=255*colorRules[i]->gc.value(r0, g0, b0, a0);
+        bcv=255*colorRules[i]->bc.value(r0, g0, b0, a0);
+        acv=255*colorRules[i]->ac.value(r0, g0, b0, a0);
+        shiftX=colorRules[i]->shiftX.value(r0, g0, b0, a0);
+        shiftY=colorRules[i]->shiftY.value(r0, g0, b0, a0);
+        rv=colorRules[i]->r.value(r0, g0, b0, a0);
+        gv=colorRules[i]->g.value(r0, g0, b0, a0);
+        bv=colorRules[i]->b.value(r0, g0, b0, a0);
+        av=colorRules[i]->a.value(r0, g0, b0, a0);
+        
+        xx=x-shiftX; if (xx<0)xx=0;if (xx>=w) xx=w-1;
+        yy=y-shiftY; if (yy<0)yy=0;if (yy>=h) yy=h-1;
+        p1=frame1->ptr<uchar>(yy);
+        
+        nr=p2[4*x+2]+rcv+rv[0]*p1[(xx)*4+0]+rv[1]*p1[(xx)*4+1]+rv[2]*p1[(xx)*4+2]+rv[3]*p1[(xx)*4+3];
+        ng=p2[4*x+1]+gcv+gv[0]*p1[(xx)*4+0]+gv[1]*p1[(xx)*4+1]+gv[2]*p1[(xx)*4+2]+gv[3]*p1[(xx)*4+3];
+        nb=p2[4*x+0]+bcv+bv[0]*p1[(xx)*4+0]+bv[1]*p1[(xx)*4+1]+bv[2]*p1[(xx)*4+2]+bv[3]*p1[(xx)*4+3];
+        na=p2[4*x+3]+acv+av[0]*p1[(xx)*4+0]+av[1]*p1[(xx)*4+1]+av[2]*p1[(xx)*4+2]+av[3]*p1[(xx)*4+3];
+        p2[x*4+0]=min(max(nb, 0.0), 255.0);
+        p2[x*4+1]=min(max(ng, 0.0), 255.0);
+        p2[x*4+2]=min(max(nr, 0.0), 255.0);
+        p2[x*4+3]=min(max(na, 0.0), 255.0);
+    }
+  }
+}
+void Filter::apply(cv::Mat* frame1, cv::Mat* frame2, cv::Mat* refFrame){
   if (globalSettings::verboseLevel>1) lout << "[I] Filter::apply " << this << LEND; 
   std::vector<double> tmp;
   fpe.updateValues(tmp);
@@ -218,6 +276,30 @@ void Filter::apply(cv::Mat* frame1, cv::Mat* frame2){
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
     if (globalSettings::verboseLevel>2) lout << "[P] Filter::apply " << this << " type==SuperColor finished, elapsed time: " << elapsed.count() << LEND;
+  } else if (type==SuperColor2) {
+    if (globalSettings::verboseLevel>2) lout << "[X] Filter::apply " << this << " type==SuperColor2 " << LEND; 
+    auto start = std::chrono::high_resolution_clock::now();
+    *frame2=cv::Vec4b(0,0,0,0);
+    for (int k=0;k<(int)colorRules.size();++k){
+      //Stuff to make multithreading possible...
+      //With same k, no two colorRules should write to same indices in array
+      if (globalSettings::threadingLevel&4){
+        fs.clear();
+        for (int i=0;i<(int)colorRules.size();++i){
+          fs.push_back(std::async(std::launch::async, &Filter::applySuperColorRule2, this, frame1, frame2, refFrame, i, k));
+        }
+        for (std::future<void>& fut : fs) fut.get();
+      }else{
+        for (int i=0;i<(int)colorRules.size();++i){
+          applySuperColorRule2(frame1, frame2, refFrame, i, k);
+        }
+      }
+    }
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    if (globalSettings::verboseLevel>2) lout << "[P] Filter::apply " << this << " type==SuperColor2 finished, elapsed time: " << elapsed.count() << LEND;
+  
+    
   }
 }
 

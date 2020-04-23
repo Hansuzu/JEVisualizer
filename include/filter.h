@@ -14,7 +14,7 @@
 
 
 class Filter{
-  enum Type{Unset, GaussianBlur, Color, SuperColor, BoxBlur};
+  enum Type{Unset, GaussianBlur, Color, SuperColor, BoxBlur, SuperColor2};
   void setConfigParam(std::string& param, std::string& key, std::string& value);
   Type type;
   Formula kernelX, kernelY;
@@ -49,10 +49,11 @@ private:
   void applyBoxBlur(cv::Mat* frame1, cv::Mat* frame2);
   void applyColor(cv::Mat* frame1, cv::Mat* frame2);
   void applySuperColorRule(cv::Mat* frame1, cv::Mat* frame2, int i, int k);
+  void applySuperColorRule2(cv::Mat* frame1, cv::Mat* frame2, cv::Mat* refFrame, int i, int k); // TODO: rename this weird stuff...
 public:
   
   void loadConfig(std::string& config);
-  void apply(cv::Mat* frame1, cv::Mat* frame2);
+  void apply(cv::Mat* frame1, cv::Mat* frame2, cv::Mat* refFrame);
   Filter(FormulaParameterEngine* pfpe, TrackController* ptc):
     type(Unset), kernelX(&fpe), kernelY(&fpe), 
     rc(&fpe), gc(&fpe), bc(&fpe), ac(&fpe), 

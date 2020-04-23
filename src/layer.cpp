@@ -186,10 +186,11 @@ void Layer::applyLayerFilters(){
   if (globalSettings::verboseLevel>2) lout << "[X] Layer::applyLayerFilters " << this << " apply layer filters" << LEND;
   auto start = std::chrono::high_resolution_clock::now();
   for (int i=0;i<(int)layerFilters.size();++i){
-    if (~i&1) layerFilters[i]->apply(frame1, frame2);
-    else      layerFilters[i]->apply(frame2, frame1);
+    if (~i&1) layerFilters[i]->apply(frame1, frame2, nullptr);
+    else      layerFilters[i]->apply(frame2, frame1, nullptr);
   }
   if ((layerFilters.size())&1) swap(frame1, frame2);
+  swap(frame1, frameIndependent);
   if (globalSettings::verboseLevel>2){
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
@@ -231,15 +232,30 @@ void Layer::drawImageToLayer(cv::Mat* oframe){
   int w=oframe->size().width;
   int h=oframe->size().height;
   uchar* p1;
+  uchar* ps;
   uchar* po;
-  for (int y=0;y<h;++y){
-    p1=frame1->ptr<uchar>(y);
-    po=oframe->ptr<uchar>(y);
-    for (int x=0;x<w;++x){
-      p1[4*x+0]=(p1[4*x+3]*(int)p1[4*x+0]+(255-p1[4*x+3])*(int)po[3*x+0])/255;
-      p1[4*x+1]=(p1[4*x+3]*(int)p1[4*x+1]+(255-p1[4*x+3])*(int)po[3*x+1])/255;
-      p1[4*x+2]=(p1[4*x+3]*(int)p1[4*x+2]+(255-p1[4*x+3])*(int)po[3*x+2])/255;
-      p1[4*x+3]=255;
+  if (!invisibleModeOn) {
+    for (int y=0;y<h;++y){
+      p1=frame1->ptr<uchar>(y);
+      ps=frameIndependent->ptr<uchar>(y);
+      po=oframe->ptr<uchar>(y);
+      for (int x=0;x<w;++x){
+        p1[4*x+0]=(ps[4*x+3]*(int)ps[4*x+0]+(255-ps[4*x+3])*(int)po[3*x+0])/255;
+        p1[4*x+1]=(ps[4*x+3]*(int)ps[4*x+1]+(255-ps[4*x+3])*(int)po[3*x+1])/255;
+        p1[4*x+2]=(ps[4*x+3]*(int)ps[4*x+2]+(255-ps[4*x+3])*(int)po[3*x+2])/255;
+        p1[4*x+3]=255;
+      }
+    }
+  }else{
+    for (int y=0;y<h;++y){
+      p1=frame1->ptr<uchar>(y);
+      po=oframe->ptr<uchar>(y);
+      for (int x=0;x<w;++x){
+        p1[4*x+0]=po[3*x+0];
+        p1[4*x+1]=po[3*x+1];
+        p1[4*x+2]=po[3*x+2];
+        p1[4*x+3]=255;
+      }
     }
   }
   if (globalSettings::verboseLevel>2){
@@ -252,8 +268,8 @@ void Layer::applyImageFilters(){
   if (globalSettings::verboseLevel>2) lout << "[X] Layer::applyImageFilters" << this << LEND;
   auto start = std::chrono::high_resolution_clock::now();
   for (int i=0;i<(int)imageFilters.size();++i){
-    if (~i&1) imageFilters[i]->apply(frame1, frame2);
-    else      imageFilters[i]->apply(frame2, frame1);
+    if (~i&1) imageFilters[i]->apply(frame1, frame2, frameIndependent);
+    else      imageFilters[i]->apply(frame2, frame1, frameIndependent);
   }
   if ((imageFilters.size())&1) swap(frame1, frame2);
   if (globalSettings::verboseLevel>2){
@@ -381,6 +397,8 @@ void Layer::setConfigParam(std::string& param, std::string& key, std::string& va
     bgVideoBegin=std::stoi(value);
   }else if (param=="bg-video-end"){
     bgVideoEnd=std::stoi(value);
+  }else if (param=="invisible-mode"){
+    invisibleModeOn=std::stoi(value);
   }else if (param=="fpv"){
     setFPEV(key, value);
   }else if (globalSettings::verboseLevel){

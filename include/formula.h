@@ -19,9 +19,16 @@ public:
   Formula* maxV;
   Formula* sinK;
   Formula* inSin;
+  
+  Formula* vR;
+  Formula* vG;
+  Formula* vB;
+  Formula* vA;
+  
   FormulaParameterEngine* fpe;
-  Formula(FormulaParameterEngine* pfpe): isConstant(1), c(0), C(NULL), frameK(NULL), minV(NULL), maxV(NULL), sinK(NULL), inSin(NULL), fpe(pfpe) {}
+  Formula(FormulaParameterEngine* pfpe): isConstant(1), c(0), C(nullptr), frameK(nullptr), minV(nullptr), maxV(nullptr), sinK(nullptr), inSin(nullptr), vR(nullptr), vG(nullptr), vB(nullptr), vA(nullptr), fpe(pfpe) {}
   double value();
+  double value(double, double, double, double);
   static void split(std::string& s, std::vector<std::string>& res);
   void parse(std::string& s);
   Formula* createCopy(){
@@ -37,6 +44,10 @@ public:
     if (frameK)  frameK->setFPE(fpe);
     if (sinK)    sinK->setFPE(fpe);
     if (inSin)   inSin->setFPE(fpe);
+    if (vR)   vR->setFPE(fpe);
+    if (vG)   vG->setFPE(fpe);
+    if (vB)   vB->setFPE(fpe);
+    if (vA)   vA->setFPE(fpe);
   }
   Formula& operator=(const Formula& o){
     isConstant=o.isConstant;
@@ -48,6 +59,10 @@ public:
     if (o.frameK)  frameK=o.frameK->createCopy();
     if (o.sinK)    sinK=o.sinK->createCopy();
     if (o.inSin)   inSin=o.inSin->createCopy();
+    if (o.vR)   vR=o.vR->createCopy();
+    if (o.vG)   vG=o.vG->createCopy();
+    if (o.vB)   vB=o.vB->createCopy();
+    if (o.vA)   vA=o.vA->createCopy();
     fpe=o.fpe;
     return *this;
   }
@@ -59,6 +74,10 @@ public:
     if (maxV) delete maxV;
     if (sinK) delete sinK;
     if (inSin) delete inSin;
+    if (vR) delete vR;
+    if (vG) delete vG;
+    if (vB) delete vB;
+    if (vA) delete vA;
   }
 };
 

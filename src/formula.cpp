@@ -28,6 +28,38 @@ double Formula::value(){
   }
 }
 
+double Formula::value(double r, double g, double b, double a){
+  if (isConstant){
+    return c;
+  }else{
+    std::vector<double>& values=fpe->getValues();
+    double ans=0;
+    if (C) ans+=C->value();
+    for (int i=0;i<(int)std::min(values.size(), variables.size());++i){
+      ans+=values[i]*variables[i]->value();
+    }
+    if (sinK && inSin){
+      double k=sinK->value(r, g, b, a);
+      if (k) ans+=k*sin(inSin->value(r, g, b, a));
+    }
+    
+    if (vR)  ans+=r*vR->value(r, g, b, a);
+    if (vG)  ans+=g*vG->value(r, g, b, a);
+    if (vB)  ans+=b*vB->value(r, g, b, a);
+    if (vA)  ans+=a*vA->value(r, g, b, a);
+    
+    if (minV){
+      double v=minV->value(r, g, b, a);
+      if (ans<v) ans=v;
+    }
+    if (maxV){
+      double v=maxV->value(r, g, b, a);
+      if (ans>v) ans=v;
+    }
+    return ans;
+  }
+}
+
 void Formula::split(std::string& s, std::vector<std::string>& res){
   std::string prev="";
   int d=0;
@@ -78,6 +110,15 @@ void Formula::parse(std::string& s){
       }else if (i==5){
         inSin=new Formula(fpe);
         inSin->parse(params[i]);
+      }else if (i==6){
+        std::vector<std::string> array;
+        split(params[i], array);
+        for (int j=0;j<std::min((int)array.size(), 4);++j){
+          if (j==0){ vR=new Formula(fpe); vR->parse(array[j]);}
+          if (j==1){ vG=new Formula(fpe); vG->parse(array[j]);}
+          if (j==2){ vB=new Formula(fpe); vB->parse(array[j]);}
+          if (j==3){ vA=new Formula(fpe); vA->parse(array[j]);}
+        }
       }
     }
   }else{

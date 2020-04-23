@@ -24,6 +24,7 @@ private:
   int firstFrame, lastFrame;      // First and last frame to actually draw
   cv::Mat* frame1;                // Layer is drawn on these (two frames are needed for filters)
   cv::Mat* frame2;
+  cv::Mat* frameIndependent;      // After independent drawing is finished, the frame is swapped to here, so independent picture can be used in imageFilters
   cv::Mat* background;            // if background-image is used, it is saved here
   cv::Mat* bgVideoFrame;            // if background-image is used, it is saved here
   cv::Mat* bgVideoHelperFrame;            // if background-image is used, it is saved here
@@ -31,6 +32,8 @@ private:
   FormulaColor LU, LD, RU, RD;    // if background-color is used
   cv::Scalar lLU, lLD, lRU, lRD;
   bool hasBgColor;
+  bool invisibleModeOn; // layers own content is not drawn to output, but can be used as a filter.
+  
   std::string bgVideoFileName;
   cv::VideoCapture bgVideo;
   enum VideoOnEnd{None, LastFrame, Replay};
@@ -86,13 +89,15 @@ public:   //TODO: remove debug prints
   
   Layer(int w, int h, FormulaParameterEngine* pfpe, TrackController* ptc):
       layerWidth(w), layerHeight(h), firstFrame(0), lastFrame(1000000),
-        frame1(nullptr), frame2(nullptr), background(nullptr),
+        frame1(nullptr), frame2(nullptr), frameIndependent(nullptr), background(nullptr),
         bgVideoFrame(nullptr), bgVideoHelperFrame(nullptr),
-        hasBgImage(0), LU(&fpe), LD(&fpe), RU(&fpe), RD(&fpe), hasBgColor(0),
+        hasBgImage(0), LU(&fpe), LD(&fpe), RU(&fpe), RD(&fpe), hasBgColor(0), invisibleModeOn(0),
         videoOnEnd(None), bgVideoPlaySpeed(&fpe), bgVideoFirstFrame(0), bgVideoLastFrame(1000000),
-        bgVideoBegin(0), bgVideoEnd(100000), bgVideoDeltaTime(0), hasBgVideo(0), tc(ptc), fpe(pfpe) {
+        bgVideoBegin(0), bgVideoEnd(100000), bgVideoDeltaTime(0), hasBgVideo(0), 
+        tc(ptc), fpe(pfpe) {
     frame1=new cv::Mat(cv::Size(w, h), CV_8UC4);
     frame2=new cv::Mat(cv::Size(w, h), CV_8UC4);
+    frameIndependent=new cv::Mat(cv::Size(w, h), CV_8UC4);
   }
   
   ~Layer(){
