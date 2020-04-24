@@ -195,28 +195,30 @@ void Filter::applySuperColorRule2(cv::Mat* frame1, cv::Mat* frame2, cv::Mat* ref
   
   if (!refFrame){
     refFrame=frame1; /// TODO: some better solution..?
-    std::cout << "NO REFFRAME?!?!?" << std::endl;
   }
+  
+  ColorRule* cr=colorRules[i];
   for (int y=y0;y<h;y+=dy){
     p2=frame2->ptr<uchar>(y);
     rp=refFrame->ptr<uchar>(y);
     for (int x=0;x<w;++x){
         r0=rp[x*4+2];g0=rp[x*4+1];b0=rp[x*4+0];a0=rp[x*4+3];
         
-        rcv=255*colorRules[i]->rc.value(r0, g0, b0, a0);
-        gcv=255*colorRules[i]->gc.value(r0, g0, b0, a0);
-        bcv=255*colorRules[i]->bc.value(r0, g0, b0, a0);
-        acv=255*colorRules[i]->ac.value(r0, g0, b0, a0);
-        shiftX=colorRules[i]->shiftX.value(r0, g0, b0, a0);
-        shiftY=colorRules[i]->shiftY.value(r0, g0, b0, a0);
-        rv=colorRules[i]->r.value(r0, g0, b0, a0);
-        gv=colorRules[i]->g.value(r0, g0, b0, a0);
-        bv=colorRules[i]->b.value(r0, g0, b0, a0);
-        av=colorRules[i]->a.value(r0, g0, b0, a0);
+        rcv=255*(cr->rc.isConstant?cr->rc.c:cr->rc.pixelValue(r0, g0, b0, a0));
+        gcv=255*(cr->gc.isConstant?cr->gc.c:cr->gc.pixelValue(r0, g0, b0, a0));
+        bcv=255*(cr->bc.isConstant?cr->bc.c:cr->bc.pixelValue(r0, g0, b0, a0));
+        acv=255*(cr->ac.isConstant?cr->ac.c:cr->ac.pixelValue(r0, g0, b0, a0));
+        shiftX=(cr->shiftX.isConstant?cr->shiftX.c:cr->shiftX.pixelValue(r0, g0, b0, a0));
+        shiftY=(cr->shiftY.isConstant?cr->shiftY.c:cr->shiftY.pixelValue(r0, g0, b0, a0));
+        rv=cr->r.pixelValue(r0, g0, b0, a0);
+        gv=cr->g.pixelValue(r0, g0, b0, a0);
+        bv=cr->b.pixelValue(r0, g0, b0, a0);
+        av=cr->a.pixelValue(r0, g0, b0, a0);
         
         xx=x-shiftX; if (xx<0)xx=0;if (xx>=w) xx=w-1;
         yy=y-shiftY; if (yy<0)yy=0;if (yy>=h) yy=h-1;
         p1=frame1->ptr<uchar>(yy);
+        
         
         nr=p2[4*x+2]+rcv+rv[0]*p1[(xx)*4+0]+rv[1]*p1[(xx)*4+1]+rv[2]*p1[(xx)*4+2]+rv[3]*p1[(xx)*4+3];
         ng=p2[4*x+1]+gcv+gv[0]*p1[(xx)*4+0]+gv[1]*p1[(xx)*4+1]+gv[2]*p1[(xx)*4+2]+gv[3]*p1[(xx)*4+3];
