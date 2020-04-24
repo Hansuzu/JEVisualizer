@@ -9,7 +9,7 @@ namespace drawingFunctions{
     cv::line(*frame, a, b, color, thickness);
   }
 
-  void drawRectangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Point& d, cv::Scalar& color, cv::Mat* frame){
+  void drawRectangle(cv::Point a, cv::Point b, cv::Point c, cv::Point d, cv::Scalar& color, cv::Mat* frame){
     if (globalSettings::verboseLevel>3) lout << "[4] drawingFunctions::drawRectangle (... <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
     while (a.y>b.y){swap(a, b);swap(b, c);swap(c, d);}
     while (a.y>d.y){swap(a, d);swap(d, c);swap(c, b);}
@@ -38,7 +38,7 @@ namespace drawingFunctions{
     }
   }
   
-  void drawTriangle(cv::Point& a, cv::Point& b, cv::Point& c, cv::Scalar& color, cv::Mat* frame){
+  void drawTriangle(cv::Point a, cv::Point b, cv::Point c, cv::Scalar& color, cv::Mat* frame){
     if (globalSettings::verboseLevel>3) lout << "[4] drawingFunctions::drawTriangle (... <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
     if (a.y>b.y) swap(a, b);
     if (a.y>c.y) swap(a, c);
@@ -71,9 +71,10 @@ namespace drawingFunctions{
   }
 
   void drawPolygon(std::vector<cv::Point>& pts, cv::Scalar& color, cv::Mat* frame){
+    // TODO: fix for nonconvex...? or LOL, maybe not...
     if (globalSettings::verboseLevel>3) lout << "[4] drawingFunctions::drawPolygon (...[" << pts.size() << "], <" << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << ">, ..." << LEND;
     for (int i=0;i+2<(int)pts.size();++i){
-      drawTriangle(pts[i], pts[i+1], pts[i+2], color, frame);
+      drawTriangle(pts[0], pts[i+1], pts[i+2], color, frame);
     }
   }
 }
