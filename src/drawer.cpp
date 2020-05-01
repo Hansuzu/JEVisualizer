@@ -35,9 +35,11 @@ void Drawer::updateFPE(int){
 
 
 void Drawer::update(int cframe){
+  double vthr=thr.value();
   for (int i=0;i<(int)indices.size();++i){
     if (i==(int)values.size()) values.push_back(0);
     values[i]=indices[i].getValue();
+    if (values[i]<vthr) values[i]=0;
   }
   
   for (int ii=0;ii<flatten;++ii) {
@@ -321,6 +323,7 @@ void Drawer::setParameter(std::string& param, std::string& key, std::string& val
       }
     }
   }
+  else if (param=="thr") thr.parse(value);
   else if (param=="w") w.parse(value);
   else if (param=="h") h.parse(value);
   else if (param=="x0") x0.parse(value);

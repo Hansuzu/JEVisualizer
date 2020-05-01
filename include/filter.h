@@ -14,6 +14,8 @@
 
 
 class Filter{
+  FormulaParameterEngine fpe;
+  
   enum Type{Unset, GaussianBlur, Color, SuperColor, BoxBlur, SuperColor2};
   void setConfigParam(std::string& param, std::string& key, std::string& value);
   Type type;
@@ -39,7 +41,6 @@ class Filter{
   std::vector<ColorRule*> colorRules; // When type==SuperColor, these are used.
   
   
-  FormulaParameterEngine fpe;
   
   TrackController* tc;
 private:
@@ -55,10 +56,11 @@ public:
   void loadConfig(std::string& config);
   void apply(cv::Mat* frame1, cv::Mat* frame2, cv::Mat* refFrame);
   Filter(FormulaParameterEngine* pfpe, TrackController* ptc):
+    fpe(pfpe), 
     type(Unset), kernelX(&fpe), kernelY(&fpe), 
     rc(&fpe), gc(&fpe), bc(&fpe), ac(&fpe), 
     r(&fpe), g(&fpe), b(&fpe), a(&fpe), 
-    fpe(pfpe), tc(ptc) 
+    tc(ptc) 
     {
       
   }

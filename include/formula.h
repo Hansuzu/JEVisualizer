@@ -10,6 +10,8 @@
 
 class Formula{
 public:
+  FormulaParameterEngine* fpe;
+  
   bool isConstant;
   double c;
   Formula* C;
@@ -25,10 +27,9 @@ public:
   Formula* vB;
   Formula* vA;
   
-  FormulaParameterEngine* fpe;
   
   
-  Formula(FormulaParameterEngine* pfpe): isConstant(1), c(0), C(nullptr), frameK(nullptr), minV(nullptr), maxV(nullptr), sinK(nullptr), inSin(nullptr), vR(nullptr), vG(nullptr), vB(nullptr), vA(nullptr), fpe(pfpe) {}
+  Formula(FormulaParameterEngine* pfpe): fpe(pfpe), isConstant(1), c(0), C(nullptr), frameK(nullptr), minV(nullptr), maxV(nullptr), sinK(nullptr), inSin(nullptr), vR(nullptr), vG(nullptr), vB(nullptr), vA(nullptr) {}
   double value();
   double pixelValue(double, double, double, double);
   static void split(std::string& s, std::vector<std::string>& res);

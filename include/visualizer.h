@@ -19,6 +19,9 @@
 
 class Visualizer{
 private:
+  FormulaParameterEngine fpe; // Contains information about parameters that can be used in formulas
+  TrackController tc; // Contains values of tracks and other stuff, a pointer to this is passed to layers
+  
   double fps; //fps of output video
   int w, h;   //width and height of output video
   
@@ -34,8 +37,6 @@ private:
   std::vector<double> maxUpSpeeds;
   std::vector<double> multipliers;
   
-  FormulaParameterEngine fpe; // Contains information about parameters that can be used in formulas
-  TrackController tc; // Contains values of tracks and other stuff, a pointer to this is passed to layers
   
   std::chrono::system_clock::time_point times[16]; // used to calculate the expected time left
   int timesi;
@@ -68,7 +69,7 @@ private:
   void readConfig(std::istream& co); // loads a configuration from a file, calls setConfigParam for each configuratino statement
 public:
   
-  Visualizer(const char* configFile):fps(20), w(640), h(480),ctime(0), cframe(0),ovfname("default.ogv"),fpe(NULL),timesi(0),firstFrame(0),lastFrame(1000000000){
+  Visualizer(const char* configFile):fpe(NULL),fps(20), w(640), h(480),ctime(0), cframe(0),ovfname("default.ogv"),timesi(0),firstFrame(0),lastFrame(1000000000){
     std::ifstream co;
     co.open(configFile);
     readConfig(co);

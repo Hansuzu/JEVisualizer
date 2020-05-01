@@ -20,6 +20,8 @@
 
 class Layer{
 private: 
+  FormulaParameterEngine fpe; // parameter to formulas
+  
   double layerWidth, layerHeight; // The coordinates in Drawers are relative to these values. Values are then scaled to actual width and height
   int firstFrame, lastFrame;      // First and last frame to actually draw
   cv::Mat* frame1;                // Layer is drawn on these (two frames are needed for filters)
@@ -54,7 +56,6 @@ private:
   void drawParticles(int cframe); //function to draw all particles of the layer
   
   bool isVisible(int cframe, double ctime); // checks whether the layer is Visible: 
-  FormulaParameterEngine fpe; // parameter to formulas
   
   //Magic to make fpe work (basically same as in visualizer.h)
   std::vector<std::vector<TrackController::Index> > fpeTracks;
@@ -88,13 +89,14 @@ public:   //TODO: remove debug prints
   void readConfig(const char* configFile);  // load configuration from file
   
   Layer(int w, int h, FormulaParameterEngine* pfpe, TrackController* ptc):
-      layerWidth(w), layerHeight(h), firstFrame(0), lastFrame(1000000),
+        fpe(pfpe), 
+        layerWidth(w), layerHeight(h), firstFrame(0), lastFrame(1000000),
         frame1(nullptr), frame2(nullptr), frameIndependent(nullptr), background(nullptr),
         bgVideoFrame(nullptr), bgVideoHelperFrame(nullptr),
         hasBgImage(0), LU(&fpe), LD(&fpe), RU(&fpe), RD(&fpe), hasBgColor(0), invisibleModeOn(0),
         videoOnEnd(None), bgVideoPlaySpeed(&fpe), bgVideoFirstFrame(0), bgVideoLastFrame(1000000),
         bgVideoBegin(0), bgVideoEnd(100000), bgVideoDeltaTime(0), hasBgVideo(0), 
-        tc(ptc), fpe(pfpe) {
+        tc(ptc)  {
     frame1=new cv::Mat(cv::Size(w, h), CV_8UC4);
     frame2=new cv::Mat(cv::Size(w, h), CV_8UC4);
     frameIndependent=new cv::Mat(cv::Size(w, h), CV_8UC4);

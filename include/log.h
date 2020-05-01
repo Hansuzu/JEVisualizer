@@ -24,8 +24,9 @@ public:
     if (parent){
       std::cout << s.str() << std::endl;
       s.str("");
+      LOG* p = parent;
       delete this;
-      return *parent;
+      return *p;
     }else{
       return (new LOG(this))->operator<<(t);
     }

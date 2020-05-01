@@ -17,6 +17,8 @@
 
 class ParticleSource {
 private:
+  FormulaParameterEngine fpe;
+  
   Formula new_particles; // the number of new particles in a frame (value of this rounded to a nearest integer)
   
   // ParticleSource's random generators for fpe
@@ -56,11 +58,14 @@ private:
     Formula startSpeedX;
     Formula startSpeedY;
     
+    FormulaColor c;
+    Formula size; // size
+    
     Formula lifeTime; // used to calculate the lifeTime
     
     Formula minX, maxX, minY, maxY; // limits for particles x and y... If a particle goes out of these limits, it dies.
     
-    ParticleConfiguration(FormulaParameterEngine* pfpe):fpe(pfpe), dSpeedX(&fpe), dSpeedY(&fpe), startX(&fpe), startY(&fpe), startSpeedX(&fpe), startSpeedY(&fpe), lifeTime(&fpe), minX(&fpe), maxX(&fpe), minY(&fpe), maxY(&fpe) {
+    ParticleConfiguration(FormulaParameterEngine* pfpe):fpe(pfpe), dSpeedX(&fpe), dSpeedY(&fpe), startX(&fpe), startY(&fpe), startSpeedX(&fpe), startSpeedY(&fpe), c(&fpe), size(&fpe), lifeTime(&fpe), minX(&fpe), maxX(&fpe), minY(&fpe), maxY(&fpe) {
       
     }
   };
@@ -77,6 +82,9 @@ private:
     double speedX;
     double speedY;
     
+    double r, g, b, a;
+    double size;
+    
     int lifeTime;
     
     bool isDead;
@@ -91,6 +99,11 @@ private:
       t=y; y=o.y; o.y=t;
       t=speedX; speedX=o.speedX; o.speedX=t;
       t=speedY; speedY=o.speedY; o.speedY=t;
+      t=r; r=o.r; o.r=t;
+      t=g; g=o.g; o.g=t;
+      t=b; b=o.b; o.b=t;
+      t=a; a=o.a; o.a=t;
+      t=size; size=o.size; o.size=t;
       
       ti=lifeTime; lifeTime=o.lifeTime; o.lifeTime=ti;
       
@@ -110,7 +123,6 @@ private:
     
   void update(int cframe); // draw calls this
   
-  FormulaParameterEngine fpe;
   std::vector<std::vector<TrackController::Index> > fpeTracks;
   std::vector<double> fpevs;
   std::vector<int> fpemap; // there can be a number of random variables and a number of track variables as fpe
@@ -136,9 +148,8 @@ public:
   
   
   ParticleSource(FormulaParameterEngine* pfpe, TrackController* ptc): 
-    new_particles(&fpe), random_generator(0), distribution(0,1), particleConf(&fpe), fpe(pfpe), tc(ptc)
+    fpe(pfpe), new_particles(&fpe), random_generator(0), distribution(0,1), particleConf(&fpe), tc(ptc)
     {
-    
   }
 };
 

@@ -14,6 +14,8 @@
 
 class Drawer{
 private:
+  FormulaParameterEngine fpe; // fpe magic
+  
   // some magic to make fpe work (basically same as in visualizer.h)
   std::vector<std::vector<TrackController::Index> > fpeTracks;
   std::vector<double> fpevs;
@@ -25,6 +27,8 @@ private:
   std::vector<std::pair<double, double> > polyCornerVs;
   std::vector<cv::Point> polygonToDraw;
   ColumnType columnType;
+  
+  Formula thr;
   
   Formula x0, y0; // left point of the spectrum
   Formula x1, y1; // right point of the spectrum
@@ -73,7 +77,6 @@ private:
   
   int flatten;
   
-  FormulaParameterEngine fpe; // fpe magic
   TrackController* tc;
   
   std::vector<double> values;                  // current values of the spectrum, update updates these, calculated from indices
@@ -92,10 +95,10 @@ private:
 public:
   void parse(std::string& config); // given a string, parses the configuration
   Drawer(FormulaParameterEngine* pfpe, TrackController* ptc) : 
-      columnType(ColumnType::Rectangle), x0(&fpe), y0(&fpe), x1(&fpe), y1(&fpe), lineColor0(&fpe), lineColor1(&fpe),
+      fpe(pfpe), columnType(ColumnType::Rectangle), thr(&fpe), x0(&fpe), y0(&fpe), x1(&fpe), y1(&fpe), lineColor0(&fpe), lineColor1(&fpe),
       fillColor0(&fpe), fillColor1(&fpe),  w(&fpe), h(&fpe), lineThickness(&fpe),
       flatten(0),
-      fpe(pfpe), tc(ptc) 
+       tc(ptc) 
   {}
 };
 

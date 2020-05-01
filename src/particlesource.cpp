@@ -120,6 +120,14 @@ void ParticleSource::initParticle(Particle& particle){
   particle.speedX=particleConf.startSpeedX.value();
   particle.speedY=particleConf.startSpeedY.value();
   particle.lifeTime=(int)(particleConf.lifeTime.value()+0.5);
+  
+  cv::Scalar color=particleConf.c.value();
+  particle.r=color[2];
+  particle.g=color[1];
+  particle.b=color[0];
+  particle.a=color[3];
+  particle.size=particleConf.size.value();
+  
 }
 
 void ParticleSource::updateParticle(int cframe, Particle& particle){
@@ -183,6 +191,10 @@ void ParticleSource::setParticleConfigParam(std::string& param, std::string& key
     particleConf.minY.parse(value);
   }else if (param=="max-y"){
     particleConf.maxY.parse(value);
+  }else if (param=="color"){
+    particleConf.c.parse(value);
+  }else if (param=="size"){
+    particleConf.size.parse(value);
   }else if (param=="life-time"){
     particleConf.lifeTime.parse(value);
   }else if (param=="fpv"){
@@ -233,11 +245,11 @@ void ParticleSource::draw(int cframe, cv::Mat* frame, double xScale, double ySca
     // Draw a particle
     double x = particle.x*xScale;
     double y = particle.y*yScale;
-    cv::Point p1(x-2, y-2);
-    cv::Point p2(x-2, y+2);
-    cv::Point p3(x+2, y+2);
-    cv::Point p4(x+2, y-2);
-    cv::Scalar color(255, 255, 255, 120);
+    cv::Point p1(x-particle.size*xScale/2, y-particle.size*yScale/2);
+    cv::Point p2(x-particle.size*xScale/2, y+particle.size*yScale/2);
+    cv::Point p3(x+particle.size*xScale/2, y+particle.size*yScale/2);
+    cv::Point p4(x+particle.size*xScale/2, y-particle.size*yScale/2);
+    cv::Scalar color(particle.b, particle.g, particle.r, particle.a);
     drawingFunctions::drawRectangle(p1, p2, p3, p4, color, frame);
   }
 }
