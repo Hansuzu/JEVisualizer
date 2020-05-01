@@ -13,6 +13,7 @@ Requirements:
 make
 g++
 OpenCV 3 
+ffmpeg or some other program to add sounds
 ```
 Build project:
 ```
