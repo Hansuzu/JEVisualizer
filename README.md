@@ -22,7 +22,8 @@ make all
 ## How to use
 Craete and edit config files on bin/ to make the visualizer do what you want and run bin/JEVisualizer .
 
-Run example 'simple'
+~~Run example 'simple'~~
+example had large files and I removed them to make this faster. TODO: modify example and make it work without large media files. ALSO: make the example actually "simple"
 ```
 ./JEVisualizer --config examples/simple/main.config
 ```
